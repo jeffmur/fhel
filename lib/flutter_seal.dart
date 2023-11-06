@@ -10,21 +10,14 @@ typedef HelloWorldFunc = Void Function();
 // Dart type definition for calling the C foreign function
 typedef HelloWorld = void Function();
 
-// class HelloWorldSEAL {
-//   void init() {
-//     var libraryPath =
-//       path.join(Directory.current.path, 'lib/hello_world/build', 'libhello.so');
+var libraryPath =
+    path.join(Directory.current.path, 'lib/hello_world/build', 'libhello.so');
 
-//   final dylib = DynamicLibrary.open(libraryPath);
+final dylib = DynamicLibrary.open(libraryPath);
 
-//   // Look up the C function 'hello_world'
-//   final HelloWorld hello =
-//       dylib.lookup<NativeFunction<HelloWorldFunc>>('hello_world').asFunction();
-//   }
-
-//   // Call the function
-//   hello();
-// }
+// Look up the C function 'hello_world'
+final HelloWorld hello =
+    dylib.lookup<NativeFunction<HelloWorldFunc>>('hello_world').asFunction();
 
 /// A Calculator.
 class Calculator {
