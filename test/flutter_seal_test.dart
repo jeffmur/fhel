@@ -10,7 +10,10 @@ void main() {
     expect(calculator.addOne(0), 1);
   });
 
-  test('hello_world', () {
-    hello(); // TODO: Validate return types
+  test('factorial', () {
+    final calculator = Calculator();
+    expect(calculator.factorial(1), 1);
+    expect(calculator.factorial(2), 2);
+    expect(calculator.factorial(3), 6);
   });
 }

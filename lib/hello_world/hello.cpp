@@ -9,7 +9,7 @@ using namespace seal;
 
 int main()
 {
-    hello_world();
+    factorial(10);
     return 0;
 }
 
@@ -22,4 +22,9 @@ void hello_world()
 {
     printf("Hello World!\n");
     printf("From C++, using C-interop via dart:ffi\n");
+}
+
+int factorial(int n) {
+    if (n==0) return 1;
+    return n * factorial(n - 1);
 }

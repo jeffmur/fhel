@@ -8,6 +8,9 @@ git config --global --add safe.directory $SEAL_SRC/linux/thirdparty/msgsl-src
 git config --global --add safe.directory $SEAL_SRC/linux/thirdparty/zlib-src
 git config --global --add safe.directory $SEAL_SRC/linux/thirdparty/zstd-src
 
+# Trust project
+git config --global --add safe.directory /workspaces/flutter_seal
+
 # C Build
 # cmake -S . -B linux -DSEAL_BUILD_SEAL_C=ON -DSEAL_BUILD_STATIC_SEAL_C=OFF
 

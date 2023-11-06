@@ -21,3 +21,5 @@
 #include <vector>
 
 extern "C" void hello_world();
+
+extern "C" int factorial(int n);

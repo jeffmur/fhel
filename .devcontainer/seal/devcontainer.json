@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/cpp
 {
-	"name": "Compile SEAL, support Dart + Flutter",
+	"name": "Microsoft SEAL",
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
@@ -25,7 +25,12 @@
 				"dart-code.flutter",
 				"ms-vscode.cpptools",
 				"ms-vscode.cpptools-extension-pack"
-			]
+			],
+			// Set zsh as shell
+			"settings": {
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "terminal.integrated.profiles.linux": { "zsh": { "path": "/bin/zsh" } }
+            }
 		}
 	},
 	
