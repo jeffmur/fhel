@@ -1,3 +1,6 @@
 [submodule "lib/SEAL"]
 	path = lib/SEAL
 	url = https://github.com/microsoft/SEAL
+[submodule "src/SEAL"]
+	path = src/SEAL
+	url = https://github.com/microsoft/SEAL

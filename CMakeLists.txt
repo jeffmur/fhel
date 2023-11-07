@@ -5,14 +5,11 @@ Project-level CMake, useful for debugging
 ]]
 cmake_minimum_required(VERSION 3.13)
 
-project(FLUTTER_SEAL VERSION 1.0.0 LANGUAGES CXX)
+project(Flutter_SEAL VERSION 1.0.0 LANGUAGES CXX)
 
-find_package(SEAL 4.1 REQUIRED)
+# libAlseal.so
+# Add source files to library and header files to install
+add_subdirectory(src/Afhel)
 
-# hello_world executable
-add_executable(hello_world lib/hello_world/hello.cpp)
-target_link_libraries(hello_world PRIVATE SEAL::seal_shared)
-
-target_sources(hello_world PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/lib/hello_world/hello.cpp
-)
+# Add test files
+add_subdirectory(test/Afhel)
