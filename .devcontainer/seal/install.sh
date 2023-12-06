@@ -1,7 +1,9 @@
 #/bin/bash
 
-export SEAL_SRC=/workspaces/flutter_seal/lib
-export SEAL_INSTALL_DIR="/tmp/seal"
+PROJECT_ROOT=${1:-"/workspaces/dart-fhe"}
+
+SEAL_SRC=$PROJECT_ROOT/lib
+SEAL_INSTALL_DIR=${2:-"/tmp/seal"}
 
 # Allow thirdparty libraries from git
 git config --global --add safe.directory $SEAL_SRC/linux/thirdparty/msgsl-src
@@ -9,7 +11,7 @@ git config --global --add safe.directory $SEAL_SRC/linux/thirdparty/zlib-src
 git config --global --add safe.directory $SEAL_SRC/linux/thirdparty/zstd-src
 
 # Trust project
-git config --global --add safe.directory /workspaces/flutter_seal
+git config --global --add safe.directory $PROJECT_ROOT
 
 # C Build
 # cmake -S . -B linux -DSEAL_BUILD_SEAL_C=ON -DSEAL_BUILD_STATIC_SEAL_C=OFF
