@@ -1,9 +1,9 @@
-name: SEAL 🧪
+name: Hello World 🧪
 
 on: [push]
 
 env:
-  IMAGE_NAME: ghcr.io/jeffmur/dart-fhe/seal
+  IMAGE_NAME: ghcr.io/jeffmur/dart-fhe/hello-world
 
 jobs:
   build:
@@ -16,9 +16,9 @@ jobs:
     ## WORKAROUND ##
     # https://github.com/devcontainers/ci/issues/212
 
-    - name: Workaround - Copy seal devcontainer
+    - name: Workaround - Copy devcontainer
       run: |
-        cp .devcontainer/seal/* .devcontainer/
+        cp .devcontainer/hello-world/* .devcontainer/
     
     - name: Pre-build dev container image
       uses: devcontainers/ci@v0.3
