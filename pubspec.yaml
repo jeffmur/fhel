@@ -1,5 +1,5 @@
-name: flutter_seal
-description: A new Flutter package project.
+name: fhe
+description: Dart library for Fully Homomorphic Encryption
 version: 0.0.1
 homepage:
 

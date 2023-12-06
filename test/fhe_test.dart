@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_seal/flutter_seal.dart';
+import 'package:fhe/fhe.dart' show Calculator;
 
 void main() {
   test('adds one to input values', () {

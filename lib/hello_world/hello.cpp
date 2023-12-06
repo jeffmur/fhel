@@ -3,13 +3,16 @@
 // BSD-style license that can be found in the LICENSE file.
 
 #include "hello.h"
+#include <iostream>
 
 using namespace std;
 using namespace seal;
 
 int main()
 {
-    factorial(10);
+    hello_world();
+    int result = (factorial(10));
+    std::cout << "Factorial of 10 is: " << result << std::endl;
     return 0;
 }
 

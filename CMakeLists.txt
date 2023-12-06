@@ -5,7 +5,7 @@ Project-level CMake, useful for debugging
 ]]
 cmake_minimum_required(VERSION 3.13)
 
-project(FLUTTER_SEAL VERSION 1.0.0 LANGUAGES CXX)
+project(FHE VERSION 1.0.0 LANGUAGES CXX)
 
 find_package(SEAL 4.1 REQUIRED)
 

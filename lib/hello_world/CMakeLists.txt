@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-project(P2P VERSION 1.0.0 LANGUAGES CXX)
+project(HELLO_WORLD VERSION 1.0.0 LANGUAGES CXX)
 
 find_package(SEAL 4.1 REQUIRED)
 
@@ -16,7 +16,6 @@ set_target_properties(hello PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 1
     OUTPUT_NAME "hello"
-    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Hex_Identity_ID_Goes_Here"
 )
 
 # hello_world executable

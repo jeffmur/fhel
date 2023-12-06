@@ -1,4 +1,4 @@
-library flutter_seal;
+library fhe;
 
 import 'dart:ffi';
 import 'dart:io' show Directory;
@@ -11,6 +11,7 @@ typedef FactorialFunc = Int Function(Int);
 typedef Factorial = int Function(int);
 
 var libraryPath =
+    // from project root
     path.join(Directory.current.path, 'lib/hello_world/build', 'libhello.so');
 
 final dylib = DynamicLibrary.open(libraryPath);
