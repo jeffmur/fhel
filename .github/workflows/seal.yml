@@ -1,6 +1,6 @@
 name: SEAL 🧪
 
-on: [push, pull_request]
+on: [push]
 
 env:
   IMAGE_NAME: ghcr.io/jeffmur/dart-fhe/seal
@@ -23,13 +23,13 @@ jobs:
     - name: Pre-build dev container image
       uses: devcontainers/ci@v0.3
       with:
-        imageName: $IMAGE_NAME
-        cacheFrom: $IMAGE_NAME
+        imageName: ${IMAGE_NAME}
+        cacheFrom: ${IMAGE_NAME}
         push: always
 
     - name: Run make ci-build in dev container
       uses: devcontainers/ci@v0.3
       with:
-        cacheFrom: $IMAGE_NAME
+        cacheFrom: ${IMAGE_NAME}
         push: never
         runCmd: dart test test/fhe_test.dart
