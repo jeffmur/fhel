@@ -24,3 +24,11 @@ cmake --build $SEAL_INSTALL_DIR
 
 # Install SEAL to $INSTALL
 sudo cmake --install $SEAL_INSTALL_DIR
+
+# Hello World Build
+
+cd $PROJECT_ROOT/lib/hello_world
+
+# C++ Build to hello_world/build
+cmake -S . -B build
+cmake --build build

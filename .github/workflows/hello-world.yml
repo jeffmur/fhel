@@ -4,7 +4,7 @@ on: [push]
 
 env:
   TAG: ${{ github.sha }}
-  IMAGE: ghcr.io/jeffmur/dart-fhe/hello-world
+  IMAGE: ghcr.io/jeffmur/dart-fhe/seal
 
 jobs:
   build:
@@ -16,13 +16,9 @@ jobs:
 
     ## LIMITATION ##
     # https://github.com/devcontainers/ci/issues/212
-
-    - name: Workaround - Copy contents of devcontainer
-      run: |
-        cp .devcontainer/hello-world/* .
     
     - name: Build Docker image
-      run: docker build -t ${{ env.IMAGE }}:${{ env.TAG }} .devcontainer/hello-world/
+      run: docker build -t ${{ env.IMAGE }}:${{ env.TAG }} .devcontainer/seal/
 
     - name: Run install.sh command
-      run: docker run --rm ${{ env.IMAGE }}:${{ env.TAG }} /bin/bash -c "./install.sh"
+      run: docker run --rm -v ${{ github.workspace }}/.devcontainer/seal:/app ${{ env.IMAGE }}:${{ env.TAG }} /bin/bash -c "/app/install.sh"
