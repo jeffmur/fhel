@@ -3,7 +3,8 @@ name: Hello World 🧪
 on: [push]
 
 env:
-  IMAGE_NAME: ghcr.io/jeffmur/dart-fhe/hello-world
+  TAG: ${{ github.sha }}
+  IMAGE: ghcr.io/jeffmur/dart-fhe/hello-world
 
 jobs:
   build:
@@ -13,23 +14,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    ## WORKAROUND ##
+    ## LIMITATION ##
     # https://github.com/devcontainers/ci/issues/212
 
-    - name: Workaround - Copy seal devcontainer
+    - name: Workaround - Copy contents of devcontainer
       run: |
-        cp .devcontainer/hello-world/* .devcontainer/
+        cp .devcontainer/hello-world/* .
     
-    # - name: Pre-build dev container image
-    #   uses: devcontainers/ci@v0.3.1900000338
-    #   with:
-    #     imageName: ${{ env.IMAGE_NAME }}
-    #     cacheFrom: ${{ env.IMAGE_NAME }}
-    #     push: always
+    - name: Build Docker image
+      run: docker build -t ${{ env.IMAGE }}:${{ env.TAG }} .devcontainer/hello-world/
 
-    - name: Run make ci-build in dev container
-      uses: devcontainers/ci@v0.3.1900000338
-      with:
-        cacheFrom: ${{ env.IMAGE_NAME }}
-        push: never
-        runCmd: dart test test/fhe_test.dart
+    - name: Run install.sh command
+      run: docker run --rm ${{ env.IMAGE }}:${{ env.TAG }} /bin/bash -c "./install.sh"
