@@ -18,8 +18,7 @@ jobs:
 
     - name: Workaround - Copy seal devcontainer
       run: |
-        cp .devcontainer/seal/devcontainer.json .devcontainer/devcontainer.json
-        cp .devcontainer/seal/Dockerfile .devcontainer/Dockerfile
+        cp .devcontainer/seal/* .devcontainer/
     
     - name: Pre-build dev container image
       uses: devcontainers/ci@v0.3
