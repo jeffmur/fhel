@@ -15,6 +15,7 @@ jobs:
 
     ## WORKAROUND ##
     # https://github.com/devcontainers/ci/issues/212
+
     - name: Workaround - Copy seal devcontainer
       run: |
         cp .devcontainer/seal/devcontainer.json .devcontainer/devcontainer.json
@@ -23,13 +24,13 @@ jobs:
     - name: Pre-build dev container image
       uses: devcontainers/ci@v0.3
       with:
-        imageName: ${IMAGE_NAME}
-        cacheFrom: ${IMAGE_NAME}
+        imageName: ${{ env.IMAGE_NAME }}
+        cacheFrom: ${{ env.IMAGE_NAME }}
         push: always
 
     - name: Run make ci-build in dev container
       uses: devcontainers/ci@v0.3
       with:
-        cacheFrom: ${IMAGE_NAME}
+        cacheFrom: ${{ env.IMAGE_NAME }}
         push: never
         runCmd: dart test test/fhe_test.dart
