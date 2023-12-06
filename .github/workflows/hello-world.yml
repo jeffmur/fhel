@@ -13,7 +13,23 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Run Tests 
-      uses: devcontainers/action@v1
+    ## WORKAROUND ##
+    # https://github.com/devcontainers/ci/issues/212
+
+    - name: Workaround - Copy seal devcontainer
+      run: |
+        cp .devcontainer/hello-world/* .devcontainer/
+    
+    # - name: Pre-build dev container image
+    #   uses: devcontainers/ci@v0.3.1900000338
+    #   with:
+    #     imageName: ${{ env.IMAGE_NAME }}
+    #     cacheFrom: ${{ env.IMAGE_NAME }}
+    #     push: always
+
+    - name: Run make ci-build in dev container
+      uses: devcontainers/ci@v0.3.1900000338
       with:
-        run: dart test test/fhe_test.dart
+        cacheFrom: ${{ env.IMAGE_NAME }}
+        push: never
+        runCmd: dart test test/fhe_test.dart
