@@ -12,7 +12,7 @@ typedef Factorial = int Function(int);
 
 var libraryPath =
     // from project root
-    path.join(Directory.current.path, 'lib/hello_world/build', 'libhello.so');
+    path.join(Directory.current.path, 'src/backend/hello_world/build', 'libhello.so');
 
 final dylib = DynamicLibrary.open(libraryPath);
 

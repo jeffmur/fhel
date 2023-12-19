@@ -27,7 +27,6 @@ migrate_working_dir/
 **/doc/api/
 .dart_tool/
 .packages
-build/
 
-# SEAL
-lib/linux/
+# Library Compilation
+build/

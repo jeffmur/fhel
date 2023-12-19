@@ -10,9 +10,9 @@ project(FHE VERSION 1.0.0 LANGUAGES CXX)
 find_package(SEAL 4.1 REQUIRED)
 
 # hello_world executable
-add_executable(hello_world lib/hello_world/hello.cpp)
+add_executable(hello_world src/backend/hello_world/hello.cpp)
 target_link_libraries(hello_world PRIVATE SEAL::seal_shared)
 
 target_sources(hello_world PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/lib/hello_world/hello.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/backend/hello_world/hello.cpp
 )
