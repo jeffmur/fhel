@@ -1,4 +1,3 @@
-
 [submodule "src/backend/seal"]
 	path = src/backend/seal
 	url = https://github.com/microsoft/SEAL
