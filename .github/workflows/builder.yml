@@ -1,0 +1,62 @@
+name: Builder Image 🧰
+
+on:
+  push:
+    branches:
+      - 'main'
+
+permissions:
+  packages: write
+
+jobs:
+  preview:
+    name: Preview 👁️
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Unit Tests 🧪
+        uses: docker://ghcr.io/jeffmur/fhel:builder
+        with:
+          args: make test-dart-ci
+
+  deploy:
+    name: Push 📤
+    runs-on: ubuntu-latest
+    environment:
+      name: build
+      url: 'https://ghcr.io/jeffmur/fhel:builder'
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx 🧰
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to GitHub Container Registry 🔒
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Image 🐳
+      uses: docker/build-push-action@v5
+      with:
+        push: true
+        tags: ghcr.io/jeffmur/fhel:builder
+        file: Builder.Dockerfile
+
+  stable:
+    name: Stable 🏁
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Unit Tests 🧪
+        uses: docker://ghcr.io/jeffmur/fhel:builder
+        with:
+          args: make test-dart-ci

@@ -11,8 +11,8 @@ typedef FactorialFunc = Int Function(Int);
 typedef Factorial = int Function(int);
 
 var libraryPath =
-    // from project root
-    path.join(Directory.current.path, 'src/backend/hello_world/build', 'libhello.so');
+    // from project root (parent of dart folder)
+    path.join(Directory.current.parent.path, 'build', 'libhello.so');
 
 final dylib = DynamicLibrary.open(libraryPath);
 
