@@ -1,0 +1,24 @@
+name: Hello World 🧪
+
+on: [push]
+
+env:
+  TAG: ${{ github.sha }}
+  IMAGE: ghcr.io/jeffmur/dart-fhe/seal
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Pre-build image and run make ci-build in dev container
+      uses: devcontainers/ci@v0.3
+      with:
+        imageName: ghcr.io/jeffmur/fhel:hello-world
+        cacheFrom: ghcr.io/jeffmur/fhel:hello-world
+        configFile: ./devcontainer/hello-world/devcontainer.json
+        push: always
+        runCmd: cd dart && dart pub get && dart test test/fhe_test.dart
