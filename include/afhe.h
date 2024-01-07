@@ -94,8 +94,8 @@ public:
       uint64_t plain_modulus_bit_size, uint64_t plain_modulus,
       int sec_level, vector<int> qi_sizes = {}, vector<uint64_t> qi_mods = {}) = 0;
 
-  virtual std::vector<std::uint64_t> get_qi() = 0;
-  virtual std::uint64_t get_plain_modulus() = 0;
+  virtual vector<uint64_t> get_qi() = 0;
+  virtual uint64_t get_plain_modulus() = 0;
   virtual size_t get_poly_modulus_degree() = 0;
   virtual scheme_t get_scheme() = 0;
 
@@ -105,6 +105,7 @@ public:
   virtual size_t sizeof_ciphertext(std::string &compr_mode, ACipherTxt &ct) = 0;
 
   // ------------------ Cryptography ------------------
+
   /**
    * @brief Encrypts a plaintext message into a ciphertext.
    *
@@ -138,6 +139,7 @@ public:
   virtual void decrypt_v(vector<shared_ptr<ACipherTxt>> &ctxts, vector<shared_ptr<APlainTxt>> &ptxts) = 0;
 
   // ------------------ Codec ------------------
+  
   /**
    * @brief Encodes a vector of integers into a plaintext message.
    *        Used by BGV and BFV schemes.

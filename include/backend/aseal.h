@@ -149,6 +149,7 @@ public:
     int sec = 128, vector<int> qi_sizes = {}, vector<uint64_t> qi_values = {});
 
   // ------------------ Cryptography ------------------
+  
   void encrypt(APlainTxt &ptxt, ACipherTxt &ctxt);
   void encrypt_v(vector<shared_ptr<APlainTxt>> &ptxts, vector<shared_ptr<ACipherTxt>> &ctxts);
 
