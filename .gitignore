@@ -30,3 +30,6 @@ migrate_working_dir/
 
 # Library Compilation
 build/
+
+# Testing
+examples/hello_seal
