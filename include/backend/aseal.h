@@ -146,10 +146,10 @@ public:
   string ContextGen(
     scheme_t scheme, uint64_t poly_modulus_degree = 1024,
     uint64_t plain_modulus_bit_size = 0, uint64_t plain_modulus = 0,
-    int sec = 128, vector<int> qi_sizes = {}, vector<uint64_t> qi_values = {});
+    int sec_level = 128, vector<int> qi_sizes = {}, vector<uint64_t> qi_values = {});
 
   // ------------------ Cryptography ------------------
-  
+
   void encrypt(APlainTxt &ptxt, ACipherTxt &ctxt);
   void encrypt_v(vector<shared_ptr<APlainTxt>> &ptxts, vector<shared_ptr<ACipherTxt>> &ctxts);
 

@@ -15,3 +15,29 @@ using namespace std;
 using namespace seal;
 
 // https://github.com/ibarrond/Pyfhel/blob/master/Pyfhel/Afhel/Afseal.cpp
+
+/**
+ * @brief Default Constructor
+*/
+Aseal::Aseal(){};
+
+Aseal::Aseal(const Aseal &other){
+  this->context = make_shared<KeyGenerator>(*context);
+  // TODO: Copy other parameters
+};
+
+/**
+ * @brief Deconstructor
+*/
+Aseal::~Aseal(){};
+
+string Aseal::ContextGen(scheme_t scheme,
+                         uint64_t poly_modulus_degree,
+                         uint64_t plain_modulus_bit_size,
+                         uint64_t plain_modulus,
+                         int sec_level,
+                         vector<int> qi_sizes,
+                         vector<uint64_t> qi_values)
+{
+
+}
