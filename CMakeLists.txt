@@ -5,25 +5,35 @@ Project-level CMake, useful for debugging
 ]]
 cmake_minimum_required(VERSION 3.13)
 
-project(HELLO_WORLD VERSION 1.0.0 LANGUAGES CXX)
+project(fhel VERSION 1.0.0 LANGUAGES CXX)
 
+# Import Backend Library
 find_package(SEAL 4.1 REQUIRED)
 
-# libhello.so
-add_library(hello SHARED examples/hello_world/hello.cpp examples/hello_world/hello.def)
-target_link_libraries(hello PRIVATE SEAL::seal_shared)
-
-set_target_properties(hello PROPERTIES
-    PUBLIC_HEADER examples/hello_world/hello.h
-    VERSION ${PROJECT_VERSION}
-    SOVERSION 1
-    OUTPUT_NAME "hello"
+# Include header files
+include_directories(
+    ${CMAKE_CURRENT_LIST_DIR}/include
+    ${CMAKE_CURRENT_LIST_DIR}/include/backend
 )
 
-# hello_world executable
-add_executable(hello_world examples/hello_world/hello.cpp)
-target_link_libraries(hello_world PRIVATE SEAL::seal_shared)
+# libafhe.so
+add_library(fhel SHARED
+    ${CMAKE_CURRENT_LIST_DIR}/src/backend/aseal.cpp
+)
 
-target_sources(hello_world PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/examples/hello_world/hello.cpp
+target_link_libraries(fhel PRIVATE SEAL::seal_shared)
+
+set_target_properties(fhel PROPERTIES
+    PUBLIC_HEADER include/afhe.h
+    VERSION ${PROJECT_VERSION}
+    SOVERSION 1
+    OUTPUT_NAME "fhel"
+)
+
+# demo fhel executable
+add_executable(fhel_demo examples/demo_fhel/bfv.cpp)
+target_link_libraries(fhel_demo SEAL::seal_shared)
+
+target_sources(fhel_demo PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/src/backend/aseal.cpp
 )

@@ -95,8 +95,16 @@ public:
  */
 class Aseal : public Afhe {
 private:
-  shared_ptr<seal::SEALContext> context; /**< Pointer to the SEAL context object. */
+  shared_ptr<seal::SEALContext> context;     /**< Pointer to the SEAL context object. */
   shared_ptr<seal::BatchEncoder> bfvEncoder; /**< Pointer to the BatchEncoder object. */
+
+  shared_ptr<seal::KeyGenerator> keyGenObj;  /** Key generator.*/
+  shared_ptr<seal::SecretKey> secretKey;     /** Secret key.*/
+  shared_ptr<seal::PublicKey> publicKey;     /** Public key.*/
+
+  shared_ptr<seal::Encryptor> encryptor;     /** Requires a Public Key.*/
+  shared_ptr<seal::Evaluator> evaluator;     /** Requires a context.*/
+  shared_ptr<seal::Decryptor> decryptor;     /** Requires a Secret Key.*/
 
 public:
   vector<uint64_t> qi; /**< Vector of uint64_t values. */
@@ -104,7 +112,7 @@ public:
   /**
    * @brief Default constructor for the Aseal class.
    */
-  Aseal();
+  Aseal(){};
 
   /**
    * @brief Copy constructor for the Aseal class.
@@ -146,7 +154,23 @@ public:
   string ContextGen(
     scheme_t scheme, uint64_t poly_modulus_degree = 1024,
     uint64_t plain_modulus_bit_size = 0, uint64_t plain_modulus = 0,
-    int sec_level = 128, vector<int> qi_sizes = {}, vector<uint64_t> qi_values = {});
+    int sec_level = 128, vector<int> qi_sizes = {}, vector<uint64_t> qi_values = {}) override;
+
+  /**
+   * @return A pointer to the SEAL context object.
+   * @throws std::logic_error if the context is not initialized.
+  */
+  inline shared_ptr<SEALContext> get_context();
+
+  // ------------------ Keys ------------------
+
+  /**
+   * @brief Generates a public and secret key pair.
+  */
+  void KeyGen() override;
+
+  void setPublicKey(seal::PublicKey &pubKey) { this->publicKey = make_shared<seal::PublicKey>(pubKey); }
+  void setSecretKey(seal::SecretKey &secKey) { this->secretKey = make_shared<seal::SecretKey>(secKey); }
 
   // ------------------ Cryptography ------------------
 
