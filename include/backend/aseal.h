@@ -94,6 +94,7 @@ public:
 inline AsealCiphertext& _to_ciphertext(ACiphertext& c){
   return dynamic_cast<AsealCiphertext&>(c);
 };
+
 inline AsealPlaintext& _to_plaintext(APlaintext& p){
   return dynamic_cast<AsealPlaintext&>(p);
 };
@@ -187,8 +188,12 @@ public:
   void encrypt(APlaintext &ptxt, ACiphertext &ctxt) override;
   void encrypt_v(vector<shared_ptr<APlaintext>> &ptxts, vector<shared_ptr<ACiphertext>> &ctxts);
 
-  void decrypt(ACiphertext &ctxt, APlaintext &ptxt);
+  void decrypt(ACiphertext &ctxt, APlaintext &ptxt) override;
   void decrypt_v(vector<shared_ptr<ACiphertext>> &ctxts, vector<shared_ptr<APlaintext>> &ptxts);
+
+  // ------------------ Arithmetic ------------------
+
+  void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
 };
 
 #endif /* ASEAL_H */

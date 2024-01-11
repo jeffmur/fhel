@@ -49,7 +49,6 @@ string Aseal::ContextGen(scheme_t scheme,
 
     // Set plaintext modulus
     param.set_plain_modulus(plain_modulus);
-
   }
 
   // Validate parameters by putting them inside a SEALContext
@@ -102,4 +101,28 @@ void Aseal::encrypt(APlaintext &ptxt, ACiphertext &ctxt)
 
   // Encrypt using casted types
   this->encryptor->encrypt(_to_plaintext(ptxt), _to_ciphertext(ctxt));
+}
+
+void Aseal::decrypt(ACiphertext &ctxt, APlaintext &ptxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Decryptor object
+  this->decryptor = make_shared<Decryptor>(seal_context, *this->secretKey);
+
+  // Decrypt using casted types
+  this->decryptor->decrypt(_to_ciphertext(ctxt), _to_plaintext(ptxt));
+}
+
+void Aseal::add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Add using casted types
+  this->evaluator->add(_to_ciphertext(ctxt1), _to_ciphertext(ctxt2), _to_ciphertext(ctxt_res));
 }

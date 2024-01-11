@@ -26,20 +26,28 @@ int main(int argc, char **argv)
   // Addition
   AsealPlaintext pt_x("1");
   AsealPlaintext pt_add("2");
-  cout << "Plaintext Addition " << pt_x.to_string() << " + " << pt_add.to_string() << endl;
+  AsealPlaintext pt_res;
+
   AsealCiphertext ct_x;
   AsealCiphertext ct_add;
+  AsealCiphertext ct_res;
 
-  // Sum
+  cout << "Plaintext Addition " << pt_x.to_string() << " + " << pt_add.to_string() << endl;
+
+  // Encryption
   he->encrypt(pt_x, ct_x);
   cout << "Ciphertext ct_x size of freshly encrypted x: " << ct_x.size() << endl;
 
   he->encrypt(pt_add, ct_add);
   cout << "Ciphertext ct_add size of freshly encrypted add: " << ct_add.size() << endl;
 
-  // he.add(k1, k2);
-  // vector<long> vRes = he.decrypt(k1);
+  // Addition
+  he->add(ct_x, ct_add, ct_res);
+  cout << "Ciphertext ct_res size of result: " << ct_res.size() << endl;
 
+  // Decryption
+  he->decrypt(ct_res, pt_res);
+  cout << "Decrypted result: " << pt_res.to_string() << endl;
 
   // vector<long> v1;
   // vector<long> v2;

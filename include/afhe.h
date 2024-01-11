@@ -65,6 +65,18 @@ static map<std::string, backend_t> backend_t_map{
  * @brief Abstract Fully Homomorphic Encryption (AFHE) class.
  */
 class Afhe
+/**
+ * @file afhe.h
+ * @brief This file contains the declaration of the Afhe class, which represents a Fully Homomorphic Encryption (FHE) scheme.
+ */
+
+/**
+ * @class Afhe
+ * @brief The Afhe class represents a Fully Homomorphic Encryption (FHE) scheme.
+ *
+ * This class provides methods for generating a context, managing keys, performing encryption and decryption operations,
+ * encoding and decoding data, and performing arithmetic operations on ciphertexts.
+ */
 {
 public:
   // FHE Backend
@@ -137,7 +149,7 @@ public:
    * @param ctxt The ciphertext to be decrypted.
    * @param ptxt The plaintext message where the decrypted message will be stored.
    */
-  // virtual void decrypt(ACipherTxt &ctxt, APlainTxt &ptxt) = 0;
+  virtual void decrypt(ACiphertext &ctxt, APlaintext &ptxt) = 0;
 
   /**
    * @brief Decrypts a vector of ciphertexts into a vector of plaintext messages.
@@ -204,7 +216,18 @@ public:
   // virtual void decode_complex(APlainTxt &ptxt, vector<complex<double>> &data) = 0;
 
   // ------------------ Arithmetic ------------------
-  // Add, Subtract, Multiply, Divide
+
+  /**
+   * @brief Adds two ciphertexts and stores the result in another ciphertext.
+   *
+   * This function performs the addition operation on two ciphertexts and stores the result in a third ciphertext.
+   *
+   * @param ctxt1 The first ciphertext to be added.
+   * @param ctxt2 The second ciphertext to be added.
+   * @param ctxt_res The ciphertext where the result will be stored.
+   */
+  virtual void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) = 0;
+
 };
 
 /**
