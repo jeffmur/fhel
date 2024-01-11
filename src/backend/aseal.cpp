@@ -91,3 +91,15 @@ void Aseal::KeyGen()
   // Refresh Encryptor, Evaluator, and Decryptor objects
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
 }
+
+void Aseal::encrypt(APlaintext &ptxt, ACiphertext &ctxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Encryptor object
+  this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
+
+  // Encrypt using casted types
+  this->encryptor->encrypt(_to_plaintext(ptxt), _to_ciphertext(ctxt));
+}

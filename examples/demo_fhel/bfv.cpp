@@ -23,17 +23,28 @@ int main(int argc, char **argv)
   he->KeyGen();
   cout << "Keys generated" << endl;
 
-
-  vector<long> v1;
-  vector<long> v2;
-  for(int i=0; i < VECTOR_SIZE; i++){ v1.push_back(i); };
-  for(int i=0; i < VECTOR_SIZE; i++){ v2.push_back(2); };
+  // Addition
+  AsealPlaintext pt_x("1");
+  AsealPlaintext pt_add("2");
+  cout << "Plaintext Addition " << pt_x.to_string() << " + " << pt_add.to_string() << endl;
+  AsealCiphertext ct_x;
+  AsealCiphertext ct_add;
 
   // Sum
-  // string k1 = he->encrypt(v1);
-  // string k2 = he->encrypt(v2);
+  he->encrypt(pt_x, ct_x);
+  cout << "Ciphertext ct_x size of freshly encrypted x: " << ct_x.size() << endl;
+
+  he->encrypt(pt_add, ct_add);
+  cout << "Ciphertext ct_add size of freshly encrypted add: " << ct_add.size() << endl;
+
   // he.add(k1, k2);
   // vector<long> vRes = he.decrypt(k1);
+
+
+  // vector<long> v1;
+  // vector<long> v2;
+  // for(int i=0; i < VECTOR_SIZE; i++){ v1.push_back(i); };
+  // for(int i=0; i < VECTOR_SIZE; i++){ v2.push_back(2); };
 
   // // Multiplication
   // k1 = he.encrypt(v1);

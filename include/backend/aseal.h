@@ -30,8 +30,8 @@ using namespace std;
 using namespace seal;
 
 // Forward Declaration
-class AsealCtxt;
-class AsealPtxt;
+class AsealCiphertext;
+class AsealPlaintext;
 class Aseal;
 class AsealPoly;
 
@@ -75,19 +75,27 @@ static map<int, sec_level_type> sec_map {
 /**
  * @brief Abstraction for Plaintext
  */
-class AsealPtxt : public APlainTxt, public seal::Plaintext {
+class AsealPlaintext : public APlaintext, public seal::Plaintext {
 public:
   using seal::Plaintext::Plaintext;
-  virtual ~AsealPtxt() = default;
+  virtual ~AsealPlaintext() = default;
 };
 
 /**
  * @brief Abstraction for Ciphertext
  */
-class AsealCtxt : public ACipherTxt, public seal::Ciphertext {
+class AsealCiphertext : public ACiphertext, public seal::Ciphertext {
 public:
   using seal::Ciphertext::Ciphertext;
-  virtual ~AsealCtxt() = default;
+  virtual ~AsealCiphertext() = default;
+};
+
+// DYNAMIC CASTING
+inline AsealCiphertext& _to_ciphertext(ACiphertext& c){
+  return dynamic_cast<AsealCiphertext&>(c);
+};
+inline AsealPlaintext& _to_plaintext(APlaintext& p){
+  return dynamic_cast<AsealPlaintext&>(p);
 };
 
 /**
@@ -105,6 +113,8 @@ private:
   shared_ptr<seal::Encryptor> encryptor;     /** Requires a Public Key.*/
   shared_ptr<seal::Evaluator> evaluator;     /** Requires a context.*/
   shared_ptr<seal::Decryptor> decryptor;     /** Requires a Secret Key.*/
+
+  shared_ptr<seal::Ciphertext> ciphertext;   /** Ciphertext.*/
 
 public:
   vector<uint64_t> qi; /**< Vector of uint64_t values. */
@@ -174,11 +184,11 @@ public:
 
   // ------------------ Cryptography ------------------
 
-  void encrypt(APlainTxt &ptxt, ACipherTxt &ctxt);
-  void encrypt_v(vector<shared_ptr<APlainTxt>> &ptxts, vector<shared_ptr<ACipherTxt>> &ctxts);
+  void encrypt(APlaintext &ptxt, ACiphertext &ctxt) override;
+  void encrypt_v(vector<shared_ptr<APlaintext>> &ptxts, vector<shared_ptr<ACiphertext>> &ctxts);
 
-  void decrypt(ACipherTxt &ctxt, APlainTxt &ptxt);
-  void decrypt_v(vector<shared_ptr<ACipherTxt>> &ctxts, vector<shared_ptr<APlainTxt>> &ptxts);
+  void decrypt(ACiphertext &ctxt, APlaintext &ptxt);
+  void decrypt_v(vector<shared_ptr<ACiphertext>> &ctxts, vector<shared_ptr<APlaintext>> &ptxts);
 };
 
 #endif /* ASEAL_H */

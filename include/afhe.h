@@ -13,9 +13,9 @@
 #include <map>    /* map */
 
 // Forward Declarations
-class ACipherTxt; /* Ciphertext */
-class APlainTxt;  /* Plaintext */
-class Afhe;       /* Abstract Class*/
+class ACiphertext; /* Ciphertext */
+class APlaintext;  /* Plaintext */
+class Afhe;        /* Abstract Class */
 
 using namespace std;
 
@@ -121,7 +121,7 @@ public:
    * @param ptxt The plaintext message to be encrypted.
    * @param ctxt The ciphertext where the encrypted message will be stored.
    */
-  // virtual void encrypt(APlainTxt &ptxt, ACipherTxt &ctxt) = 0;
+  virtual void encrypt(APlaintext &ptxt, ACiphertext &ctxt) = 0;
 
   /**
    * @brief Encrypts a vector of plaintext messages into a vector of ciphertexts.
@@ -210,17 +210,17 @@ public:
 /**
  * @brief Abstraction for Plaintexts.
  */
-class APlainTxt{
+class APlaintext {
 public:
-  virtual ~APlainTxt(){};
+  virtual ~APlaintext() = default;
 };
 
 /**
  * @brief Abstraction for Ciphertexts.
  */
-class ACipherTxt{
+class ACiphertext{
 public:
-  virtual ~ACipherTxt(){};
+  virtual ~ACiphertext() = default;
 };
 
 // Include Backend Libraries
