@@ -9,10 +9,6 @@
 */
 #include <afhe.h>
 
-#include <cassert>
-#include <cstdio>
-#define VECTOR_SIZE 5
-
 using namespace std;
 
 int main(int argc, char **argv)
