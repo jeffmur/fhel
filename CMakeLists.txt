@@ -31,7 +31,7 @@ set_target_properties(fhel PROPERTIES
 )
 
 # demo fhel executable
-add_executable(fhel_demo examples/demo_fhel/bfv.cpp)
+add_executable(fhel_demo examples/demo_fhel/addition.cpp)
 target_link_libraries(fhel_demo SEAL::seal_shared)
 
 target_sources(fhel_demo PRIVATE
