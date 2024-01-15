@@ -9,6 +9,7 @@
 #ifndef AFHE_H
 #define AFHE_H
 
+#include <vector> /* Vectorizing all operations */
 #include <string> /* string class */
 #include <map>    /* map */
 
