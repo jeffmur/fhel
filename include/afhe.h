@@ -9,9 +9,7 @@
 #ifndef AFHE_H
 #define AFHE_H
 
-#include <vector> /* Vectorizing all operations */
 #include <string> /* string class */
-#include <map>    /* map */
 
 // Forward Declarations
 class ACiphertext; /* Ciphertext */
@@ -37,31 +35,6 @@ enum class scheme_t : int
   bgv = 0x3,
 };
 
-// ------------------ Libraries ------------------
-/**
- * @brief Enum for the backend library type.
- * @return Integer representing the backend library type.
- */
-enum class backend_t : int
-{
-  // No library set; cannot be used for encryption
-  none = 0x0,
-  // Microsoft SEAL
-  seal = 0x1,
-  // OpenFHE
-  openfhe = 0x2,
-};
-static map<backend_t, std::string> backend_t_str{
-    {backend_t::none, "none"},
-    {backend_t::seal, "seal"},
-    {backend_t::openfhe, "openfhe"},
-};
-static map<std::string, backend_t> backend_t_map{
-    {"none", backend_t::none},
-    {"seal", backend_t::seal},
-    {"openfhe", backend_t::openfhe},
-};
-
 /**
  * @brief Abstract Fully Homomorphic Encryption (AFHE) class.
  */
@@ -80,14 +53,9 @@ class Afhe
  */
 {
 public:
-  // FHE Backend
-  backend_t backend;
-
-  // Factory function to create Afhe objects
-  // virtual Afhe(backend_t backend);
-
   // Class Management
   Afhe(){};
+  // Destructor
   virtual ~Afhe(){};
 
   // ------------------ Parameters ------------------
@@ -104,7 +72,7 @@ public:
    * @param qi_sizes (optional) A vector of sizes for each modulus in the modulus chain.
    * @param qi_mods (optional) A vector of specific moduli for the modulus chain.
    *
-   * @return A string representing the generated context.
+   * @return A string representing the status of generated context.
    */
   virtual string ContextGen(
       scheme_t scheme, uint64_t poly_modulus_degree,
@@ -246,8 +214,5 @@ class ACiphertext{
 public:
   virtual ~ACiphertext() = default;
 };
-
-// Include Backend Libraries
-#include "aseal.h"
 
 #endif /* AFHE_H */

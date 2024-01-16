@@ -7,13 +7,13 @@
  * ------------------------------------------------------------------
  * @author Jeffrey Murray Jr
 */
-#include <afhe.h>
+#include <fhe.h>
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
-  Afhe* he = new Aseal();
+  Afhe* he = get_backend(backend_t::seal);
 
   /* Parameters */
   long poly_mod_degree = 4096;

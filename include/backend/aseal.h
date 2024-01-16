@@ -149,19 +149,7 @@ public:
    */
   virtual ~Aseal();
 
-  /**
-   * @brief Generates a context for the Fully Homomorphic Encryption (FHE) scheme.
-   *
-   * The context contains all the public parameters needed for the encryption and decryption processes.
-   *
-   * @param scheme The encryption scheme to be used.
-   * @param poly_modulus_degree (optional) The degree of the polynomial modulus, which determines the size and performance of the FHE operations.
-   * @param plain_modulus_bit_size (optional) The bit size of the plaintext modulus.
-   * @param plain_modulus (optional) The plaintext modulus, which affects the precision of the computations.
-   * @param sec (optional) The security level, which affects the hardness of the cryptographic problem underlying the FHE scheme.
-   * @param qi_sizes (optional) A vector of sizes for each modulus in the modulus chain.
-   * @param qi_values (optional) A vector of specific moduli for the modulus chain.
-  */
+  // ------------------ Context ------------------
   string ContextGen(
     scheme_t scheme, uint64_t poly_modulus_degree = 1024,
     uint64_t plain_modulus_bit_size = 0, uint64_t plain_modulus = 0,
@@ -175,9 +163,6 @@ public:
 
   // ------------------ Keys ------------------
 
-  /**
-   * @brief Generates a public and secret key pair.
-  */
   void KeyGen() override;
 
   void setPublicKey(seal::PublicKey &pubKey) { this->publicKey = make_shared<seal::PublicKey>(pubKey); }

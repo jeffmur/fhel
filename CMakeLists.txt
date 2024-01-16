@@ -16,7 +16,7 @@ include_directories(
     ${CMAKE_CURRENT_LIST_DIR}/include/backend
 )
 
-# libafhe.so
+# libfhel.so
 add_library(fhel SHARED
     ${CMAKE_CURRENT_LIST_DIR}/src/backend/aseal.cpp
 )
@@ -24,7 +24,7 @@ add_library(fhel SHARED
 target_link_libraries(fhel PRIVATE SEAL::seal_shared)
 
 set_target_properties(fhel PROPERTIES
-    PUBLIC_HEADER include/afhe.h
+    PUBLIC_HEADER include/fhe.h
     VERSION ${PROJECT_VERSION}
     SOVERSION 1
     OUTPUT_NAME "fhel"
