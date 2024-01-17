@@ -205,6 +205,7 @@ public:
 class APlaintext {
 public:
   virtual ~APlaintext() = default;
+  virtual string to_string() = 0;
 };
 
 /**
@@ -213,6 +214,7 @@ public:
 class ACiphertext{
 public:
   virtual ~ACiphertext() = default;
+  virtual size_t size() = 0;
 };
 
 #endif /* AFHE_H */

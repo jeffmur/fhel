@@ -18,38 +18,52 @@ classDiagram
 
     class scheme_t {
         <<Enumeration>>
+        NONE
         BFV
         BGV
         CKKS
     }
 
-    class KeyPair {
-        String publicKey
-        String secretKey
+    class Text {
+        <<Abstract>>
+        vector~foo~ value
+    }
+
+    Text <|-- Plaintext
+    Text <|-- Ciphertext
+
+    class Plaintext~Text~{
+        to_string(): String
+    }
+
+    class Ciphertext~Text~{
+        size(): Int
     }
 
     scheme_t --> Afhe
-    KeyPair --> Afhe
+    Plaintext --> Afhe
+    Ciphertext --> Afhe
 
     class Afhe {
         <<Abstract>>
-        Int scheme_t
+        scheme_t scheme
 
-        genKeys(): KeyPair
-        encrypt(String): String
-        decrypt(String): String
-        add(String, String): String
-    }
-
-    class SEAL~Afhe~{
+        genKeys(): void
         encrypt(Plaintext): Ciphertext
         decrypt(Ciphertext): Plaintext
         add(Ciphertext, Ciphertext): Ciphertext
     }
 
+    class SEAL~Afhe~{
+        String publicKey
+        String privateKey
+        encode(Plaintext)
+        decode(Plaintext)
+    }
+
     class FHE {
         <<interface>>
-        get_backend(backend_t): Afhe
+        init_backend(backend_t): Afhe
     }
 
     Afhe --> FHE
@@ -68,5 +82,3 @@ Legend:
 * `backend_t`: An enumeration class representing different Fully Homomorphic Encryption libraries.
 
 * `scheme_t`: An enumeration class representing different encryption schemes, including BFV, BGV, and CKKS.
-
-* `KeyPair`: A class representing a pair of public and secret keys used for encryption and decryption.

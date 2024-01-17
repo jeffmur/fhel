@@ -51,14 +51,50 @@ static map<string, backend_t> backend_t_map{
 /**
  * @brief Get the backend object
 */
-Afhe* get_backend(backend_t backend) {
+Afhe* init_backend(backend_t backend) {
     switch (backend)
     {
     case backend_t::seal:
         cout << "Using Microsoft SEAL" << endl;
         return new Aseal();
     case backend_t::openfhe:
-        cout << "Using OpenFHE" << endl;
+        // cout << "Using OpenFHE" << endl;
+        runtime_error("Not Implemented");
+    default:
+        throw runtime_error("No backend set");
+    }
+}
+
+APlaintext* init_plaintext(backend_t backend) {
+    switch (backend)
+    {
+    case backend_t::seal:
+        return new AsealPlaintext();
+    case backend_t::openfhe:
+        runtime_error("Not Implemented");
+    default:
+        throw runtime_error("No backend set");
+    }
+}
+
+APlaintext* init_plaintext(backend_t backend, string value) {
+    switch (backend)
+    {
+    case backend_t::seal:
+        return new AsealPlaintext(value);
+    case backend_t::openfhe:
+        runtime_error("Not Implemented");
+    default:
+        throw runtime_error("No backend set");
+    }
+}
+
+ACiphertext* init_ciphertext(backend_t backend) {
+    switch (backend)
+    {
+    case backend_t::seal:
+        return new AsealCiphertext();
+    case backend_t::openfhe:
         runtime_error("Not Implemented");
     default:
         throw runtime_error("No backend set");

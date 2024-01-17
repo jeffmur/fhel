@@ -30,8 +30,6 @@ using namespace std;
 using namespace seal;
 
 // Forward Declaration
-class AsealCiphertext;
-class AsealPlaintext;
 class Aseal;
 class AsealPoly;
 
@@ -77,8 +75,16 @@ static map<int, sec_level_type> sec_map {
  */
 class AsealPlaintext : public APlaintext, public seal::Plaintext {
 public:
+  // Inherit constructors
   using seal::Plaintext::Plaintext;
-  virtual ~AsealPlaintext() = default;
+  string to_string() override {
+    return seal::Plaintext::to_string();
+  }
+  ~AsealPlaintext(){};
+};
+
+inline AsealPlaintext& _to_plaintext(APlaintext& p){
+  return dynamic_cast<AsealPlaintext&>(p);
 };
 
 /**
@@ -87,16 +93,15 @@ public:
 class AsealCiphertext : public ACiphertext, public seal::Ciphertext {
 public:
   using seal::Ciphertext::Ciphertext;
-  virtual ~AsealCiphertext() = default;
+  ~AsealCiphertext(){};
+  size_t size() override {
+    return seal::Ciphertext::size();
+  }
 };
 
 // DYNAMIC CASTING
 inline AsealCiphertext& _to_ciphertext(ACiphertext& c){
   return dynamic_cast<AsealCiphertext&>(c);
-};
-
-inline AsealPlaintext& _to_plaintext(APlaintext& p){
-  return dynamic_cast<AsealPlaintext&>(p);
 };
 
 /**
