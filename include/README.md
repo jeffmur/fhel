@@ -73,6 +73,10 @@ Legend:
 
 * `FHE`: An interface that defines a method get_backend for obtaining an instance of Afhe based on a given backend library type.
 
+* `Plaintext` & `Ciphertext`: An abstract class representing the basic functionality of text objects. Used as the main interface for backend required parameters.
+
+* `Ciphertext`: An abstract class representing the basic functionality of cipher objects. Used as the main interface for backend required functions.
+
 * `backend_t`: An enumeration class representing different Fully Homomorphic Encryption libraries.
 
 * `scheme_t`: An enumeration class representing different encryption schemes, including BFV, BGV, and CKKS.
