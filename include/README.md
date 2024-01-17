@@ -24,19 +24,11 @@ classDiagram
         CKKS
     }
 
-    class Text {
-        <<Abstract>>
-        vector~foo~ value
-    }
-
-    Text <|-- Plaintext
-    Text <|-- Ciphertext
-
-    class Plaintext~Text~{
+    class Plaintext{
         to_string(): String
     }
 
-    class Ciphertext~Text~{
+    class Ciphertext{
         size(): Int
     }
 
@@ -64,6 +56,8 @@ classDiagram
     class FHE {
         <<interface>>
         init_backend(backend_t): Afhe
+        init_plaintext(backend_t): Plaintext
+        init_ciphertext(backend_t): Ciphertext
     }
 
     Afhe --> FHE
