@@ -37,3 +37,9 @@ target_link_libraries(fhel_demo SEAL::seal_shared)
 target_sources(fhel_demo PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src/backend/aseal.cpp
 )
+
+# Enable Testing
+enable_testing()
+
+# Unit Tests
+add_test(NAME add_test COMMAND $<TARGET_FILE:fhel_demo>)
