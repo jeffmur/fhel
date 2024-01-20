@@ -6,4 +6,4 @@ deps:
 .PHONY: test
 test: deps
 	@echo "Testing dart..."
-	@dart test -r expanded
+	@dart test

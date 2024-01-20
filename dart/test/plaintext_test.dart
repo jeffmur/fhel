@@ -13,7 +13,7 @@ void noValue(FHE fhe) {
 }
 
 void withValue(FHE fhe, String value) {
-  test('Plaintext Value', () {
+  test('Plaintext Value == $value', () {
     final plaintext = Plaintext.withValue(fhe.backend, value);
     expect(plaintext.text, value);
     expect(plaintext.backend.prettyName, fhe.backend.prettyName);
