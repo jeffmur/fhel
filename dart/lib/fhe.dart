@@ -5,25 +5,31 @@ import 'dart:io' show Directory;
 
 import 'package:path/path.dart' as path;
 
-// FFI signature of the hello_world C function
-typedef FactorialFunc = Int Function(Int);
-// Dart type definition for calling the C foreign function
-typedef Factorial = int Function(int);
+// // FFI signature of the hello_world C function
+// typedef FactorialFunc = Int Function(Int);
+// // Dart type definition for calling the C foreign function
+// typedef Factorial = int Function(int);
+
+typedef InitBackendC = Pointer Function(Int32 backend);
+typedef InitBackend = Pointer Function(int backend);
+
+typedef AddC = Int32 Function(Int32 a, Int32 b);
+typedef Add = int Function(int a, int b);
 
 var libraryPath =
     // from project root (parent of dart folder)
-    path.join(Directory.current.parent.path, 'build', 'libhello.so');
+    path.join(Directory.current.parent.path, 'build', 'libfhel.dylib');
 
 final dylib = DynamicLibrary.open(libraryPath);
 
+final Add c_add = dylib.lookup<NativeFunction<AddC>>('add').asFunction();
+
 // Look up the C function 'hello_world'
-final Factorial c_factorial =
-    dylib.lookup<NativeFunction<FactorialFunc>>('factorial').asFunction();
+// final InitBackend c_init_backend =
+//     dylib.lookup<NativeFunction<InitBackendC>>('init_backend').asFunction();
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
+class FHE {
+  int backend;
 
-  int factorial(int value) => c_factorial(value);
+  FHE() : backend = c_add(1, 2);
 }

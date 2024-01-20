@@ -13,7 +13,7 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-  Afhe* he = init_backend(backend_t::seal);
+  Afhe* he = init_backend(1);
 
   /* Parameters */
   long poly_mod_degree = 4096;
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
   /* FHE Addition Demo */
   APlaintext* pt_x = init_plaintext(backend_t::seal, "100");
   APlaintext* pt_add = init_plaintext(backend_t::seal, "17");
-  APlaintext* pt_res = init_plaintext(backend_t::seal);
+  APlaintext* pt_res = init_plaintext(backend_t::seal, "");
 
   ACiphertext* ct_x = init_ciphertext(backend_t::seal);
   ACiphertext* ct_add = init_ciphertext(backend_t::seal);

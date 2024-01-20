@@ -23,7 +23,7 @@
  * @brief Enum for the supported backend libraries.
  * @return Integer representing the backend library type.
  */
-enum class backend_t : int
+enum class backend_t : int32_t
 {
   none = 0,    /* No Library Set */
   seal = 1,    /* Microsoft SEAL */
@@ -48,16 +48,20 @@ static map<string, backend_t> backend_t_map{
   {"openfhe", backend_t::openfhe},
 };
 
+extern "C" int32_t add(int32_t a, int32_t b) {
+  return a + b;
+}
+
 /**
  * @brief Get the backend object
 */
-Afhe* init_backend(backend_t backend) {
+extern "C" Afhe* init_backend(int32_t backend) {
     switch (backend)
     {
-    case backend_t::seal:
+    case 1:
         cout << "Using Microsoft SEAL" << endl;
         return new Aseal();
-    case backend_t::openfhe:
+    case 2:
         // cout << "Using OpenFHE" << endl;
         runtime_error("Not Implemented");
     default:
@@ -65,19 +69,19 @@ Afhe* init_backend(backend_t backend) {
     }
 }
 
-APlaintext* init_plaintext(backend_t backend) {
-    switch (backend)
-    {
-    case backend_t::seal:
-        return new AsealPlaintext();
-    case backend_t::openfhe:
-        runtime_error("Not Implemented");
-    default:
-        throw runtime_error("No backend set");
-    }
-}
+// extern "C" APlaintext* init_plaintext(backend_t backend) {
+//     switch (backend)
+//     {
+//     case backend_t::seal:
+//         return new AsealPlaintext();
+//     case backend_t::openfhe:
+//         runtime_error("Not Implemented");
+//     default:
+//         throw runtime_error("No backend set");
+//     }
+// }
 
-APlaintext* init_plaintext(backend_t backend, string value) {
+extern "C" APlaintext* init_plaintext(backend_t backend, string value) {
     switch (backend)
     {
     case backend_t::seal:
@@ -89,7 +93,7 @@ APlaintext* init_plaintext(backend_t backend, string value) {
     }
 }
 
-ACiphertext* init_ciphertext(backend_t backend) {
+extern "C" ACiphertext* init_ciphertext(backend_t backend) {
     switch (backend)
     {
     case backend_t::seal:

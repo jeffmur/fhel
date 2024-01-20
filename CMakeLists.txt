@@ -16,9 +16,10 @@ include_directories(
     ${CMAKE_CURRENT_LIST_DIR}/include/backend
 )
 
-# libfhel.so
+# libfhel.so (dylib on Mac)
 add_library(fhel SHARED
     ${CMAKE_CURRENT_LIST_DIR}/src/backend/aseal.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/fhe.def
 )
 
 target_link_libraries(fhel PRIVATE SEAL::seal_shared)
