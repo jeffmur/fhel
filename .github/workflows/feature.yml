@@ -37,7 +37,7 @@ jobs:
         with:
           args: make test-ci
 
-      # - name: Dart Test 🎯
-      #   uses: docker://ghcr.io/jeffmur/fhel:builder
-      #   with:
-      #     args: make test-dart-ci
+      - name: Dart Test 🎯
+        uses: docker://ghcr.io/jeffmur/fhel:builder
+        with:
+          args: make test-dart-ci

@@ -2,25 +2,27 @@ import 'package:test/test.dart';
 
 import 'package:fhe/fhe.dart' show FHE;
 
-// void main() {
-//   test('adds one to input values', () {
-//     final calculator = Calculator();
-//     expect(calculator.addOne(2), 3);
-//     expect(calculator.addOne(-7), -6);
-//     expect(calculator.addOne(0), 1);
-//   });
-
-//   test('factorial', () {
-//     final calculator = Calculator();
-//     expect(calculator.factorial(1), 1);
-//     expect(calculator.factorial(2), 2);
-//     expect(calculator.factorial(3), 6);
-//   });
-// }
-
 void main() {
-  test('FHE', () {
+  test('Default Backend', () {
     final fhe = FHE();
-    expect(fhe.backend, isNotNull);
+    expect(fhe.backend, 0);
+  });
+
+  test('Backend not supported', () {
+    final fhe = FHE();
+    fhe.init('not a backend');
+    expect(fhe.backend, 0);
+  });
+
+  test('Backend seal', () {
+    final fhe = FHE();
+    fhe.init('seal');
+    expect(fhe.backend, 1);
+  });
+
+  test('Backend openfhe', () {
+    final fhe = FHE();
+    fhe.init('openfhe');
+    expect(fhe.backend, 2);
   });
 }

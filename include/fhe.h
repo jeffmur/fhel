@@ -2,7 +2,7 @@
  * @file fhe.h
  * ------------------------------------------------------------------
  * @brief Interface with Fully Homomorphic Encryption (AFHE) library.
- *        
+ *
  * ------------------------------------------------------------------
  * @author Jeffrey Murray Jr (jeffmur)
  */
@@ -13,96 +13,94 @@
 #include <vector> /* Vectorizing all operations */
 #include <string> /* string class */
 #include <map>    /* map */
-#include <afhe.h> /* Abstraction Layer */
+#include "afhe.h" /* Abstraction Layer */
 
 // Include Backend Libraries
 #include <aseal.h> /* Microsoft SEAL */
 
-// ------------------ Libraries ------------------
-/**
- * @brief Enum for the supported backend libraries.
- * @return Integer representing the backend library type.
- */
-enum class backend_t : int32_t
-{
-  none = 0,    /* No Library Set */
-  seal = 1,    /* Microsoft SEAL */
-  openfhe = 2, /* OpenFHE */
-};
+extern "C" {
+    /**
+     * @brief Enum for the supported backend libraries.
+     * @return Integer representing the backend library type.
+     */
+    enum backend_t : int32_t
+    {
+        no_t = 0,    /* No Library Set */
+        seal_t = 1,    /* Microsoft SEAL */
+        openfhe_t = 2, /* OpenFHE */
+    };
+
+}
 
 /**
  * @brief Map type to string for the supported backend libraries.
 */
-static map<backend_t, string> backend_t_str{
-  {backend_t::none, "none"},
-  {backend_t::seal, "seal"},
-  {backend_t::openfhe, "openfhe"},
+static map<backend_t, const char*> backend_t_str{
+  {backend_t::no_t, "none"},
+  {backend_t::seal_t, "seal"},
+  {backend_t::openfhe_t, "openfhe"},
+};
+
+struct cmp_str
+{
+   bool operator()(const char* a, const char* b) const
+   {
+      return std::strcmp(a, b) < 0;
+   }
 };
 
 /**
  * @brief Map string to type for the supported backend libraries.
 */
-static map<string, backend_t> backend_t_map{
-  {"none", backend_t::none},
-  {"seal", backend_t::seal},
-  {"openfhe", backend_t::openfhe},
+static map<const char*, backend_t, cmp_str> backend_t_map{
+  {"none", backend_t::no_t},
+  {"seal", backend_t::seal_t},
+  {"openfhe", backend_t::openfhe_t},
 };
 
-extern "C" int32_t add(int32_t a, int32_t b) {
-  return a + b;
-}
+extern "C" {
+    /**
+     * @brief Convert backend type to string.
+     * @param backend Backend library to convert.
+     * @return String representing the backend library.
+     */
+    const char* backend_t_to_string(backend_t backend);
 
-/**
- * @brief Get the backend object
-*/
-extern "C" Afhe* init_backend(int32_t backend) {
-    switch (backend)
-    {
-    case 1:
-        cout << "Using Microsoft SEAL" << endl;
-        return new Aseal();
-    case 2:
-        // cout << "Using OpenFHE" << endl;
-        runtime_error("Not Implemented");
-    default:
-        throw runtime_error("No backend set");
-    }
-}
+    /**
+     * @brief Convert string to backend type.
+     * @param backend String to convert.
+     * @return Backend library type.
+     */
+    backend_t backend_t_from_string(const char* backend);
 
-// extern "C" APlaintext* init_plaintext(backend_t backend) {
-//     switch (backend)
-//     {
-//     case backend_t::seal:
-//         return new AsealPlaintext();
-//     case backend_t::openfhe:
-//         runtime_error("Not Implemented");
-//     default:
-//         throw runtime_error("No backend set");
-//     }
-// }
+    /**
+     * @brief Initialize the backend library.
+     * @param backend Backend library to use.
+     * @return Pointer to the backend library.
+     */
+    Afhe* init_backend(backend_t backend);
 
-extern "C" APlaintext* init_plaintext(backend_t backend, string value) {
-    switch (backend)
-    {
-    case backend_t::seal:
-        return new AsealPlaintext(value);
-    case backend_t::openfhe:
-        runtime_error("Not Implemented");
-    default:
-        throw runtime_error("No backend set");
-    }
-}
+    /**
+     * @brief Initialize a plaintext.
+     * @param backend Backend library to use.
+     * @return Pointer to the plaintext.
+     */
+    APlaintext* init_plaintext(backend_t backend);
 
-extern "C" ACiphertext* init_ciphertext(backend_t backend) {
-    switch (backend)
-    {
-    case backend_t::seal:
-        return new AsealCiphertext();
-    case backend_t::openfhe:
-        runtime_error("Not Implemented");
-    default:
-        throw runtime_error("No backend set");
-    }
+    /**
+     * @brief Initialize a plaintext with a value.
+     * @param backend Backend library to use.
+     * @param value Value to initialize the plaintext with.
+     * @return Pointer to the plaintext.
+     */
+    APlaintext* init_plaintext_value(backend_t backend, const char* value);
+
+    /**
+     * @brief Initialize a ciphertext.
+     * @param backend Backend library to use.
+     * @return Pointer to the ciphertext.
+     */
+    ACiphertext* init_ciphertext(backend_t backend);
 }
 
 #endif /* FHE_H */

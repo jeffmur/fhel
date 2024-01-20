@@ -12,14 +12,14 @@ find_package(SEAL 4.1 REQUIRED)
 
 # Include header files
 include_directories(
-    ${CMAKE_CURRENT_LIST_DIR}/include
-    ${CMAKE_CURRENT_LIST_DIR}/include/backend
+    include
+    include/backend
 )
 
-# libfhel.so (dylib on Mac)
+# libfhel.so/dylib
 add_library(fhel SHARED
-    ${CMAKE_CURRENT_LIST_DIR}/src/backend/aseal.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/fhe.def
+    src/backend/aseal.cpp
+    src/fhe.cpp
 )
 
 target_link_libraries(fhel PRIVATE SEAL::seal_shared)
@@ -36,7 +36,8 @@ add_executable(fhel_demo examples/demo_fhel/addition.cpp)
 target_link_libraries(fhel_demo SEAL::seal_shared)
 
 target_sources(fhel_demo PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/src/backend/aseal.cpp
+    src/backend/aseal.cpp
+    src/fhe.cpp
 )
 
 # Enable Testing

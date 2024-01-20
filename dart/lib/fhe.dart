@@ -2,34 +2,50 @@ library fhe;
 
 import 'dart:ffi';
 import 'dart:io' show Directory;
+import 'package:ffi/ffi.dart'; // for Utf8
 
 import 'package:path/path.dart' as path;
 
-// // FFI signature of the hello_world C function
-// typedef FactorialFunc = Int Function(Int);
-// // Dart type definition for calling the C foreign function
-// typedef Factorial = int Function(int);
-
-typedef InitBackendC = Pointer Function(Int32 backend);
-typedef InitBackend = Pointer Function(int backend);
-
-typedef AddC = Int32 Function(Int32 a, Int32 b);
-typedef Add = int Function(int a, int b);
-
 var libraryPath =
     // from project root (parent of dart folder)
-    path.join(Directory.current.parent.path, 'build', 'libfhel.dylib');
+    path.join(Directory.current.parent.path, 'build', 'libfhel.so');
 
 final dylib = DynamicLibrary.open(libraryPath);
 
-final Add c_add = dylib.lookup<NativeFunction<AddC>>('add').asFunction();
+typedef BackendType = Int;
 
-// Look up the C function 'hello_world'
-// final InitBackend c_init_backend =
-//     dylib.lookup<NativeFunction<InitBackendC>>('init_backend').asFunction();
+typedef StringToBackendTypeC = BackendType Function(Pointer<Utf8> backend);
+typedef StringToBackendType = int Function(Pointer<Utf8> backend);
+
+final StringToBackendType c_string_to_backend_type = dylib
+    .lookup<NativeFunction<StringToBackendTypeC>>('backend_t_from_string')
+    .asFunction();
+
+typedef BackendTypeToStringC = Pointer<Utf8> Function(BackendType backend);
+typedef BackendTypeToString = Pointer<Utf8> Function(int backend);
+
+final BackendTypeToString c_backend_type_to_string = dylib
+    .lookup<NativeFunction<BackendTypeToStringC>>('backend_t_to_string')
+    .asFunction();
+
+typedef InitBackendC = Pointer Function(BackendType backend);
+typedef InitBackend = Pointer Function(int backend);
+
+final InitBackend c_init_backend =
+    dylib.lookup<NativeFunction<InitBackendC>>('init_backend').asFunction();
+
+// TODO: wrap C backend struct
 
 class FHE {
   int backend;
+  String backendName;
 
-  FHE() : backend = c_add(1, 2);
+  FHE()
+      : backend = 0,
+        backendName = '';
+
+  init(String name) {
+    backend = c_string_to_backend_type(name.toNativeUtf8());
+    backendName = name;
+  }
 }

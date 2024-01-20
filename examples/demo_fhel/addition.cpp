@@ -7,13 +7,16 @@
  * ------------------------------------------------------------------
  * @author Jeffrey Murray Jr
 */
-#include <fhe.h>
+#include "fhe.h"
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
-  Afhe* he = init_backend(1);
+
+  cout << backend_t_to_string(backend_t::seal_t) << ":" << backend_t_from_string("seal") << endl;
+
+  Afhe* he = init_backend(backend_t::seal_t);
 
   /* Parameters */
   long poly_mod_degree = 4096;
@@ -28,13 +31,13 @@ int main(int argc, char **argv)
   cout << "Keys generated" << endl;
 
   /* FHE Addition Demo */
-  APlaintext* pt_x = init_plaintext(backend_t::seal, "100");
-  APlaintext* pt_add = init_plaintext(backend_t::seal, "17");
-  APlaintext* pt_res = init_plaintext(backend_t::seal, "");
+  APlaintext* pt_x = init_plaintext_value(backend_t::seal_t, "100");
+  APlaintext* pt_add = init_plaintext_value(backend_t::seal_t, "17");
+  APlaintext* pt_res = init_plaintext(backend_t::seal_t);
 
-  ACiphertext* ct_x = init_ciphertext(backend_t::seal);
-  ACiphertext* ct_add = init_ciphertext(backend_t::seal);
-  ACiphertext* ct_res = init_ciphertext(backend_t::seal);
+  ACiphertext* ct_x = init_ciphertext(backend_t::seal_t);
+  ACiphertext* ct_add = init_ciphertext(backend_t::seal_t);
+  ACiphertext* ct_res = init_ciphertext(backend_t::seal_t);
 
   cout << "FHE Addition " << pt_x->to_string() << " + " << pt_add->to_string() << endl;
 
