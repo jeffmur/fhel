@@ -1,4 +1,4 @@
-# Fully Homomorphic Encryption Library
+# Abstraction Layer
 
 The design of this library implements an abstraction layer over existing Fully Homomorphic Encryption (FHE) libraries. Through abstraction, we can interface with various backend libraries via the same function calls.
 
@@ -55,6 +55,8 @@ classDiagram
 
     class FHE {
         <<interface>>
+        backend_t_from_string(String): backend_t
+        backend_t_to_string(backend_t): String
         init_backend(backend_t): Afhe
         init_plaintext(backend_t): Plaintext
         init_ciphertext(backend_t): Ciphertext

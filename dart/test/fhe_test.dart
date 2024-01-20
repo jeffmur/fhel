@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 import 'package:fhe/fhe.dart' show FHE;
 
 void main() {
-  test('Default Backend', () {
+  test('Default Backend Constructor', () {
     final fhe = FHE();
     expect(fhe.backend, 0);
   });
