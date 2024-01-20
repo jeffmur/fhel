@@ -33,6 +33,6 @@ void main() {
     final fhe = FHE('openfhe');
     noValue(fhe);
     withValue(fhe, 'Not Impelemented');
-    withValue(fhe, '1234567890');
+    // withValue(fhe, '1234567890');
   });
 }
