@@ -9,7 +9,8 @@
 #ifndef AFHE_H
 #define AFHE_H
 
-#include <string> /* string class */
+#include <string>  /* string class */
+#include <cstdint> /* uint64_t */
 
 // Forward Declarations
 class ACiphertext; /* Ciphertext */
@@ -75,9 +76,9 @@ public:
    * @return A string representing the status of generated context.
    */
   virtual string ContextGen(
-      scheme_t scheme, uint64_t poly_modulus_degree,
-      uint64_t plain_modulus_bit_size, uint64_t plain_modulus,
-      int sec_level, vector<int> qi_sizes = {}, vector<uint64_t> qi_mods = {}) = 0;
+    scheme_t scheme, uint64_t poly_modulus_degree,
+    uint64_t plain_modulus_bit_size, uint64_t plain_modulus,
+    int sec_level, vector<int> qi_sizes = {}, vector<uint64_t> qi_mods = {}) = 0;
 
   // virtual vector<uint64_t> get_qi() = 0;
   // virtual uint64_t get_plain_modulus() = 0;
@@ -129,7 +130,7 @@ public:
   // virtual void decrypt_v(vector<shared_ptr<ACipherTxt>> &ctxts, vector<shared_ptr<APlainTxt>> &ptxts) = 0;
 
   // ------------------ Codec ------------------
-  
+
   /**
    * @brief Encodes a vector of integers into a plaintext message.
    *        Used by BGV and BFV schemes.

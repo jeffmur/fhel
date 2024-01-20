@@ -1,8 +1,8 @@
 /**
  * @file addition.cpp
  * ------------------------------------------------------------------
- * @brief Demonstrate the addition functionality of the library. To 
- *        successfully add two ciphertexts, they must be derived 
+ * @brief Demonstrate the addition functionality of the library. To
+ *        successfully add two ciphertexts, they must be derived
  *        from the same encryption keys.
  * ------------------------------------------------------------------
  * @author Jeffrey Murray Jr
