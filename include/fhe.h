@@ -16,7 +16,8 @@
 #include "afhe.h" /* Abstraction Layer */
 
 // Include Backend Libraries
-#include <aseal.h> /* Microsoft SEAL */
+#include <aseal.h>   /* Microsoft SEAL */
+#include <openfhe.h> /* OpenFHE */
 
 extern "C" {
     /**
@@ -101,6 +102,16 @@ extern "C" {
      * @return Pointer to the ciphertext.
      */
     ACiphertext* init_ciphertext(backend_t backend);
+
+    /**
+     * @brief Encrypt a plaintext.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+     * @param plaintext Pointer to the plaintext.
+     * @return Pointer to the ciphertext.
+    */
+    ACiphertext* encrypt(backend_t backend, Afhe* afhe, APlaintext* plaintext);
+
 }
 
 #endif /* FHE_H */
