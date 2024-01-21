@@ -169,6 +169,8 @@ public:
   // ------------------ Keys ------------------
 
   void KeyGen() override;
+  // string get_secret_key() override;
+  // string get_public_key() override;
 
   void setPublicKey(seal::PublicKey &pubKey) { this->publicKey = make_shared<seal::PublicKey>(pubKey); }
   void setSecretKey(seal::SecretKey &secKey) { this->secretKey = make_shared<seal::SecretKey>(secKey); }

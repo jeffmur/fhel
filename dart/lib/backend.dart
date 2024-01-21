@@ -18,9 +18,6 @@ final BackendTypeToString c_backend_type_to_string = dylib
     .lookup<NativeFunction<BackendTypeToStringC>>('backend_t_to_string')
     .asFunction();
 
-typedef InitBackendC = Pointer Function(BackendType backend);
-typedef InitBackend = Pointer Function(int backend);
-
 class Backend {
   int value = 0;
   String prettyName = "";

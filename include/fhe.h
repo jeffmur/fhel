@@ -112,6 +112,13 @@ extern "C" {
     */
     ACiphertext* encrypt(backend_t backend, Afhe* afhe, APlaintext* plaintext);
 
+    const char* generate_context(backend_t backend, Afhe* afhe, scheme_t scheme, long poly_mod_degree, long pt_mod_bit, long pt_mod, long sec_level);
+
+    void generate_keys(backend_t backend, Afhe* afhe);
+
+    // const char* get_secret_key(Afhe* afhe);
+
+    // const char* get_public_key(Afhe* afhe);
 }
 
 #endif /* FHE_H */

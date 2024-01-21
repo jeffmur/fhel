@@ -97,6 +97,8 @@ public:
    * @brief Generates a public and private key pair.
   */
   virtual void KeyGen() = 0;
+  // virtual string get_secret_key() = 0;
+  // virtual string get_public_key() = 0;
 
   /**
    * @brief Encrypts a plaintext message into a ciphertext.

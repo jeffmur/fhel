@@ -37,6 +37,12 @@ public:
     void KeyGen() override {
         return;
     }
+    // string get_secret_key() override {
+    //     return "Not Implemented";
+    // }
+    // string get_public_key() override {
+    //     return "Not Implemented";
+    // }
     void encrypt(APlaintext &ptxt, ACiphertext &ctxt) override {
         return;
     }

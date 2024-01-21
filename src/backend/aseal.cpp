@@ -91,6 +91,16 @@ void Aseal::KeyGen()
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
 }
 
+// string Aseal::get_secret_key()
+// {
+//     return this->secretKey.get()->data();
+// }
+
+// string Aseal::get_public_key()
+// {
+//     return this->publicKey.get()->data().size();
+// }
+
 void Aseal::encrypt(APlaintext &ptxt, ACiphertext &ctxt)
 {
   // Gather current context, resolves object
