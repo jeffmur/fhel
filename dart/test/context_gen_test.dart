@@ -21,4 +21,6 @@ void main() {
     final context = fhe.genContext(4096, 0, 0, 0);
     expect(context.split(':')[0], "invalid_plain_modulus_bit_count");
   });
+
+  // TODO: Add more tests for invalid parameters against various schemes
 }

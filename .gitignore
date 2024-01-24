@@ -23,9 +23,8 @@ pubspec.lock
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
-.vscode/c_cpp_properties.json
-.vscode/settings.json
-.vscode/tasks.json
+!.vscode/launch.json
+.vscode/*
 
 # Flutter/Dart/Pub related
 # Libraries should not include pubspec.lock, per https://dart.dev/guides/libraries/private-files#pubspeclock.
