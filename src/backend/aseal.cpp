@@ -34,7 +34,7 @@ string Aseal::ContextGen(scheme_t scheme,
                          int sec_level,
                          vector<int> qi_sizes,
                          vector<uint64_t> qi_values)
-{
+{ try {
   // Initialize parameters
   EncryptionParameters param(scheme_map_to_seal[scheme]);
 
@@ -50,7 +50,6 @@ string Aseal::ContextGen(scheme_t scheme,
     // Set plaintext modulus
     param.set_plain_modulus(plain_modulus);
   }
-
   // Validate parameters by putting them inside a SEALContext
   this->context = make_shared<SEALContext>(param, true, sec_map[sec_level]);
 
@@ -59,6 +58,10 @@ string Aseal::ContextGen(scheme_t scheme,
   //    - Error name and message from list in seal/context/context.cpp otherwise
   return string(this->context->parameter_error_name())  + ": " +
                 this->context->parameter_error_message();
+  }
+  catch (invalid_argument &e) {
+    return string("invalid_argument: ") + e.what();
+  } 
 }
 
 shared_ptr<SEALContext> inline Aseal::get_context()

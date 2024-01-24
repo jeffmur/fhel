@@ -35,20 +35,23 @@ final GenKeys c_gen_keys =
     dylib.lookup<NativeFunction<GenKeysC>>('generate_keys').asFunction();
 
 class FHE {
+  int scheme = 0;
   Backend backend = Backend();
   Pointer library = nullptr;
   String publicKey = "";
   String secretKey = "";
 
   FHE(String name) {
+    scheme = 1;
     backend = Backend.set(name);
     library = c_init_backend(backend.value);
   }
 
   String genContext(int polyModDegree, int ptModBit, int ptMod, int secLevel) {
-    return c_gen_context(
-            backend.value, library, 1, polyModDegree, ptModBit, ptMod, secLevel)
-        .toDartString();
+    final ptr = c_gen_context(backend.value, library, scheme, polyModDegree,
+        ptModBit, ptMod, secLevel);
+
+    return ptr.toDartString();
   }
 
   void genKeys() {
@@ -63,6 +66,6 @@ class FHE {
 void main() {
   final fhe = FHE('seal');
   print(fhe.backend.prettyName);
-  // print(fhe.genContext(8192, 20, 0, 128)); // TODO: handle errors
+  print(fhe.genContext(8192, 20, 0, 128));
   print(fhe.genContext(4096, 20, 1024, 128));
 }

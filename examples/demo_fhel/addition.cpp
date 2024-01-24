@@ -24,6 +24,8 @@ int main(int argc, char **argv)
   long pt_mod = 1024;
   long sec_level = 128;
 
+  const char* ctx1 = generate_context(backend_t::seal_t, he, scheme_t::bfv, 4096, pt_mod_bit, pt_mod, sec_level);
+  cout << "Context char* generated with status " << ctx1 << endl;
   string ctx = he->ContextGen(scheme_t::bfv, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
   cout << "Context generated with status " << ctx << endl;
 

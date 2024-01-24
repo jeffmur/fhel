@@ -11,12 +11,12 @@ final StringToBackendType c_string_to_backend_type = dylib
     .lookup<NativeFunction<StringToBackendTypeC>>('backend_t_from_string')
     .asFunction();
 
-typedef BackendTypeToStringC = Pointer<Utf8> Function(BackendType backend);
-typedef BackendTypeToString = Pointer<Utf8> Function(int backend);
+// typedef BackendTypeToStringC = Pointer<Utf8> Function(BackendType backend);
+// typedef BackendTypeToString = Pointer<Utf8> Function(int backend);
 
-final BackendTypeToString c_backend_type_to_string = dylib
-    .lookup<NativeFunction<BackendTypeToStringC>>('backend_t_to_string')
-    .asFunction();
+// final BackendTypeToString c_backend_type_to_string = dylib
+//     .lookup<NativeFunction<BackendTypeToStringC>>('backend_t_to_string')
+//     .asFunction();
 
 class Backend {
   int value = 0;

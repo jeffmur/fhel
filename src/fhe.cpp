@@ -64,15 +64,16 @@ const char* generate_context(backend_t backend, Afhe* afhe, scheme_t scheme, lon
     {
     case backend_t::seal_t:
     {
-        cout << "Generating context" << endl;
         string ctx = afhe->ContextGen(scheme, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
-        cout << ctx << endl;
-        return ctx.c_str();
+        // !Important: Must copy string to char* to avoid memory leak
+        char *cpy = new char[ctx.size()+1] ;
+        strcpy(cpy, ctx.c_str());
+        return cpy;
     }
     case backend_t::openfhe_t:
-        return "Error: Not Implemented";
+        return "invalid: Not Implemented";
     default:
-        return "No backend set";
+        return "error: No backend set";
     }
 }
 
