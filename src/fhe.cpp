@@ -1,13 +1,13 @@
 #include "fhe.h"
 
-const char* backend_t_to_string(backend_t backend)
-{
-    return backend_t_str[backend];
-}
-
 backend_t backend_t_from_string(const char* backend)
 {
     return backend_t_map[backend];
+}
+
+scheme_t scheme_t_from_string(const char* scheme)
+{
+    return scheme_t_map[scheme];
 }
 
 Afhe* init_backend(backend_t backend) {
@@ -58,13 +58,14 @@ ACiphertext* init_ciphertext(backend_t backend) {
     }
 }
 
-const char* generate_context(backend_t backend, Afhe* afhe, scheme_t scheme, long poly_mod_degree, long pt_mod_bit, long pt_mod, long sec_level)
+const char* generate_context(backend_t backend, Afhe* afhe, scheme_t scheme_type, long poly_mod_degree, long pt_mod_bit, long pt_mod, long sec_level)
 {
     switch (backend)
     {
     case backend_t::seal_t:
     {
-        string ctx = afhe->ContextGen(scheme, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
+        scheme a_scheme = scheme_t_map_scheme[scheme_type];
+        string ctx = afhe->ContextGen(a_scheme, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
         // !Important: Must copy string to char* to avoid memory leak
         char *cpy = new char[ctx.size()+1] ;
         strcpy(cpy, ctx.c_str());

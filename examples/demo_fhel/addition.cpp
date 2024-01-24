@@ -13,9 +13,6 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-
-  cout << backend_t_to_string(backend_t::seal_t) << ":" << backend_t_from_string("seal") << endl;
-
   Afhe* he = init_backend(backend_t::seal_t);
 
   /* Parameters */
@@ -24,9 +21,9 @@ int main(int argc, char **argv)
   long pt_mod = 1024;
   long sec_level = 128;
 
-  const char* ctx1 = generate_context(backend_t::seal_t, he, scheme_t::bfv, 4096, pt_mod_bit, pt_mod, sec_level);
+  const char* ctx1 = generate_context(backend_t::seal_t, he, scheme_t::bfv_s, 4096, pt_mod_bit, pt_mod, sec_level);
   cout << "Context char* generated with status " << ctx1 << endl;
-  string ctx = he->ContextGen(scheme_t::bfv, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
+  string ctx = he->ContextGen(scheme::bfv, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
   cout << "Context generated with status " << ctx << endl;
 
   he->KeyGen();

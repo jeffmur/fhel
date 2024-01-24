@@ -56,7 +56,6 @@ classDiagram
     class FHE {
         <<interface>>
         backend_t_from_string(String): backend_t
-        backend_t_to_string(backend_t): String
         init_backend(backend_t): Afhe
         init_plaintext(backend_t): Plaintext
         init_ciphertext(backend_t): Ciphertext

@@ -1,7 +1,7 @@
 import 'dart:ffi';
 import 'package:ffi/ffi.dart'; // for Utf8
 import 'package:fhe/ffi.dart' show dylib;
-import 'package:fhe/backend.dart' show BackendType, Backend;
+import 'package:fhe/afhe/backend.dart' show BackendType, Backend;
 
 typedef InitPlaintextC = Pointer Function(BackendType backend);
 typedef InitPlaintext = Pointer Function(int backend);
@@ -39,10 +39,10 @@ class Plaintext {
 // void main() {
 //   final backend = Backend.set("seal");
 //   final plaintext = Plaintext(backend);
-//   print(plaintext.backend.prettyName);
+//   print(plaintext.backend.name);
 //   print(plaintext.text);
 
 //   final plaintext2 = Plaintext.withValue(backend, "1234");
-//   print(plaintext2.backend.prettyName);
+//   print(plaintext2.backend.name);
 //   print(plaintext2.text);
 // }

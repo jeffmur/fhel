@@ -26,20 +26,33 @@ extern "C" {
      */
     enum backend_t : int32_t
     {
-        no_t = 0,    /* No Library Set */
+        no_t = 0,      /* No Library Set */
         seal_t = 1,    /* Microsoft SEAL */
         openfhe_t = 2, /* OpenFHE */
+    };
+
+    /**
+     * @brief Enum for the supported schemes.
+     * @return Integer representing the scheme type.
+    */
+    enum scheme_t : int32_t
+    {
+        no_s = scheme::none,   /* No Scheme Set */
+        bfv_s = scheme::bfv,   /* Brakerski-Fan-Vercauteren */
+        ckks_s = scheme::ckks, /* Cheon-Kim-Kim-Song */
+        bgv_s = scheme::bgv,   /* Brakerski-Gentry-Vaikuntanathan */
     };
 
 }
 
 /**
- * @brief Map type to string for the supported backend libraries.
+ * @brief Map scheme_t to (abstract) scheme type
 */
-static map<backend_t, const char*> backend_t_str{
-  {backend_t::no_t, "none"},
-  {backend_t::seal_t, "seal"},
-  {backend_t::openfhe_t, "openfhe"},
+static map<scheme_t, scheme> scheme_t_map_scheme{
+  {scheme_t::no_s, scheme::none},
+  {scheme_t::bfv_s, scheme::bfv},
+  {scheme_t::ckks_s, scheme::ckks},
+  {scheme_t::bgv_s, scheme::bgv},
 };
 
 struct cmp_str
@@ -48,6 +61,16 @@ struct cmp_str
    {
       return std::strcmp(a, b) < 0;
    }
+};
+
+/**
+ * @brief Map string to type for the supported schemes.
+*/
+static map<const char*, scheme_t, cmp_str> scheme_t_map{
+  {"none", scheme_t::no_s},
+  {"bfv", scheme_t::bfv_s},
+  {"ckks", scheme_t::ckks_s},
+  {"bgv", scheme_t::bgv_s},
 };
 
 /**
@@ -65,7 +88,7 @@ extern "C" {
      * @param backend Backend library to convert.
      * @return String representing the backend library.
      */
-    const char* backend_t_to_string(backend_t backend);
+    // const char* backend_t_to_string(backend_t backend);
 
     /**
      * @brief Convert string to backend type.
@@ -73,6 +96,13 @@ extern "C" {
      * @return Backend library type.
      */
     backend_t backend_t_from_string(const char* backend);
+
+    /**
+     * @brief Convert scheme type to string.
+     * @param scheme Scheme to convert.
+     * @return String representing the scheme.
+     */
+    scheme_t scheme_t_from_string(const char* scheme);
 
     /**
      * @brief Initialize the backend library.

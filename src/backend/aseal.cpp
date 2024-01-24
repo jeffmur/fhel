@@ -27,7 +27,7 @@ using namespace seal;
 
 Aseal::~Aseal(){};
 
-string Aseal::ContextGen(scheme_t scheme,
+string Aseal::ContextGen(scheme scheme,
                          uint64_t poly_modulus_degree,
                          uint64_t plain_modulus_bit_size,
                          uint64_t plain_modulus,
@@ -39,7 +39,7 @@ string Aseal::ContextGen(scheme_t scheme,
   EncryptionParameters param(scheme_map_to_seal[scheme]);
 
   // BFV
-  if (scheme == scheme_t::bfv)
+  if (scheme == scheme::bfv)
   {
     // Set polynomial modulus degree
     param.set_poly_modulus_degree(poly_modulus_degree);

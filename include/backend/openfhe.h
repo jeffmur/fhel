@@ -29,7 +29,7 @@ class Aopenfhe : public Afhe {
 public:
     Aopenfhe(){};
     ~Aopenfhe(){};
-    string ContextGen(scheme_t scheme, uint64_t poly_modulus_degree,
+    string ContextGen(scheme scheme, uint64_t poly_modulus_degree,
                       uint64_t plain_modulus_bit_size, uint64_t plain_modulus,
                       int sec_level, vector<int> qi_sizes = {}, vector<uint64_t> qi_mods = {}) override {
         return "Not Implemented";

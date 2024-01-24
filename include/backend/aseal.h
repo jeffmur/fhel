@@ -53,11 +53,11 @@ static map<string, seal::compr_mode_type> compr_mode_map {
 /**
  * @brief Scheme types
  */
-static map<scheme_t, seal::scheme_type> scheme_map_to_seal {
-    {scheme_t::none, seal::scheme_type::none},
-    {scheme_t::bfv, seal::scheme_type::bfv},
-    {scheme_t::ckks, seal::scheme_type::ckks},
-    {scheme_t::bgv, seal::scheme_type::bgv},
+static map<scheme, seal::scheme_type> scheme_map_to_seal {
+    {scheme::none, seal::scheme_type::none},
+    {scheme::bfv, seal::scheme_type::bfv},
+    {scheme::ckks, seal::scheme_type::ckks},
+    {scheme::bgv, seal::scheme_type::bgv},
 };
 
 /**
@@ -156,7 +156,7 @@ public:
 
   // ------------------ Context ------------------
   string ContextGen(
-    scheme_t scheme, uint64_t poly_modulus_degree = 1024,
+    scheme scheme, uint64_t poly_modulus_degree = 1024,
     uint64_t plain_modulus_bit_size = 0, uint64_t plain_modulus = 0,
     int sec_level = 128, vector<int> qi_sizes = {}, vector<uint64_t> qi_values = {}) override;
 

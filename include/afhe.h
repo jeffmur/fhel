@@ -25,16 +25,12 @@ using namespace std;
  * @brief Enum for the scheme type.
  * @return Integer representing the scheme type.
  */
-enum class scheme_t : int
+enum scheme : int
 {
-  // No scheme set; cannot be used for encryption
-  none = 0x0,
-  // Brakerski-Fan-Vercauteren (BFV) scheme
-  bfv = 0x1,
-  // Cheon-Kim-Kim-Song (CKKS) scheme
-  ckks = 0x2,
-  // Brakerski-Gentry-Vaikuntanathan (BGV) scheme
-  bgv = 0x3,
+  none = 0, /* No Scheme Set */
+  bfv = 1,  /* Brakerski-Fan-Vercauteren */
+  ckks = 2, /* Cheon-Kim-Kim-Song */
+  bgv = 3,  /* Brakerski-Gentry-Vaikuntanathan */
 };
 
 /**
@@ -77,7 +73,7 @@ public:
    * @return A string representing the status of generated context.
    */
   virtual string ContextGen(
-    scheme_t scheme, uint64_t poly_modulus_degree,
+    scheme scheme, uint64_t poly_modulus_degree,
     uint64_t plain_modulus_bit_size, uint64_t plain_modulus,
     int sec_level, vector<int> qi_sizes = {}, vector<uint64_t> qi_mods = {}) = 0;
 

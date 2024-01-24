@@ -1,13 +1,13 @@
 import 'dart:ffi';
 import 'package:test/test.dart';
 import 'package:fhe/fhe.dart' show FHE;
-import 'package:fhe/plaintext.dart';
+import 'package:fhe/afhe/plaintext.dart';
 
 void noValue(FHE fhe) {
   test('Plaintext No Value', () {
     final plaintext = Plaintext(fhe.backend);
     expect(plaintext.text, "");
-    expect(plaintext.backend.prettyName, fhe.backend.prettyName);
+    expect(plaintext.backend.name, fhe.backend.name);
     expect(plaintext.library.address, isNot(nullptr));
   });
 }
@@ -16,7 +16,7 @@ void withValue(FHE fhe, String value) {
   test('Plaintext Value == $value', () {
     final plaintext = Plaintext.withValue(fhe.backend, value);
     expect(plaintext.text, value);
-    expect(plaintext.backend.prettyName, fhe.backend.prettyName);
+    expect(plaintext.backend.name, fhe.backend.name);
     expect(plaintext.library.address, isNot(nullptr));
   });
 }
