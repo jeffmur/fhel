@@ -5,14 +5,7 @@ import 'dart:ffi';
 // import 'package:fhe/plaintext.dart';
 import 'package:fhe/ffi.dart' show dylib;
 import 'package:ffi/ffi.dart'; // for Utf8
-import 'package:fhe/afhe/backend.dart';
-import 'package:fhe/afhe/scheme.dart';
-
-typedef InitBackendC = Pointer Function(BackendType backend);
-typedef InitBackend = Pointer Function(int backend);
-
-final InitBackend c_init_backend =
-    dylib.lookup<NativeFunction<InitBackendC>>('init_backend').asFunction();
+import 'package:fhe/afhe/type.dart';
 
 typedef GenContextC = Pointer<Utf8> Function(
     BackendType backend,
