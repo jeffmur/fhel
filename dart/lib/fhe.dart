@@ -84,26 +84,26 @@ class FHE {
   }
 }
 
-void main() {
-  final fhe = FHE.withScheme('seal', 'bfv');
-  print(fhe.genContext(4096, 20, 1024, 128));
-  fhe.genKeys();
+// void main() {
+//   final fhe = FHE.withScheme('seal', 'bfv');
+//   print(fhe.genContext(4096, 20, 1024, 128));
+//   fhe.genKeys();
 
-  // Max is 399. TODO: WHY?!
-  Plaintext pt_x = Plaintext.withValue(fhe.backend, "100");
-  Plaintext pt_add = Plaintext.withValue(fhe.backend, "80");
+//   // Max is 399. TODO: WHY?!
+//   Plaintext pt_x = Plaintext.withValue(fhe.backend, "100");
+//   Plaintext pt_add = Plaintext.withValue(fhe.backend, "80");
 
-  print("<dart> pt_x: ${pt_x.text}");
-  print("<dart> pt_add: ${pt_add.text}");
+//   print("<dart> pt_x: ${pt_x.text}");
+//   print("<dart> pt_add: ${pt_add.text}");
 
-  Ciphertext ct_x = fhe.encrypt(pt_x);
-  Ciphertext ct_add = fhe.encrypt(pt_add);
+//   Ciphertext ct_x = fhe.encrypt(pt_x);
+//   Ciphertext ct_add = fhe.encrypt(pt_add);
 
-  Ciphertext ct_res = fhe.add(ct_x, ct_add);
+//   Ciphertext ct_res = fhe.add(ct_x, ct_add);
 
-  Plaintext res = fhe.decrypt(ct_res);
+//   Plaintext res = fhe.decrypt(ct_res);
 
-  print(res.text);
+//   print(res.text);
 
-  // print(cipher.library);
-}
+//   // print(cipher.library);
+// }

@@ -1,6 +1,6 @@
 # Implementation Layer
 
-The design of this library implements the abstraction layer, [README.md](../include/README.md), that acts as an interface to enable basic Fully Homomorphic Encryption (FHE) functionality.
+The [adapter](https://refactoring.guru/design-patterns/adapter) design of this library interfaces with the abstraction layer, [README.md](../include/README.md). Using [dart:ffi](https://pub.dev/packages/ffi), Dart can execute C functions, reference memory addresses of object, and convert primitive data types.
 
 ```mermaid
 
@@ -13,16 +13,25 @@ classDiagram
         size(): Int
     }
 
+    class Backend {
+
+    }
+
     Plaintext --> FHE
     Ciphertext --> FHE
+    Backend --> FHE
 
     class FHE {
-        Int backend
-        String backendName
-        String publicKey
-        String secretKey
+        Backend backend
+        Scheme scheme
+        Pointer library
 
-        init(String backendName): void
+        FHE(String)
+
+        FHE(String, String)
+
+        genContext(int, int, int, int): void
+        genKeys()
         encrypt(Plaintext): Ciphertext
         decrypt(Ciphertext): Plaintext
         add(Ciphertext, Ciphertext): Ciphertext
@@ -35,13 +44,5 @@ Legend:
 
 * `Ciphertext`: Represents an encrypted ciphertext value and provides a `size()` method to get its size.
 
-* `FHE`: The main class that implements the Fully Homomorphic Encryption (FHE) functionality. It has the following properties and methods:
-    * `backend`: An integer representing the backend.
-    * `backendName`: A string representing the name of the backend.
-    * `publicKey`: A string representing the public key.
-    * `secretKey`: A string representing the secret key.
-    * `init(backendName)`: Initializes the FHE instance with the specified backend name.
-    * `encrypt(Plaintext)`: Encrypts a plaintext value and returns a ciphertext.
-    * `decrypt(Ciphertext)`: Decrypts a ciphertext value and returns a plaintext.
-    * `add(Ciphertext, Ciphertext)`: Adds two ciphertexts and returns the result as a new ciphertext.
+* `FHE`: Models the desired backend FHE library and encryption schemas. Enables callers execute basic FHE functionalities.
 
