@@ -8,12 +8,12 @@ void main() {
     String status = fhe.genContext(4096, 20, 1024, 128);
     expect(status, 'success: valid');
     fhe.genKeys();
-    final plaintext1 = Plaintext.withValue(fhe.backend, '1');
-    final plaintext2 = Plaintext.withValue(fhe.backend, '2');
-    final ciphertext1 = fhe.encrypt(plaintext1);
-    final ciphertext2 = fhe.encrypt(plaintext2);
-    final ciphertext3 = fhe.add(ciphertext1, ciphertext2);
-    final plaintext3 = fhe.decrypt(ciphertext3);
-    expect(plaintext3.text, '3');
+    final pt_x = Plaintext.withValue(fhe.backend, '1');
+    final ct_x = fhe.encrypt(pt_x);
+    final pt_add = Plaintext.withValue(fhe.backend, '2');
+    final ct_add = fhe.encrypt(pt_add);
+    final ct_res = fhe.add(ct_x, ct_add);
+    final pt_res = fhe.decrypt(ct_res);
+    expect(pt_res.text, '3');
   });
 }
