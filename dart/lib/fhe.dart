@@ -1,11 +1,13 @@
 library fhe;
 
 import 'dart:ffi';
-// import 'package:fhe/ciphertext.dart';
-// import 'package:fhe/plaintext.dart';
+import 'package:fhe/afhe/crypto.dart';
 import 'package:fhe/ffi.dart' show dylib;
 import 'package:ffi/ffi.dart'; // for Utf8
 import 'package:fhe/afhe/type.dart';
+import 'package:fhe/afhe/plaintext.dart';
+import 'package:fhe/afhe/ciphertext.dart';
+import 'package:fhe/afhe/operation.dart';
 
 typedef GenContextC = Pointer<Utf8> Function(
     BackendType backend,
@@ -58,15 +60,50 @@ class FHE {
     c_gen_keys(backend.value, library);
   }
 
-  // encrypt(Plaintext plaintext) {}
+  Ciphertext encrypt(Plaintext plaintext) {
+    final ptr = c_encrypt(backend.value, library, plaintext.obj);
 
-  // decrypt(Ciphertext ciphertext) {}
+    Ciphertext ctx = Ciphertext(backend);
+    ctx.library = ptr;
+    return ctx;
+  }
+
+  Plaintext decrypt(Ciphertext ciphertext) {
+    Pointer ptr = c_decrypt(backend.value, library, ciphertext.library);
+
+    Plaintext ptx = Plaintext.fromObject(backend, ptr);
+    return ptx;
+  }
+
+  Ciphertext add(Ciphertext a, Ciphertext b) {
+    Pointer ptr = c_add(backend.value, library, a.library, b.library);
+
+    Ciphertext ctx = Ciphertext(backend);
+    ctx.library = ptr;
+    return ctx;
+  }
 }
 
 void main() {
   final fhe = FHE.withScheme('seal', 'bfv');
-  print(fhe.scheme.name);
-  print(fhe.scheme.value);
-  print(fhe.genContext(8192, 20, 0, 128));
   print(fhe.genContext(4096, 20, 1024, 128));
+  fhe.genKeys();
+
+  // Max is 399. TODO: WHY?!
+  Plaintext pt_x = Plaintext.withValue(fhe.backend, "100");
+  Plaintext pt_add = Plaintext.withValue(fhe.backend, "80");
+
+  print("<dart> pt_x: ${pt_x.text}");
+  print("<dart> pt_add: ${pt_add.text}");
+
+  Ciphertext ct_x = fhe.encrypt(pt_x);
+  Ciphertext ct_add = fhe.encrypt(pt_add);
+
+  Ciphertext ct_res = fhe.add(ct_x, ct_add);
+
+  Plaintext res = fhe.decrypt(ct_res);
+
+  print(res.text);
+
+  // print(cipher.library);
 }

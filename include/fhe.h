@@ -105,6 +105,27 @@ extern "C" {
     scheme_t scheme_t_from_string(const char* scheme);
 
     /**
+     * @brief Generate a context for the backend library.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+     * @param scheme Scheme to use.
+     * @param poly_mod_degree Polynomial modulus degree.
+     * @param pt_mod_bit Plaintext modulus bit size.
+     * @param pt_mod Plaintext modulus.
+     * @param sec_level Security level.
+     * @return String representing the context.
+    */
+    const char* generate_context(backend_t backend, Afhe* afhe, scheme_t scheme, long poly_mod_degree, long pt_mod_bit, long pt_mod, long sec_level);
+
+    /**
+     * @brief Generate keys for the backend library.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+     * @return String representing the keys.
+    */
+    void generate_keys(backend_t backend, Afhe* afhe);
+
+    /**
      * @brief Initialize the backend library.
      * @param backend Backend library to use.
      * @return Pointer to the backend library.
@@ -127,6 +148,13 @@ extern "C" {
     APlaintext* init_plaintext_value(backend_t backend, const char* value);
 
     /**
+     * @brief Get the value of a plaintext.
+     * @param plaintext Pointer to the plaintext.
+     * @return Value of the plaintext.
+     */
+    const char* get_plaintext_value(APlaintext* plaintext);
+
+    /**
      * @brief Initialize a ciphertext.
      * @param backend Backend library to use.
      * @return Pointer to the ciphertext.
@@ -142,9 +170,21 @@ extern "C" {
     */
     ACiphertext* encrypt(backend_t backend, Afhe* afhe, APlaintext* plaintext);
 
-    const char* generate_context(backend_t backend, Afhe* afhe, scheme_t scheme, long poly_mod_degree, long pt_mod_bit, long pt_mod, long sec_level);
+    /**
+     * @brief Decrypt a ciphertext.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext Pointer to the ciphertext.
+     * @return Pointer to the plaintext.
+    */
+    APlaintext* decrypt(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
 
-    void generate_keys(backend_t backend, Afhe* afhe);
+    /**
+     * @brief Add two ciphertexts.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+    */
+    ACiphertext* add(backend_t backend, Afhe* afhe, ACiphertext* ciphertext1, ACiphertext* ciphertext2);
 
     // const char* get_secret_key(Afhe* afhe);
 

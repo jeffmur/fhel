@@ -17,22 +17,30 @@ final InitPlaintextValue c_init_plaintext_value = dylib
     .lookup<NativeFunction<InitPlaintextValueC>>('init_plaintext_value')
     .asFunction();
 
+typedef GetPlaintextC = Pointer<Utf8> Function(Pointer plaintext);
+typedef GetPlaintext = Pointer<Utf8> Function(Pointer plaintext);
+
+final GetPlaintext c_get_plaintext = dylib
+    .lookup<NativeFunction<GetPlaintextC>>('get_plaintext_value')
+    .asFunction();
+
 class Plaintext {
   String text = "";
   Backend backend = Backend();
-  Pointer library = nullptr;
+  Pointer obj = nullptr;
 
   Plaintext(this.backend) {
-    library = c_init_plaintext(backend.value);
+    obj = c_init_plaintext(backend.value);
   }
 
   Plaintext.withValue(this.backend, this.text) {
-    set(text);
+    // print(obj);
+    obj = c_init_plaintext_value(backend.value, text.toNativeUtf8());
+    // print(obj);
   }
 
-  set(String text) {
-    this.text = text;
-    library = c_init_plaintext_value(backend.value, text.toNativeUtf8());
+  Plaintext.fromObject(this.backend, this.obj) {
+    text = c_get_plaintext(obj).toDartString();
   }
 }
 

@@ -13,7 +13,7 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-  Afhe* he = init_backend(backend_t::seal_t);
+  Afhe* fhe = init_backend(backend_t::seal_t);
 
   /* Parameters */
   long poly_mod_degree = 4096;
@@ -21,12 +21,12 @@ int main(int argc, char **argv)
   long pt_mod = 1024;
   long sec_level = 128;
 
-  const char* ctx1 = generate_context(backend_t::seal_t, he, scheme_t::bfv_s, 4096, pt_mod_bit, pt_mod, sec_level);
+  const char* ctx1 = generate_context(backend_t::seal_t, fhe, scheme_t::bfv_s, 4096, pt_mod_bit, pt_mod, sec_level);
   cout << "Context char* generated with status " << ctx1 << endl;
-  string ctx = he->ContextGen(scheme::bfv, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
+  string ctx = fhe->ContextGen(scheme::bfv, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
   cout << "Context generated with status " << ctx << endl;
 
-  he->KeyGen();
+  fhe->KeyGen();
   cout << "Keys generated" << endl;
 
   /* FHE Addition Demo */
@@ -45,18 +45,18 @@ int main(int argc, char **argv)
    * Note: The same keys must be used for both plaintexts
    *       Otherwise, the addition will fail
   */
-  he->encrypt(*pt_x, *ct_x);
+  ct_x = encrypt(backend_t::seal_t, fhe, pt_x);
   cout << "Size of freshly encrypted ct_x: " << ct_x->size() << endl;
 
-  he->encrypt(*pt_add, *ct_add);
+  ct_add = encrypt(backend_t::seal_t, fhe, pt_add);
   cout << "Size of freshly encrypted ct_add: " << ct_add->size() << endl;
 
   /* Addition */
-  he->add(*ct_x, *ct_add, *ct_res);
+  ct_res = add(backend_t::seal_t, fhe, ct_x, ct_add);
   cout << "Size of encrypted summation: " << ct_res->size() << endl;
 
-  // /* Decryption */
-  he->decrypt(*ct_res, *pt_res);
+  /* Decryption */
+  pt_res = decrypt(backend_t::seal_t, fhe, ct_res);
   cout << "Decrypted result: " << pt_res->to_string() << endl;
 
 };

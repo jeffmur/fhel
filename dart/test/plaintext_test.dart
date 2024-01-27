@@ -8,7 +8,7 @@ void noValue(FHE fhe) {
     final plaintext = Plaintext(fhe.backend);
     expect(plaintext.text, "");
     expect(plaintext.backend.name, fhe.backend.name);
-    expect(plaintext.library.address, isNot(nullptr));
+    expect(plaintext.obj.address, isNot(nullptr));
   });
 }
 
@@ -17,7 +17,7 @@ void withValue(FHE fhe, String value) {
     final plaintext = Plaintext.withValue(fhe.backend, value);
     expect(plaintext.text, value);
     expect(plaintext.backend.name, fhe.backend.name);
-    expect(plaintext.library.address, isNot(nullptr));
+    expect(plaintext.obj.address, isNot(nullptr));
   });
 }
 
