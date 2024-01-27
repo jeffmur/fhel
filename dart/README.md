@@ -6,20 +6,39 @@ The [adapter](https://refactoring.guru/design-patterns/adapter) design of this l
 
 classDiagram
     class Plaintext {
-        to_string(): String
+        String text
+        Backend backend
+        Pointer obj
+
+        Plaintext(Backend, String)
+        Plaintext(Backend, Pointer)
     }
 
     class Ciphertext {
-        size(): Int
+        Backend backend
+        Pointer library
+
+        Ciphertext(Backend)
     }
 
     class Backend {
+        int value
+        String name
+        
+        Backend(String)
+    }
 
+    class Scheme {
+        int value
+        String name
+
+        Scheme(String)
     }
 
     Plaintext --> FHE
     Ciphertext --> FHE
     Backend --> FHE
+    Scheme --> FHE
 
     class FHE {
         Backend backend
