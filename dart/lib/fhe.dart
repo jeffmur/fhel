@@ -49,11 +49,35 @@ class FHE {
     library = c_init_backend(backend.value);
   }
 
-  String genContext(int polyModDegree, int ptModBit, int ptMod, int secLevel) {
-    final ptr = c_gen_context(backend.value, library, scheme.value,
-        polyModDegree, ptModBit, ptMod, secLevel);
+  String genBFVContext(Map context) {
+    final ptr = c_gen_context(
+        backend.value,
+        library,
+        scheme.value,
+        context['polyModDegree'],
+        context['ptModBit'] ?? 0, // Not used in BFV (maybe batching?)
+        context['ptMod'],
+        context['secLevel']);
 
     return ptr.toDartString();
+  }
+
+  String genBGVContext(Map context) {
+    return "Not implemented";
+  }
+
+  String genCKKSContext(Map context) {
+    return "Not implemented";
+  }
+
+  String genContext(Map<String, int> context) {
+    return switch (scheme.name) {
+      "" => "Scheme not set",
+      "bfv" => genBFVContext(context),
+      "bgv" => genBGVContext(context),
+      "ckks" => genCKKSContext(context),
+      _ => "Invalid scheme"
+    };
   }
 
   void genKeys() {
