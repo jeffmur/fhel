@@ -49,7 +49,7 @@ classDiagram
 
         FHE(String, String)
 
-        genContext(int, int, int, int): void
+        genContext(Map): void
         genKeys()
         encrypt(Plaintext): Ciphertext
         decrypt(Ciphertext): Plaintext
