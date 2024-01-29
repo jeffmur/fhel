@@ -32,6 +32,11 @@ jobs:
           tags: ghcr.io/jeffmur/fhel:builder
           file: Builder.Dockerfile
 
+      - name: Project Test 🧪
+        uses: docker://ghcr.io/jeffmur/fhel:builder
+        with:
+          args: make test-ci
+
       - name: Dart Test 🎯
         uses: docker://ghcr.io/jeffmur/fhel:builder
         with:
