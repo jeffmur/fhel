@@ -21,7 +21,7 @@ int main(int argc, char **argv)
   long pt_mod = 1024;
   long sec_level = 128;
 
-  const char* ctx1 = generate_context(backend_t::seal_t, fhe, scheme_t::bfv_s, 4096, pt_mod_bit, pt_mod, sec_level);
+  const char* ctx1 = generate_context(backend_t::seal_t, fhe, scheme_t::bfv_s, poly_mod_degree, pt_mod_bit, 4096, sec_level);
   cout << "Context char* generated with status " << ctx1 << endl;
   string ctx = fhe->ContextGen(scheme::bfv, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
   cout << "Context generated with status " << ctx << endl;
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
   cout << "Keys generated" << endl;
 
   /* FHE Addition Demo */
-  APlaintext* pt_x = init_plaintext_value(backend_t::seal_t, "100");
+  APlaintext* pt_x = init_plaintext_value(backend_t::seal_t, "399");
   APlaintext* pt_add = init_plaintext_value(backend_t::seal_t, "17");
   APlaintext* pt_res = init_plaintext(backend_t::seal_t);
 

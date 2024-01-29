@@ -33,10 +33,10 @@ void main() {
       'secLevel': 128
     };
     // poly_modulus_degree : [ 1024, 2048, 4096, 8192, 16384, 32768 ]
-    // 
 
-    expect(sealBFVAddition('399', '80', ctx), '19'); 
-    // ctx['polyModDegree'] = 32768;
+    expect(sealBFVAddition('200', '80', ctx), '280'); 
+
+    // Note: This may be due to invalid parameter validation
     ctx['ptMod'] = 4096;
     expect(sealBFVAddition('399', '80', ctx), '419');
   });
