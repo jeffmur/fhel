@@ -5,10 +5,10 @@
     "version": "2.0.0",
     "configurations": [
         {
-            "name": "(Linux) fhel_demo",
+            "name": "(Linux) gtest",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/fhel_demo",
+            "program": "${workspaceFolder}/build/seal_test",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
@@ -17,10 +17,10 @@
             "MIMode": "gdb",
         },
         {
-            "name": "(MacOS) fhel_demo",
+            "name": "(MacOS) gtest",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/fhel_demo",
+            "program": "${workspaceFolder}/build/seal_test",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

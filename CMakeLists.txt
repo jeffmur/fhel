@@ -5,6 +5,7 @@ Project-level CMake, useful for debugging
 ]]
 cmake_minimum_required(VERSION 3.13)
 
+# Set C++ standard, required by GoogleTest
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -48,7 +49,7 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(
   seal_test
-  test/seal/bfv_test.cpp
+  test/seal/bfv_context.cpp
   test/seal/bfv_encrypt.cpp
 )
 

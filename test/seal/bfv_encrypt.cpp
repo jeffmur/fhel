@@ -40,10 +40,9 @@ TEST(BFV_Encrypt, ValidPlainModulus) {
     fhe->KeyGen();
     AsealPlaintext pt_x = AsealPlaintext(to_string(pair.second));
     AsealCiphertext ct_x = AsealCiphertext();
+    AsealPlaintext pt_x_dec = AsealPlaintext();
 
     fhe->encrypt(pt_x, ct_x);
-
-    AsealPlaintext pt_x_dec = AsealPlaintext();
     fhe->decrypt(ct_x, pt_x_dec);
 
     // Expect decryption to be equal to plaintext.
