@@ -39,7 +39,7 @@ build: trust-project install-deps build-cmake
 .PHONY: test-standalone
 test-standalone:
 	@echo "Testing cpp..."
-	@cd $(AL_INSTALL_DIR); ctest --verbose
+	@cd $(AL_INSTALL_DIR); ctest
 
 .PHONY: test
 test: build test-standalone
