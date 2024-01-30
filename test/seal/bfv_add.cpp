@@ -5,11 +5,14 @@
 TEST(BFV_Add, Integers) {
   std::map<int, int> plaintextToModulus = {
     {100, 1024},
-    {200, 2048},
-    {300, 4096},
-    {400, 8192},
-    // {500, 8192}, /* returns 0 */
-    {1000, 32768},
+    {200, 1024},
+    {300, 1024},
+    {400, 1024},
+    {500, 1024},
+    {1000, 2048},
+    {2000, 4196},
+    {4000, 8392},
+    {5000, 16784}
   };
 
   for (const auto& pair : plaintextToModulus) {
@@ -24,11 +27,11 @@ TEST(BFV_Add, Integers) {
     EXPECT_STREQ(ctx.c_str(), "success: valid");
 
     fhe->KeyGen();
-    AsealPlaintext pt_x = AsealPlaintext(to_string(plaintext));
+    AsealPlaintext pt_x = AsealPlaintext(uint64_to_hex(plaintext));
     AsealCiphertext ct_x = AsealCiphertext();
     fhe->encrypt(pt_x, ct_x);
 
-    AsealPlaintext pt_y = AsealPlaintext(to_string(plaintext));
+    AsealPlaintext pt_y = AsealPlaintext(uint64_to_hex(plaintext));
     AsealCiphertext ct_y = AsealCiphertext();
     fhe->encrypt(pt_y, ct_y);
 
@@ -40,8 +43,10 @@ TEST(BFV_Add, Integers) {
     fhe->decrypt(ct_res, pt_res);
 
     int expect = plaintext + plaintext;
-    // cout << "pt_res: " << pt_res->to_string() << endl;
-    int actual = atoi(pt_res.to_string().c_str());
-    EXPECT_EQ(actual, expect);
+
+    // Convert hexademical string to uint_64.
+    string res_hex = pt_res.to_string();
+    int res_int = hex_to_uint64(res_hex);
+    EXPECT_EQ(res_int, expect);
   }
 }

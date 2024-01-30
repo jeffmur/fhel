@@ -71,6 +71,20 @@ static map<int, sec_level_type> sec_map {
 };
 
 /**
+ * @brief Convert uint_64 to hexademical string.
+*/
+inline string uint64_to_hex(uint64_t value) {
+  return seal::util::uint_to_hex_string(&value, size_t(1));
+}
+
+/**
+ * @brief Convert hexademical string to uint_64.
+*/
+inline uint64_t hex_to_uint64(string value) {
+  return stoi(value, 0, 16);
+}
+
+/**
  * @brief Abstraction for Plaintext
  */
 class AsealPlaintext : public APlaintext, public seal::Plaintext {
