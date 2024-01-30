@@ -8,7 +8,7 @@ TEST(BFV_Add, Integers) {
     {200, 2048},
     {300, 4096},
     {400, 8192},
-    // {500, 16384}, returns 0?
+    // {500, 8192}, /* returns 0 */
     {1000, 32768},
   };
 
@@ -24,31 +24,24 @@ TEST(BFV_Add, Integers) {
     EXPECT_STREQ(ctx.c_str(), "success: valid");
 
     fhe->KeyGen();
-    AsealPlaintext* pt_x = new AsealPlaintext(to_string(plaintext));
-    AsealCiphertext* ct_x = new AsealCiphertext();
-    fhe->encrypt(*pt_x, *ct_x);
-    delete pt_x;
+    AsealPlaintext pt_x = AsealPlaintext(to_string(plaintext));
+    AsealCiphertext ct_x = AsealCiphertext();
+    fhe->encrypt(pt_x, ct_x);
 
-    AsealPlaintext* pt_y = new AsealPlaintext(to_string(plaintext));
-    AsealCiphertext* ct_y = new AsealCiphertext();
-    fhe->encrypt(*pt_y, *ct_y);
-    delete pt_y;
+    AsealPlaintext pt_y = AsealPlaintext(to_string(plaintext));
+    AsealCiphertext ct_y = AsealCiphertext();
+    fhe->encrypt(pt_y, ct_y);
 
-    AsealPlaintext* pt_res = new AsealPlaintext();
-    AsealCiphertext* ct_res = new AsealCiphertext();
+    AsealPlaintext pt_res = AsealPlaintext();
+    AsealCiphertext ct_res = AsealCiphertext();
 
-    fhe->add(*ct_x, *ct_y, *ct_res);
-    delete ct_x;
-    delete ct_y;
+    fhe->add(ct_x, ct_y, ct_res);
 
-    fhe->decrypt(*ct_res, *pt_res);
-    delete ct_res;
+    fhe->decrypt(ct_res, pt_res);
 
     int expect = plaintext + plaintext;
     // cout << "pt_res: " << pt_res->to_string() << endl;
-    int actual = atoi(pt_res->to_string().c_str());
+    int actual = atoi(pt_res.to_string().c_str());
     EXPECT_EQ(actual, expect);
-    delete pt_res;
-    delete fhe;
   }
 }
