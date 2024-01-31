@@ -1,5 +1,5 @@
 #include <gtest/gtest.h> // NOLINT
-#include "aseal.h"       /* Microsoft SEAL */
+#include <aseal.h>       /* Microsoft SEAL */
 
 TEST(BFV, ValidParameters) {
   Aseal* fhe = new Aseal();
