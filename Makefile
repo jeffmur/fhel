@@ -41,8 +41,8 @@ ctest:
 	@echo "Testing cpp..."
 	@cd $(AL_INSTALL_DIR); ctest
 
-.PHONY: test-ci
-test-ci: build-cmake ctest
+.PHONY: ctest-ci
+ctest-ci: build-cmake ctest
 
 # Test Helper
 .PHONY: dtest
