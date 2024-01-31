@@ -2,7 +2,7 @@
 #include <aseal.h>       /* Microsoft SEAL */
 #include <map>
 
-TEST(BFV_Add, Integers) {
+TEST(BFV_Add, IntegersToHexadecimal) {
   std::map<int, int> plaintextToModulus = {
     {100, 1024},
     {200, 1024},
