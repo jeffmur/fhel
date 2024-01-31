@@ -22,13 +22,12 @@ void main() {
     }
   });
 
-  test('Seal supports in-order BFV, CKKS, BGV', () {
-    int i = 1;
-    for (var name in ['BFV', 'CKKS', 'BGV']) {
-      final fhe = FHE.withScheme('seal', name);
-      expect(fhe.scheme.value, i);
-      expect(fhe.scheme.name, name);
-      i++;
-    }
+  test('Seal Schemes supports in-order', () {
+    final schemes = {1: 'BFV', 2: 'CKKS', 3: 'BGV'};
+    schemes.forEach((k, v) {
+      final fhe = FHE.withScheme('seal', v);
+      expect(fhe.scheme.value, k);
+      expect(fhe.scheme.name, v);
+    });
   });
 }

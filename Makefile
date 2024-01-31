@@ -41,24 +41,17 @@ ctest:
 	@echo "Testing cpp..."
 	@cd $(AL_INSTALL_DIR); ctest
 
-.PHONY: test
-test: build ctest
-
 .PHONY: test-ci
 test-ci: build-cmake ctest
 
 # Test Helper
-.PHONY: dart-test
-dart-test:
+.PHONY: dtest
+dtest:
 	@echo "Testing dart..."
 	@cd $(DART_SRC); $(MAKE) test
 
-# Rebuild project, if nessesary, and run dart tests
-.PHONY: test-dart
-test-dart: build dart-test
-
 # Automate testing for github workflows
-.PHONY: test-dart-ci
-test-dart-ci: build-cmake
+.PHONY: dtest-ci
+dtest-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
 	$(MAKE) dart-test
