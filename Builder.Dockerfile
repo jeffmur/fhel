@@ -1,4 +1,4 @@
-FROM instrumentisto/flutter:3.13.9 as builder
+FROM instrumentisto/flutter:3.16.9 as builder
 
 FROM mcr.microsoft.com/devcontainers/cpp:1-debian-11
 
