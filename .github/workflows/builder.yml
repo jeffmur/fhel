@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Unit Tests 🧪
         uses: docker://ghcr.io/jeffmur/fhel:builder
@@ -29,7 +29,7 @@ jobs:
       url: 'https://ghcr.io/jeffmur/fhel:builder'
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Docker Buildx 🧰
       uses: docker/setup-buildx-action@v3
@@ -54,7 +54,7 @@ jobs:
     needs: deploy
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Unit Tests 🧪
         uses: docker://ghcr.io/jeffmur/fhel:builder
