@@ -30,6 +30,16 @@ typedef GenKeys = void Function(int backend, Pointer library);
 final GenKeys c_gen_keys =
     dylib.lookup<NativeFunction<GenKeysC>>('generate_keys').asFunction();
 
+typedef InvariantNoiseBudgetC = Int32 Function(
+    BackendType backend, Pointer library, Pointer ciphertext);
+
+typedef InvariantNoiseBudget = int Function(
+    int backend, Pointer library, Pointer ciphertext);
+
+final InvariantNoiseBudget c_invariant_noise_budget = dylib
+    .lookup<NativeFunction<InvariantNoiseBudgetC>>('invariant_noise_budget')
+    .asFunction();
+
 class FHE {
   Scheme scheme = Scheme();
   Backend backend = Backend();
@@ -96,6 +106,10 @@ class FHE {
 
     Plaintext ptx = Plaintext.fromObject(backend, ptr);
     return ptx;
+  }
+
+  int invariantNoiseBudget(Ciphertext ciphertext) {
+    return c_invariant_noise_budget(backend.value, library, ciphertext.library);
   }
 
   Ciphertext add(Ciphertext a, Ciphertext b) {

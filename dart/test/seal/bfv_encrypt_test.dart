@@ -16,6 +16,9 @@ void main() {
     final ciphertext = fhe.encrypt(plaintext);
     final decrypted = fhe.decrypt(ciphertext);
 
+    // Check invariant noise budget
+    expect(fhe.invariantNoiseBudget(ciphertext), lessThanOrEqualTo(53));
+
     // Validate that hexidecimal are equal
     expect(decrypted.text.toLowerCase(), pt.toLowerCase());
 
