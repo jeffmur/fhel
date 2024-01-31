@@ -112,25 +112,13 @@ ACiphertext* encrypt(backend_t backend, Afhe* afhe, APlaintext* ptxt) {
     {
     case backend_t::seal_t:
     {
-        // cout << "Params: " << &afhe << endl;
-        // cout << "Backend: " << backend << endl;
         ACiphertext* ctxt = init_ciphertext(backend);
-        // string pt = plaintext->to_string();
-
-        // !Important: Must copy string to char* to avoid memory leak
-        // char *cpy = new char[pt.size()+1] ;
-        // strcpy(cpy, pt.c_str());
-
-        // APlaintext* ptxt = init_plaintext_value(backend_t::seal_t, "123");
-
-        // cout << "<cpp> ptx: " << ptxt->to_string() << endl;
         try {
             afhe->encrypt(*ptxt, *ctxt);
         }
         catch (invalid_argument &e) {
             cout << "encrypt: " << e.what() << endl;
         }
-        // cout << "ciphertext size(): " << ctxt->size() << endl;
         return ctxt;
     }
     default:
