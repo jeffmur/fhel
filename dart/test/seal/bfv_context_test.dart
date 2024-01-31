@@ -22,10 +22,11 @@ void main() {
     final fhe = FHE.withScheme("seal", "bfv");
     final context =
         fhe.genContext({'polyModDegree': 4096, 'ptMod': 0, 'secLevel': 128});
-    expect(context.split(':')[0], "invalid_plain_modulus_bit_count");
+    expect(context, "invalid_plain_modulus_bit_count: plain_modulus's bit count "
+      "is not bounded by SEAL_PLAIN_MOD_BIT_COUNT_MIN(MAX)");
   });
 
-  // TODO: Security level is not checked during parameter validation
+  /* TODO: Security level is not checked during parameter validation */
   // However, there are only 3 options: 128, 192, 256 in SEAL
   // test('Invalid Security Level', () {
   //   final fhe = FHE.withScheme("seal", "bfv");

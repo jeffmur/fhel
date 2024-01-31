@@ -5,6 +5,10 @@ Project-level CMake, useful for debugging
 ]]
 cmake_minimum_required(VERSION 3.13)
 
+# Set C++ standard, required by GoogleTest
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 project(fhel VERSION 1.0.0 LANGUAGES CXX)
 
 # Import Backend Library
@@ -31,17 +35,31 @@ set_target_properties(fhel PROPERTIES
     OUTPUT_NAME "fhel"
 )
 
-# demo fhel executable
-add_executable(fhel_demo examples/demo_fhel/addition.cpp)
-target_link_libraries(fhel_demo SEAL::seal_shared)
-
-target_sources(fhel_demo PRIVATE
-    src/backend/aseal.cpp
-    src/fhe.cpp
-)
-
-# Enable Testing
 enable_testing()
 
-# Unit Tests
-add_test(NAME add_test COMMAND $<TARGET_FILE:fhel_demo>)
+# Google Test Platform
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+add_executable(
+  seal_test
+  test/seal/bfv_context.cpp
+  test/seal/bfv_encrypt.cpp
+  test/seal/bfv_addition.cpp
+)
+
+target_link_libraries(
+  seal_test
+  GTest::gtest_main
+  SEAL::seal_shared
+  fhel
+)
+
+include(GoogleTest)
+gtest_discover_tests(seal_test)

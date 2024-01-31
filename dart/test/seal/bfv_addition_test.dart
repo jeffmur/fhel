@@ -13,11 +13,11 @@ String sealBFVAddition(String a, String b, Map<String,int> context) {
   final ct_add = fhe.encrypt(pt_add);
   final ct_res = fhe.add(ct_x, ct_add);
   final pt_res = fhe.decrypt(ct_res);
-  return pt_res.text;
+  return pt_res.text.toLowerCase();
 }
 
 void main() {
-  test("SEAL Addition", () {
+  test("SEAL Integer Addition", () {
     Map<String,int> ctx = {
       'polyModDegree': 4096,
       'ptMod': 1024,
@@ -26,18 +26,32 @@ void main() {
     expect(sealBFVAddition('100', '80', ctx), '180');
   });
 
-  test("SEAL Addition plaintext modulus affects decryption", () {
+  test("SEAL Hexadecimal Addition", () {
     Map<String,int> ctx = {
       'polyModDegree': 4096,
       'ptMod': 1024,
       'secLevel': 128
     };
-    // poly_modulus_degree : [ 1024, 2048, 4096, 8192, 16384, 32768 ]
 
-    expect(sealBFVAddition('200', '80', ctx), '280'); 
+    expect(
+      280.toRadixString(16),
+      sealBFVAddition(
+        200.toRadixString(16),
+        80.toRadixString(16),
+        ctx));
 
-    // Note: This may be due to invalid parameter validation
-    ctx['ptMod'] = 4096;
-    expect(sealBFVAddition('399', '80', ctx), '419');
+    // Otherwise, you are forced to increase plaintext modulus,
+    // resulting in more noise growth and failed decryption
+    ctx['ptMod'] = 67136;
+    expect(sealBFVAddition('2000', '2000', ctx), '4000');
+
+    // When using hexadecimal, plain modulus can be lower
+    ctx['ptMod'] = 4196;
+    expect(
+      2800.toRadixString(16).toLowerCase(),
+      sealBFVAddition(
+        2000.toRadixString(16),
+        800.toRadixString(16),
+        ctx));
   });
 }

@@ -63,20 +63,19 @@ class FHE {
   }
 
   String genBGVContext(Map context) {
-    return "Not implemented";
+    return "Not Implemented";
   }
 
   String genCKKSContext(Map context) {
-    return "Not implemented";
+    return "Not Implemented";
   }
 
   String genContext(Map<String, int> context) {
     return switch (scheme.name) {
-      "" => "Scheme not set",
       "bfv" => genBFVContext(context),
       "bgv" => genBGVContext(context),
       "ckks" => genCKKSContext(context),
-      _ => "Invalid scheme"
+      _ => "error: Invalid Scheme"
     };
   }
 

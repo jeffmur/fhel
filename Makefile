@@ -36,29 +36,23 @@ build-cmake:
 .PHONY: build
 build: trust-project install-deps build-cmake
 
-.PHONY: test-standalone
-test-standalone:
+.PHONY: ctest
+ctest:
 	@echo "Testing cpp..."
-	@cd $(AL_INSTALL_DIR); ctest --verbose
+	@cd $(AL_INSTALL_DIR); ctest
 
-.PHONY: test
-test: build test-standalone
-
-.PHONY: test-ci
-test-ci: build-cmake test-standalone
+.PHONY: ctest-ci
+ctest-ci: build-cmake ctest
 
 # Test Helper
-.PHONY: dart-test
-dart-test:
+.PHONY: dtest
+dtest:
 	@echo "Testing dart..."
 	@cd $(DART_SRC); $(MAKE) test
 
-# Rebuild project, if nessesary, and run dart tests
-.PHONY: test-dart
-test-dart: build dart-test
-
 # Automate testing for github workflows
-.PHONY: test-dart-ci
-test-dart-ci: build-cmake
+.PHONY: dtest-ci
+dtest-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
-	$(MAKE) dart-test
+	@cd $(DART_SRC); $(MAKE) deps
+	$(MAKE) dtest
