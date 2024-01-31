@@ -54,4 +54,4 @@ dtest:
 .PHONY: dtest-ci
 dtest-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
-	$(MAKE) dart-test
+	$(MAKE) dtest
