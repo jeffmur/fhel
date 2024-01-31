@@ -3,36 +3,31 @@ import 'package:test/test.dart';
 import 'package:fhe/fhe.dart' show FHE;
 import 'package:fhe/afhe/plaintext.dart';
 
-void noValue(FHE fhe) {
-  test('Plaintext No Value', () {
-    final plaintext = Plaintext(fhe.backend);
-    expect(plaintext.text, "");
-    expect(plaintext.backend.name, fhe.backend.name);
-    expect(plaintext.obj.address, isNot(nullptr));
-  });
-}
-
-void withValue(FHE fhe, String value) {
-  test('Plaintext Value == $value', () {
-    final plaintext = Plaintext.withValue(fhe.backend, value);
-    expect(plaintext.text, value);
-    expect(plaintext.backend.name, fhe.backend.name);
-    expect(plaintext.obj.address, isNot(nullptr));
-  });
-}
-
 void main() {
   group('Microsoft SEAL', () {
     final fhe = FHE('seal');
-    noValue(fhe);
-    // withValue(fhe, 'Hello, World!');
-    withValue(fhe, '1234567890');
-  });
 
-  group('OpenFHE', () {
-    final fhe = FHE('openfhe');
-    noValue(fhe);
-    withValue(fhe, 'Not Impelemented');
-    // withValue(fhe, '1234567890');
+    test('Default Constructor', () {
+      final seal_pt = Plaintext(fhe.backend);
+      expect(seal_pt.text, "");
+      expect(seal_pt.backend.name, 'seal');
+      // Reference a new AsealPlaintext
+      expect(seal_pt.obj.address, isNot(nullptr));
+    });
+
+    test('Constructor with Integer', () {
+      final seal_pt_val = Plaintext.withValue(fhe.backend, "123");
+      expect(seal_pt_val.text, "123");
+      expect(seal_pt_val.backend.name, fhe.backend.name);
+      expect(seal_pt_val.obj.address, isNot(nullptr));
+    });
+
+    test('Constructor with Hexadecimal', () {
+      String hex = 123.toRadixString(16); /* 7b */
+      final seal_pt_val = Plaintext.withValue(fhe.backend, hex);
+      expect(seal_pt_val.text, "7b");
+      expect(seal_pt_val.backend.name, fhe.backend.name);
+      expect(seal_pt_val.obj.address, isNot(nullptr));
+    });
   });
 }

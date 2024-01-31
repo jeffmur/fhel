@@ -24,9 +24,9 @@ const char* generate_context(backend_t backend, Afhe* afhe, scheme_t scheme_type
         return cpy;
     }
     case backend_t::openfhe_t:
-        return "invalid: Not Implemented";
+        return "warn: [generate_context] Not Implemented";
     default:
-        return "error: No backend set";
+        return "error: [generate_context] No backend set";
     }
 }
 
@@ -117,7 +117,7 @@ ACiphertext* encrypt(backend_t backend, Afhe* afhe, APlaintext* ptxt) {
             afhe->encrypt(*ptxt, *ctxt);
         }
         catch (invalid_argument &e) {
-            cout << "encrypt: " << e.what() << endl;
+            cout << "error: [encrypt] " << e.what() << endl;
         }
         return ctxt;
     }
@@ -136,7 +136,7 @@ APlaintext* decrypt(backend_t backend, Afhe* afhe, ACiphertext* ctxt) {
             afhe->decrypt(*ctxt, *ptxt);
         }
         catch (invalid_argument &e) {
-            cout << "decrypt: " << e.what() << endl;
+            cout << "error: [decrypt] " << e.what() << endl;
         }
         return ptxt;
     }
@@ -155,7 +155,7 @@ ACiphertext* add(backend_t backend, Afhe* afhe, ACiphertext* ctxt1, ACiphertext*
             afhe->add(*ctxt1, *ctxt2, *ctxt);
         }
         catch (invalid_argument &e) {
-            cout << "add: " << e.what() << endl;
+            cout << "error: [add] " << e.what() << endl;
         }
         return ctxt;
     }
