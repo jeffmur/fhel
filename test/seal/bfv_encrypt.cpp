@@ -80,7 +80,7 @@ TEST(BFV_Encrypt, NoPlaintextConversion) {
     fhe->encrypt(pt_x, ct_x);
     fhe->decrypt(ct_x, pt_x_dec);
 
-    // Without hexademical "compression", left to increase modulus.
+    // Without hexademical "compression", must increase modulus.
     EXPECT_STREQ(pt_x_dec.to_string().c_str(), to_string(plaintext).c_str());
   }
 }
