@@ -120,6 +120,8 @@ public:
    */
   virtual void decrypt(ACiphertext &ctxt, APlaintext &ptxt) = 0;
 
+  virtual int invariant_noise_budget(ACiphertext &ctxt) = 0;
+
   /**
    * @brief Decrypts a vector of ciphertexts into a vector of plaintext messages.
    *

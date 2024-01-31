@@ -49,6 +49,9 @@ public:
     void decrypt(ACiphertext &ctxt, APlaintext &ptxt) override {
         return;
     }
+    int invariant_noise_budget(ACiphertext &ctxt) override {
+        return -1;
+    }
     void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_out) override {
         return;
     }

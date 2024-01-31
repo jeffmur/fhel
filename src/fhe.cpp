@@ -145,6 +145,23 @@ APlaintext* decrypt(backend_t backend, Afhe* afhe, ACiphertext* ctxt) {
     }
 }
 
+int invariant_noise_budget(backend_t backend, Afhe* afhe, ACiphertext* ctxt) {
+    switch(backend)
+    {
+    case backend_t::seal_t:
+    {
+        int noise = afhe->invariant_noise_budget(*ctxt);
+        return noise;
+        // string noise_str = to_string(noise);
+        // char *cpy = new char[noise_str.size()+1] ;
+        // strcpy(cpy, noise_str.c_str());
+        // return cpy;
+    }
+    default:
+        return -1; //"error: [invariant_noise_budget] No backend set";
+    }
+}
+
 ACiphertext* add(backend_t backend, Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
     switch(backend)
     {

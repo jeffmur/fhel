@@ -128,6 +128,17 @@ void Aseal::decrypt(ACiphertext &ctxt, APlaintext &ptxt)
   this->decryptor->decrypt(_to_ciphertext(ctxt), _to_plaintext(ptxt));
 }
 
+int Aseal::invariant_noise_budget(ACiphertext &ctxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Decryptor object
+  this->decryptor = make_shared<Decryptor>(seal_context, *this->secretKey);
+
+  return this->decryptor->invariant_noise_budget(_to_ciphertext(ctxt));
+}
+
 void Aseal::add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res)
 {
   // Gather current context, resolves object

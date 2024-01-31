@@ -65,6 +65,7 @@ classDiagram
         generate_keys(backend_t, Afhe): void
         encrypt(backend_t, Afhe, Plaintext): Ciphertext
         decrypt(backend_t, Afhe, Ciphertext): Plaintext
+        invariant_noise_budget(backend_t, Afhe, Ciphertext): string
         add(backend_t, Afhe, Ciphertext, Ciphertext): Ciphertext
     }
 
