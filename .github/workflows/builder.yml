@@ -19,7 +19,7 @@ jobs:
       - name: Unit Tests 🧪
         uses: docker://ghcr.io/jeffmur/fhel:builder
         with:
-          args: make test-dart-ci
+          args: make dtest-ci
 
   deploy:
     name: Push 📤
@@ -59,4 +59,4 @@ jobs:
       - name: Unit Tests 🧪
         uses: docker://ghcr.io/jeffmur/fhel:builder
         with:
-          args: make test-dart-ci
+          args: make dtest-ci
