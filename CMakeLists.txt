@@ -51,7 +51,7 @@ add_executable(
   seal_test
   test/seal/bfv_context.cpp
   test/seal/bfv_encrypt.cpp
-  test/seal/bfv_add.cpp
+  test/seal/bfv_addition.cpp
 )
 
 target_link_libraries(
