@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'package:fhe/fhe.dart' show FHE;
 
 void main() {
-  group('Backend: ', () {
+  group('Backend:', () {
     test('Microsoft SEAL', () {
       final fhe = FHE('seal');
       expect(fhe.backend.value, 1);

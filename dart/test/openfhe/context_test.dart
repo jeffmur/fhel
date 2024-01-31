@@ -2,8 +2,7 @@ import 'package:test/test.dart';
 import 'package:fhe/fhe.dart' show FHE;
 
 void main() {
-  group("OpenFHE Context: ", () {
-    test('Not Implemented', () {
+  test('Not Implemented', () {
       final fhe = FHE("openfhe");
       final ctx = fhe.genContext({});
       expect(ctx, "error: Invalid Scheme");
@@ -15,5 +14,4 @@ void main() {
 
       expect(ctx_val, "warn: [generate_context] Not Implemented");
     });
-  });
 }
