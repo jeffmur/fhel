@@ -11,7 +11,8 @@
 
 #include <string>  /* string class */
 #include <cstdint> /* uint64_t */
-#include <vector>
+#include <vector>  /* vector */
+#include <memory>  /* shared_ptr */
 
 // Forward Declarations
 class ACiphertext; /* Ciphertext */
@@ -93,6 +94,11 @@ public:
    * @brief Generates a public and private key pair.
   */
   virtual void KeyGen() = 0;
+  /**
+   * @brief Returns the number of slots for batching.
+  */
+  virtual int batch_slot_count() = 0;
+
   // virtual string get_secret_key() = 0;
   // virtual string get_public_key() = 0;
 
@@ -110,7 +116,7 @@ public:
    * @param ptxts The vector of plaintext messages to be encrypted.
    * @param ctxts The vector of ciphertexts where the encrypted messages will be stored.
    */
-  // virtual void encrypt_v(vector<shared_ptr<APlainTxt>> &ptxts, vector<shared_ptr<ACipherTxt>> &ctxts) = 0;
+  // virtual void encrypt_v(vector<shared_ptr<APlaintext>> &ptxts, vector<shared_ptr<ACiphertext>> &ctxts) = 0;
 
   /**
    * @brief Decrypts a ciphertext into a plaintext message.
@@ -120,6 +126,12 @@ public:
    */
   virtual void decrypt(ACiphertext &ctxt, APlaintext &ptxt) = 0;
 
+  /**
+   * @brief Returns the invariant noise budget of a ciphertext.
+   *
+   * @param ctxt The ciphertext to be analyzed.
+   * @return The invariant noise budget (in bits) of the ciphertext.
+  */
   virtual int invariant_noise_budget(ACiphertext &ctxt) = 0;
 
   /**
@@ -128,7 +140,7 @@ public:
    * @param ctxts The vector of ciphertexts to be decrypted.
    * @param ptxts The vector of plaintext messages where the decrypted messages will be stored.
    */
-  // virtual void decrypt_v(vector<shared_ptr<ACipherTxt>> &ctxts, vector<shared_ptr<APlainTxt>> &ptxts) = 0;
+  // virtual void decrypt_v(vector<shared_ptr<ACiphertext>> &ctxts, vector<shared_ptr<APlaintext>> &ptxts) = 0;
 
   // ------------------ Codec ------------------
 
@@ -139,7 +151,7 @@ public:
    * @param data The vector of integers to be encoded.
    * @param ptxt The plaintext message where the encoded message will be stored.
    */
-  // virtual void encode_int(vector<int64_t> &data, APlainTxt &ptxt) = 0;
+  virtual void encode_int(vector<uint64_t> &data, APlaintext &ptxt) = 0;
 
   /**
    * @brief Encodes a vector of floats into a plaintext message.
@@ -166,7 +178,7 @@ public:
    * @param ptxt The plaintext message to be decoded.
    * @param data The vector of integers where the decoded message will be stored.
    */
-  // virtual void decode_int(APlainTxt &ptxt, vector<int64_t> &data) = 0;
+  virtual void decode_int(APlaintext &ptxt, vector<uint64_t> &data) = 0;
 
   /**
    * @brief Decodes a plaintext message into a vector of floats.

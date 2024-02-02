@@ -124,7 +124,7 @@ inline AsealCiphertext& _to_ciphertext(ACiphertext& c){
 class Aseal : public Afhe {
 private:
   shared_ptr<seal::SEALContext> context;     /**< Pointer to the SEAL context object. */
-  shared_ptr<seal::BatchEncoder> bfvEncoder; /**< Pointer to the BatchEncoder object. */
+  shared_ptr<seal::BatchEncoder> encoder;    /**< Pointer to the BatchEncoder object. */
 
   shared_ptr<seal::KeyGenerator> keyGenObj;  /** Key generator.*/
   shared_ptr<seal::SecretKey> secretKey;     /** Secret key.*/
@@ -180,6 +180,8 @@ public:
   */
   inline shared_ptr<SEALContext> get_context();
 
+  int batch_slot_count() override;
+
   // ------------------ Keys ------------------
 
   void KeyGen() override;
@@ -198,6 +200,12 @@ public:
   // void decrypt_v(vector<shared_ptr<ACiphertext>> &ctxts, vector<shared_ptr<APlaintext>> &ptxts);
 
   int invariant_noise_budget(ACiphertext &ctxt) override;
+
+  // -------------------- Codec --------------------
+
+  void encode_int(vector<uint64_t> &data, APlaintext &ptxt) override;
+  void decode_int(APlaintext &ptxt, vector<uint64_t> &data) override;
+
   // ------------------ Arithmetic ------------------
 
   void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;

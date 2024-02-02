@@ -92,3 +92,65 @@ TEST(BFV_Encrypt, NoPlaintextConversion) {
     EXPECT_STREQ(pt_x_dec.to_string().c_str(), to_string(plaintext).c_str());
   }
 }
+
+TEST(BFV_Encrypt, EncryptVectorInteger) {
+
+  Aseal* fhe = new Aseal();
+
+  std::map<int, int> modulusToBitSize = {
+    // {1024, 17}, /* modulus too small */
+    {2048, 18},
+    {4096, 19},
+    {8192, 20},
+    {16384, 21}
+  };
+
+  for (const auto& pair : modulusToBitSize) {
+    int modulus = pair.first;
+    int bitSize = pair.second;
+
+    string ctx = fhe->ContextGen(scheme::bfv, modulus, bitSize, -1, 128);
+
+    // Expect two strings not to be equal.
+    EXPECT_STREQ(ctx.c_str(), "success: valid");
+
+    fhe->KeyGen();
+
+    AsealPlaintext pt_x = AsealPlaintext();
+
+    /*
+      Here we create the following matrix:
+        [ 1,  2,  3,  4,  0,  0,  0,  0 ]
+        [ 0,  0,  0,  0,  0,  0,  0,  0 ]
+    */
+    vector<uint64_t> x(8, 0ULL);
+    x[0] = 1ULL;
+    x[1] = 2ULL;
+    x[2] = 3ULL;
+    x[3] = 4ULL;
+
+    fhe->encode_int(x, pt_x);
+
+    // When batching, plaintext has poly_modulus_degree / 2 slots.
+    size_t slot_count = fhe->batch_slot_count();
+    size_t max_pt_row_size = slot_count / 2;
+    EXPECT_EQ(max_pt_row_size, modulus / 2);
+
+    AsealCiphertext ct_x = AsealCiphertext();
+    fhe->encrypt(pt_x, ct_x);
+
+    // Decryption can be incorrect when noise budget is zero.
+    EXPECT_GT(fhe->invariant_noise_budget(ct_x), 0);
+
+    AsealPlaintext decrypt_x = AsealPlaintext();
+    fhe->decrypt(ct_x, decrypt_x);
+
+    vector<uint64_t> decode_x;
+    fhe->decode_int(decrypt_x, decode_x);
+
+    // Plaintext x and decoded_x must be equal.
+    for (int i = 0; i < x.size(); i++) {
+      EXPECT_EQ(x[i], decode_x[i]);
+    }
+  }
+}
