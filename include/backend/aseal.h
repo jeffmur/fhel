@@ -197,6 +197,7 @@ public:
   void decrypt(ACiphertext &ctxt, APlaintext &ptxt) override;
   // void decrypt_v(vector<shared_ptr<ACiphertext>> &ctxts, vector<shared_ptr<APlaintext>> &ptxts);
 
+  int invariant_noise_budget(ACiphertext &ctxt) override;
   // ------------------ Arithmetic ------------------
 
   void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;

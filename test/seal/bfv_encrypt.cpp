@@ -43,6 +43,10 @@ TEST(BFV_Encrypt, ConvertToHexadecimal) {
     AsealPlaintext pt_x_dec = AsealPlaintext();
 
     fhe->encrypt(pt_x, ct_x);
+
+    // 54 or 55 bits of noise budget are accumulated.
+    EXPECT_LE(fhe->invariant_noise_budget(ct_x), 55);
+
     fhe->decrypt(ct_x, pt_x_dec);
 
     // Expect decryption to be equal to plaintext.
@@ -78,6 +82,10 @@ TEST(BFV_Encrypt, NoPlaintextConversion) {
     AsealPlaintext pt_x_dec = AsealPlaintext();
 
     fhe->encrypt(pt_x, ct_x);
+
+    // 54 or 55 bits of noise budget are accumulated.
+    EXPECT_LE(fhe->invariant_noise_budget(ct_x), 55);
+
     fhe->decrypt(ct_x, pt_x_dec);
 
     // Without hexademical "compression", must increase modulus.

@@ -180,6 +180,11 @@ extern "C" {
     APlaintext* decrypt(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
 
     /**
+     * @brief Calculate the added noise to the ciphertext.
+    */
+    int invariant_noise_budget(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
+
+    /**
      * @brief Add two ciphertexts.
      * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
