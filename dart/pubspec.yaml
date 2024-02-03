@@ -11,7 +11,7 @@ dependencies:
   ffi: ^2.1.0
   flutter:
     sdk: flutter
-  path: ^1.9.0
+  path: ^1.8.3
 
 dev_dependencies:
   flutter_lints: ^3.0.0
@@ -22,10 +22,10 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
-  # To add assets to your package, add an assets section, like this:
-  assets:
-    - ../build/libfhel.so
+  plugin:
+    platforms:
+      android:
+        ffiPlugin: true
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/assets-and-images/#from-packages

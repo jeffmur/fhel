@@ -21,9 +21,9 @@ trust-project:
 	@git submodule update --init --recursive
 
 # Install dependencies
-.PHONY: install-deps
-install-deps:
-	@cd $(FHE_LIB_SRC); BACKEND=seal $(MAKE) install
+# .PHONY: install-deps
+# install-deps:
+# 	@cd $(FHE_LIB_SRC); BACKEND=seal $(MAKE) install
 
 # Build helper, e.g hello_world
 .PHONY: build-cmake
@@ -34,7 +34,7 @@ build-cmake:
 
 # Install Dependencies and Build Project
 .PHONY: build
-build: trust-project install-deps build-cmake
+build: trust-project build-cmake
 
 .PHONY: ctest
 ctest:

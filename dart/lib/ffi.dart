@@ -1,18 +1,19 @@
 import 'dart:ffi';
-import 'dart:io' show Directory;
-import 'package:path/path.dart' as path;
 import 'dart:io' show Platform;
 
-String os = Platform.operatingSystem;
 
-var file = switch (os) {
-  'macos' => 'libfhel.dylib',
-  'windows' => 'fhel.dll',
-  _ => 'libfhel.so'
-};
+const String _libName = 'fhel';
 
-// from project root (parent of dart folder)
-// var libraryPath = path.join(Directory.current.parent.path, 'build', file);
-var libraryPath = path.join(Directory.current.path, 'bin', file);
-
-final dylib = DynamicLibrary.open(libraryPath);
+/// The dynamic library in which the symbols for [AndroidNativeAddBindings] can be found.
+final DynamicLibrary dylib = () {
+  if (Platform.isMacOS || Platform.isIOS) {
+    return DynamicLibrary.open('$_libName.framework/$_libName');
+  }
+  if (Platform.isAndroid || Platform.isLinux) {
+    return DynamicLibrary.open('lib$_libName.so');
+  }
+  if (Platform.isWindows) {
+    return DynamicLibrary.open('$_libName.dll');
+  }
+  throw UnsupportedError('Unknown platform: ${Platform.operatingSystem}');
+}();

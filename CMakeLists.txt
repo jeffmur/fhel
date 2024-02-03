@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(fhel VERSION 1.0.0 LANGUAGES CXX)
 
 # Import Backend Library
+add_subdirectory(src/backend/seal)
 find_package(SEAL 4.1 REQUIRED)
 
 # Include header files
@@ -26,7 +27,7 @@ add_library(fhel SHARED
     src/fhe.cpp
 )
 
-target_link_libraries(fhel PRIVATE SEAL::seal_shared)
+target_link_libraries(fhel PUBLIC SEAL::seal_shared)
 
 set_target_properties(fhel PROPERTIES
     PUBLIC_HEADER include/fhe.h
@@ -34,6 +35,8 @@ set_target_properties(fhel PROPERTIES
     SOVERSION 1
     OUTPUT_NAME "fhel"
 )
+
+target_compile_definitions(fhel PUBLIC DART_SHARED_LIB)
 
 enable_testing()
 
