@@ -180,8 +180,6 @@ public:
   */
   inline shared_ptr<SEALContext> get_context();
 
-  int batch_slot_count() override;
-
   // ------------------ Keys ------------------
 
   void KeyGen() override;

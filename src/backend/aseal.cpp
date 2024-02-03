@@ -74,11 +74,6 @@ string Aseal::ContextGen(scheme scheme,
   }
 }
 
-int Aseal::batch_slot_count()
-{
-  return this->encoder->slot_count();
-}
-
 shared_ptr<SEALContext> inline Aseal::get_context()
 {
   if (this->context == nullptr)

@@ -37,9 +37,6 @@ public:
     void KeyGen() override {
         return;
     }
-    int batch_slot_count() override {
-        return -1;
-    }
     // string get_secret_key() override {
     //     return "Not Implemented";
     // }

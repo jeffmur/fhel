@@ -131,11 +131,6 @@ TEST(BFV_Encrypt, EncryptVectorInteger) {
 
     fhe->encode_int(x, pt_x);
 
-    // When batching, plaintext has poly_modulus_degree / 2 slots.
-    size_t slot_count = fhe->batch_slot_count();
-    size_t max_pt_row_size = slot_count / 2;
-    EXPECT_EQ(max_pt_row_size, modulus / 2);
-
     AsealCiphertext ct_x = AsealCiphertext();
     fhe->encrypt(pt_x, ct_x);
 

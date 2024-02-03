@@ -78,11 +78,6 @@ public:
     uint64_t plain_modulus_bit_size, uint64_t plain_modulus,
     int sec_level, vector<int> qi_sizes = {}, vector<uint64_t> qi_mods = {}) = 0;
 
-  /**
-   * @brief Returns the number of slots for batching.
-  */
-  virtual int batch_slot_count() = 0;
-
   // virtual vector<uint64_t> get_qi() = 0;
   // virtual uint64_t get_plain_modulus() = 0;
   // virtual size_t get_poly_modulus_degree() = 0;
