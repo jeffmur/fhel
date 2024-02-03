@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:fhe/fhe.dart' show FHE;
+import 'package:fhel/fhe.dart' show FHE;
 
 void main() {
   test('Valid Parameters', () {

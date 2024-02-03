@@ -1,7 +1,7 @@
 import 'dart:ffi';
 import 'package:ffi/ffi.dart'; // for Utf8
-import 'package:fhe/ffi.dart' show dylib;
-import 'package:fhe/afhe/type.dart' show BackendType, Backend;
+import 'package:fhel/ffi.dart' show dylib;
+import 'package:fhel/afhe/type.dart' show BackendType, Backend;
 
 typedef InitPlaintextC = Pointer Function(BackendType backend);
 typedef InitPlaintext = Pointer Function(int backend);

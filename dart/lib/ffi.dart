@@ -12,6 +12,7 @@ var file = switch (os) {
 };
 
 // from project root (parent of dart folder)
-var libraryPath = path.join(Directory.current.parent.path, 'build', file);
+// var libraryPath = path.join(Directory.current.parent.path, 'build', file);
+var libraryPath = path.join(Directory.current.path, 'bin', file);
 
 final dylib = DynamicLibrary.open(libraryPath);
