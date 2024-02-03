@@ -121,7 +121,6 @@ TEST(BFV_Encrypt, EncryptVectorInteger) {
     /*
       Here we create the following matrix:
         [ 1,  2,  3,  4,  0,  0,  0,  0 ]
-        [ 0,  0,  0,  0,  0,  0,  0,  0 ]
     */
     vector<uint64_t> x(8, 0ULL);
     x[0] = 1ULL;
