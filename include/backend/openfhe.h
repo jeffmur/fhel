@@ -49,6 +49,12 @@ public:
     void decrypt(ACiphertext &ctxt, APlaintext &ptxt) override {
         return;
     }
+    void encode_int(vector<uint64_t> &data, APlaintext &ptxt) override {
+        return;
+    }
+    void decode_int(APlaintext &ptxt, vector<uint64_t> &data) override {
+        return;
+    }
     int invariant_noise_budget(ACiphertext &ctxt) override {
         return -1;
     }

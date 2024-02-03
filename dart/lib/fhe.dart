@@ -1,6 +1,7 @@
 library fhe;
 
 import 'dart:ffi';
+import 'package:fhe/afhe/codec.dart';
 import 'package:fhe/afhe/crypto.dart';
 import 'package:fhe/ffi.dart' show dylib;
 import 'package:ffi/ffi.dart'; // for Utf8
@@ -65,8 +66,8 @@ class FHE {
         library,
         scheme.value,
         context['polyModDegree'],
-        context['ptModBit'] ?? 0, // Not used in BFV (maybe batching?)
-        context['ptMod'],
+        context['ptModBit'] ?? 0, // Only used when batching
+        context['ptMod'] ?? 0, // Not used when batching
         context['secLevel']);
 
     return ptr.toDartString();
@@ -112,6 +113,19 @@ class FHE {
     return c_invariant_noise_budget(backend.value, library, ciphertext.library);
   }
 
+  Plaintext encodeVecInt(List<int> vec) {
+    Pointer ptr = c_encode_vector_int(
+        backend.value, library, intListToArray(vec), vec.length);
+
+    return Plaintext.fromObject(backend, ptr);
+  }
+
+  List<int> decodeVecInt(Plaintext plaintext, int arrayLength) {
+    return arrayToIntList(
+        c_decode_vector_int(backend.value, library, plaintext.obj),
+        arrayLength);
+  }
+
   Ciphertext add(Ciphertext a, Ciphertext b) {
     Pointer ptr = c_add(backend.value, library, a.library, b.library);
 
@@ -120,27 +134,3 @@ class FHE {
     return ctx;
   }
 }
-
-// void main() {
-//   final fhe = FHE.withScheme('seal', 'bfv');
-//   print(fhe.genContext(4096, 20, 1024, 128));
-//   fhe.genKeys();
-
-//   // Max is 399. TODO: WHY?!
-//   Plaintext pt_x = Plaintext.withValue(fhe.backend, "100");
-//   Plaintext pt_add = Plaintext.withValue(fhe.backend, "80");
-
-//   print("<dart> pt_x: ${pt_x.text}");
-//   print("<dart> pt_add: ${pt_add.text}");
-
-//   Ciphertext ct_x = fhe.encrypt(pt_x);
-//   Ciphertext ct_add = fhe.encrypt(pt_add);
-
-//   Ciphertext ct_res = fhe.add(ct_x, ct_add);
-
-//   Plaintext res = fhe.decrypt(ct_res);
-
-//   print(res.text);
-
-//   // print(cipher.library);
-// }

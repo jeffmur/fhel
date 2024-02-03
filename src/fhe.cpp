@@ -180,3 +180,46 @@ ACiphertext* add(backend_t backend, Afhe* afhe, ACiphertext* ctxt1, ACiphertext*
         return init_ciphertext(backend);
     }
 }
+
+APlaintext* encode_int(backend_t backend, Afhe* afhe, uint64_t* data, int size) {
+    switch(backend)
+    {
+    case backend_t::seal_t:
+    {
+        APlaintext* ptxt = init_plaintext(backend);
+        try {
+            // Convert array to vector
+            vector<uint64_t> data_vec(data, data + size);
+            afhe->encode_int(data_vec, *ptxt);
+        }
+        catch (invalid_argument &e) {
+            cout << "error: [encode_int] " << e.what() << endl;
+        }
+        return ptxt;
+    }
+    default:
+        return init_plaintext(backend);
+    }
+}
+
+uint64_t* decode_int(backend_t backend, Afhe* afhe, APlaintext* ptxt) {
+    switch(backend)
+    {
+    case backend_t::seal_t:
+    {
+        vector<uint64_t> data;
+        try {
+            afhe->decode_int(*ptxt, data);
+        }
+        catch (invalid_argument &e) {
+            cout << "error: [decode_int] " << e.what() << endl;
+        }
+        // Extract vector contents to array
+        uint64_t* result = new uint64_t[data.size()];
+        copy(data.begin(), data.end(), result);
+        return result;
+    }
+    default:
+        return nullptr;
+    }
+}
