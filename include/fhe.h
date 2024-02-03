@@ -83,11 +83,6 @@ static map<const char*, backend_t, cmp_str> backend_t_map{
 };
 
 extern "C" {
-    struct Array
-    {
-      int* array;
-      int len;
-    };
     /**
      * @brief Convert backend type to string.
      * @param backend Backend library to convert.
