@@ -25,4 +25,21 @@ void main() {
     // Validate that integers are equal
     expect(int.parse(decrypted.text, radix: 16), 2500);
   });
+
+  test('BFV Encrypt List<int>', () {
+    final fhe = FHE.withScheme('seal', 'bfv');
+    fhe.genContext(
+        {'polyModDegree': 8192, 'ptModBit': 20, 'ptMod': 0, 'secLevel': 128});
+    fhe.genKeys();
+
+    List<int> vec = [1, 2, 3, 4];
+
+    final ptx = fhe.encodeVecInt(vec);
+
+    final res = fhe.decodeVecInt(ptx, 4);
+
+    for (int i = 0; i < res.length; i++) {
+      expect(res[i], vec[i]);
+    }
+  });
 }

@@ -83,6 +83,11 @@ static map<const char*, backend_t, cmp_str> backend_t_map{
 };
 
 extern "C" {
+    struct Array
+    {
+      int* array;
+      int len;
+    };
     /**
      * @brief Convert backend type to string.
      * @param backend Backend library to convert.
@@ -194,6 +199,24 @@ extern "C" {
     // const char* get_secret_key(Afhe* afhe);
 
     // const char* get_public_key(Afhe* afhe);
+
+    /**
+     * @brief Encode a vector of integers into a plaintext.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+     * @param data Vector of integers to encode.
+     * @return Pointer to the plaintext.
+    */
+    APlaintext* encode_int(backend_t backend, Afhe* afhe, uint64_t* data, int len);
+
+    /**
+     * @brief Decode a plaintext into a vector of integers.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+     * @param plaintext Pointer to the plaintext.
+     * @return Vector of integers.
+    */
+    uint64_t* decode_int(backend_t backend, Afhe* afhe, APlaintext* plaintext);
 }
 
 #endif /* FHE_H */
