@@ -28,7 +28,6 @@ class Plaintext {
   String text = "";
   Backend backend = Backend();
   Pointer obj = nullptr;
-  bool isVector = false;
 
   Plaintext(this.backend) {
     obj = c_init_plaintext(backend.value);
@@ -40,10 +39,9 @@ class Plaintext {
     // print(obj);
   }
 
-  Plaintext.fromObject(this.backend, this.obj, this.isVector) {
+  Plaintext.fromObject(this.backend, this.obj) {
     text = c_get_plaintext(obj).toDartString();
   }
-
 }
 
 // void main() {

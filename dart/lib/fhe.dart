@@ -105,7 +105,7 @@ class FHE {
   Plaintext decrypt(Ciphertext ciphertext) {
     Pointer ptr = c_decrypt(backend.value, library, ciphertext.library);
 
-    Plaintext ptx = Plaintext.fromObject(backend, ptr, true);
+    Plaintext ptx = Plaintext.fromObject(backend, ptr);
     return ptx;
   }
 
@@ -117,7 +117,7 @@ class FHE {
     Pointer ptr = c_encode_vector_int(
         backend.value, library, intListToArray(vec), vec.length);
 
-    return Plaintext.fromObject(backend, ptr, true);
+    return Plaintext.fromObject(backend, ptr);
   }
 
   List<int> decodeVecInt(Plaintext plaintext, int arrayLength) {
