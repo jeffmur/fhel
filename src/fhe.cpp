@@ -181,22 +181,6 @@ ACiphertext* add(backend_t backend, Afhe* afhe, ACiphertext* ctxt1, ACiphertext*
     }
 }
 
-void print_uint64_t_array(uint64_t* ptr, size_t size) {
-    std::cout << "uint64_t: ";
-    for (size_t i = 0; i < size; i++) {
-        std::cout << ptr[i] << " ";
-    }
-    std::cout << std::endl;
-}
-
-void print_vector(const vector<uint64_t>& data) {
-    cout << "vector: ";
-    for (const auto& element : data) {
-        cout << element << " ";
-    }
-    cout << endl;
-}
-
 APlaintext* encode_int(backend_t backend, Afhe* afhe, uint64_t* data, int size) {
     switch(backend)
     {
@@ -204,11 +188,8 @@ APlaintext* encode_int(backend_t backend, Afhe* afhe, uint64_t* data, int size) 
     {
         APlaintext* ptxt = init_plaintext(backend);
         try {
-            // print_uint64_t_array(data, size);
             // Convert array to vector
             vector<uint64_t> data_vec(data, data + size);
-
-            // print_vector(data_vec);
             afhe->encode_int(data_vec, *ptxt);
         }
         catch (invalid_argument &e) {
@@ -233,12 +214,10 @@ uint64_t* decode_int(backend_t backend, Afhe* afhe, APlaintext* ptxt) {
         catch (invalid_argument &e) {
             cout << "error: [decode_int] " << e.what() << endl;
         }
-        // cout << "data size: " << data.size() << endl;
-        // print_uint64_t_array(data.data(), data.size());
+        // Extract vector contents to array
         uint64_t* result = new uint64_t[data.size()];
-        std::copy(data.begin(), data.end(), result);
+        copy(data.begin(), data.end(), result);
         return result;
-        // return data.data();
     }
     default:
         return nullptr;

@@ -112,14 +112,6 @@ public:
   virtual void encrypt(APlaintext &ptxt, ACiphertext &ctxt) = 0;
 
   /**
-   * @brief Encrypts a vector of plaintext messages into a vector of ciphertexts.
-   *
-   * @param ptxts The vector of plaintext messages to be encrypted.
-   * @param ctxts The vector of ciphertexts where the encrypted messages will be stored.
-   */
-  // virtual void encrypt_v(vector<shared_ptr<APlaintext>> &ptxts, vector<shared_ptr<ACiphertext>> &ctxts) = 0;
-
-  /**
    * @brief Decrypts a ciphertext into a plaintext message.
    *
    * @param ctxt The ciphertext to be decrypted.
@@ -134,14 +126,6 @@ public:
    * @return The invariant noise budget (in bits) of the ciphertext.
   */
   virtual int invariant_noise_budget(ACiphertext &ctxt) = 0;
-
-  /**
-   * @brief Decrypts a vector of ciphertexts into a vector of plaintext messages.
-   *
-   * @param ctxts The vector of ciphertexts to be decrypted.
-   * @param ptxts The vector of plaintext messages where the decrypted messages will be stored.
-   */
-  // virtual void decrypt_v(vector<shared_ptr<ACiphertext>> &ctxts, vector<shared_ptr<APlaintext>> &ptxts) = 0;
 
   // ------------------ Codec ------------------
 
