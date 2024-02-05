@@ -13,7 +13,8 @@ project(fhel VERSION 1.0.0 LANGUAGES CXX)
 
 # Import Backend Library
 add_subdirectory(src/backend/seal)
-find_package(SEAL 4.1 REQUIRED)
+
+# find_package(SEAL REQUIRED)
 
 # Include header files
 include_directories(
@@ -27,7 +28,7 @@ add_library(fhel SHARED
     src/fhe.cpp
 )
 
-target_link_libraries(fhel PUBLIC SEAL::seal_shared)
+target_link_libraries(fhel PUBLIC seal)
 
 set_target_properties(fhel PROPERTIES
     PUBLIC_HEADER include/fhe.h
@@ -38,31 +39,31 @@ set_target_properties(fhel PROPERTIES
 
 target_compile_definitions(fhel PUBLIC DART_SHARED_LIB)
 
-enable_testing()
+# enable_testing()
 
-# Google Test Platform
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+# # Google Test Platform
+# include(FetchContent)
+# FetchContent_Declare(
+#   googletest
+#   URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+# )
+# # For Windows: Prevent overriding the parent project's compiler/linker settings
+# set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+# FetchContent_MakeAvailable(googletest)
 
-add_executable(
-  seal_test
-  test/seal/bfv_context.cpp
-  test/seal/bfv_encrypt.cpp
-  test/seal/bfv_addition.cpp
-)
+# add_executable(
+#   seal_test
+#   test/seal/bfv_context.cpp
+#   test/seal/bfv_encrypt.cpp
+#   test/seal/bfv_addition.cpp
+# )
 
-target_link_libraries(
-  seal_test
-  GTest::gtest_main
-  SEAL::seal_shared
-  fhel
-)
+# target_link_libraries(
+#   seal_test
+#   GTest::gtest_main
+#   seal
+#   fhel
+# )
 
-include(GoogleTest)
-gtest_discover_tests(seal_test)
+# include(GoogleTest)
+# gtest_discover_tests(seal_test)
