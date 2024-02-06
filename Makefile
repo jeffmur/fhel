@@ -28,10 +28,10 @@ trust-project:
 
 # Build helper, e.g hello_world
 .PHONY: build-cmake
-build-cmake: export UNIT_TEST ?= ON
+build-cmake: UNIT_TEST ?= ON
 build-cmake:
 	@echo "Building project..."
-	@cmake -S . -B $(AL_INSTALL_DIR)
+	@cmake -S . -B $(AL_INSTALL_DIR) -DUNIT_TEST=$(UNIT_TEST)
 	@cmake --build $(AL_INSTALL_DIR)
 
 # Install Dependencies and Build Project
@@ -66,8 +66,7 @@ dtest-ci: build-cmake
 	$(MAKE) dtest
 
 .PHONY: apk-ci
-apk-ci: export ANDROID_SDK_ROOT = /tmp/android-sdk-linux
-apk-ci: export UNIT_TEST = OFF
+apk-ci: export UNIT_TEST = OFF # Disable unit test for release
 apk-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
 	$(MAKE) apk
