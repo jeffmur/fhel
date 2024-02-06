@@ -27,6 +27,7 @@ trust-project:
 
 # Build helper, e.g hello_world
 .PHONY: build-cmake
+build-cmake: UNIT_TEST?=ON
 build-cmake:
 	@echo "Building project..."
 	@cmake -S . -B $(AL_INSTALL_DIR)
