@@ -1,7 +1,10 @@
 #[[
-Project-level CMake, useful for debugging
-* Import additional libraries
-* Compile/Debug via CMake Tools plugin
+    Project-level CMake Config
+    --------------------------
+    * Import / Install backend libraries
+    * Compile source code, fhel, into a shared library
+    * Used for building the Dart package
+    * Enable GoogleTest if UNIT_TEST environment variable is set to ON
 ]]
 cmake_minimum_required(VERSION 3.13)
 
@@ -12,7 +15,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(fhel VERSION 1.0.0 LANGUAGES CXX)
 
 # Import Backend Library
-find_package(SEAL 4.1 REQUIRED)
+add_subdirectory(src/backend/seal)
+
+# find_package(SEAL REQUIRED)
 
 # Include header files
 include_directories(
@@ -26,7 +31,7 @@ add_library(fhel SHARED
     src/fhe.cpp
 )
 
-target_link_libraries(fhel PRIVATE SEAL::seal_shared)
+target_link_libraries(fhel PUBLIC seal)
 
 set_target_properties(fhel PROPERTIES
     PUBLIC_HEADER include/fhe.h
@@ -35,31 +40,36 @@ set_target_properties(fhel PROPERTIES
     OUTPUT_NAME "fhel"
 )
 
-enable_testing()
+target_compile_definitions(fhel PUBLIC DART_SHARED_LIB)
 
-# Google Test Platform
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+# Check if UNIT_TEST environment variable is set to ON
+if(DEFINED ENV{UNIT_TEST} AND "$ENV{UNIT_TEST}" STREQUAL "ON")
+    enable_testing()
 
-add_executable(
-  seal_test
-  test/seal/bfv_context.cpp
-  test/seal/bfv_encrypt.cpp
-  test/seal/bfv_addition.cpp
-)
+    # Google Test Platform
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+    )
+    # For Windows: Prevent overriding the parent project's compiler/linker settings
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
 
-target_link_libraries(
-  seal_test
-  GTest::gtest_main
-  SEAL::seal_shared
-  fhel
-)
+    add_executable(
+        seal_test
+        test/seal/bfv_context.cpp
+        test/seal/bfv_encrypt.cpp
+        test/seal/bfv_addition.cpp
+    )
 
-include(GoogleTest)
-gtest_discover_tests(seal_test)
+    target_link_libraries(
+        seal_test
+        GTest::gtest_main
+        seal
+        fhel
+    )
+
+    include(GoogleTest)
+    gtest_discover_tests(seal_test)
+endif()

@@ -1,7 +1,7 @@
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
-import 'package:fhe/afhe/type.dart' show BackendType;
-import 'package:fhe/ffi.dart' show dylib;
+import 'package:fhel/afhe/type.dart' show BackendType;
+import 'package:fhel/ffi.dart' show dylib;
 
 // encode
 

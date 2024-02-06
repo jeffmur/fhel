@@ -1,6 +1,6 @@
 import 'dart:ffi';
-import 'package:fhe/afhe/type.dart' show BackendType, Backend;
-import 'package:fhe/ffi.dart' show dylib;
+import 'package:fhel/afhe/type.dart' show BackendType, Backend;
+import 'package:fhel/ffi.dart' show dylib;
 
 typedef InitCiphertextC = Pointer Function(BackendType backend);
 typedef InitCiphertext = Pointer Function(int backend);

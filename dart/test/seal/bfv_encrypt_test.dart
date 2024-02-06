@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
-import 'package:fhe/fhe.dart' show FHE;
-import 'package:fhe/afhe/plaintext.dart';
+import 'package:fhel/fhe.dart' show FHE;
+import 'package:fhel/afhe/plaintext.dart';
 
 void main() {
   test('BFV Encrypt Hexidecimal', () {

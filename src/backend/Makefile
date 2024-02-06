@@ -9,10 +9,12 @@ clean:
 .PHONY: trust
 trust:
 	@echo "Trusting seal..."
-	@git config --global --add safe.directory $(BACKEND)
+	@git config --global --add safe.directory $(CMAKE_CURRENT_SOURCE_DIR)/$(BACKEND)
 	@git config --global --add safe.directory $(INSTALL_DIR)/thirdparty/msgsl-src
 	@git config --global --add safe.directory $(INSTALL_DIR)/thirdparty/zlib-src
 	@git config --global --add safe.directory $(INSTALL_DIR)/thirdparty/zstd-src
+
+# TODO: How can we install dependencies in CMakeLists.txt?
 
 .PHONY: build
 build: trust

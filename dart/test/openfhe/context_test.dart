@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:fhe/fhe.dart' show FHE;
+import 'package:fhel/fhe.dart' show FHE;
 
 void main() {
   test('Not Implemented', () {
@@ -9,7 +9,7 @@ void main() {
 
       final fhe_val = FHE.withScheme("openfhe", "bfv");
       final ctx_val = fhe_val.genContext({'polyModDegree': 4096,
-                                          'ptMod': 1024, 
+                                          'ptMod': 1024,
                                           'secLevel': 128});
 
       expect(ctx_val, "warn: [generate_context] Not Implemented");

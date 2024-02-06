@@ -1,17 +1,24 @@
 import 'dart:ffi';
-import 'dart:io' show Directory;
+import 'dart:io' show Directory, Platform;
 import 'package:path/path.dart' as path;
-import 'dart:io' show Platform;
 
-String os = Platform.operatingSystem;
+const String _libName = 'fhel';
 
-var file = switch (os) {
-  'macos' => 'libfhel.dylib',
-  'windows' => 'fhel.dll',
-  _ => 'libfhel.so'
-};
-
-// from project root (parent of dart folder)
-var libraryPath = path.join(Directory.current.parent.path, 'build', file);
-
-final dylib = DynamicLibrary.open(libraryPath);
+final DynamicLibrary dylib = () {
+  var pathPrefix = "";
+  // Development
+  // * Build from project root (parent of dart folder)
+  if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
+    pathPrefix = path.join(Directory.current.parent.path, 'build');
+  }
+  if (Platform.isIOS || Platform.isMacOS) {
+    return DynamicLibrary.open(path.join(pathPrefix, 'lib$_libName.dylib'));
+  }
+  if (Platform.isAndroid || Platform.isLinux) {
+    return DynamicLibrary.open(path.join(pathPrefix, 'lib$_libName.so'));
+  }
+  if (Platform.isWindows) {
+    return DynamicLibrary.open('$_libName.dll');
+  }
+  throw UnsupportedError('Unknown platform: ${Platform.operatingSystem}');
+}();

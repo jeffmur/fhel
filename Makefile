@@ -1,6 +1,7 @@
 PROJECT_ROOT := $(shell pwd)
 DART_SRC ?= $(PROJECT_ROOT)/dart
 FHE_LIB_SRC ?= $(PROJECT_ROOT)/src/backend
+FLUTTER_EXAMPLE ?= $(PROJECT_ROOT)/example
 
 # Abstraction Layer, e.g. hello_world
 AL_INSTALL_DIR ?= $(PROJECT_ROOT)/build
@@ -21,20 +22,21 @@ trust-project:
 	@git submodule update --init --recursive
 
 # Install dependencies
-.PHONY: install-deps
-install-deps:
-	@cd $(FHE_LIB_SRC); BACKEND=seal $(MAKE) install
+# .PHONY: install-deps
+# install-deps:
+# 	@cd $(FHE_LIB_SRC); BACKEND=seal $(MAKE) install
 
 # Build helper, e.g hello_world
 .PHONY: build-cmake
+build-cmake: export UNIT_TEST = ON
 build-cmake:
 	@echo "Building project..."
 	@cmake -S . -B $(AL_INSTALL_DIR)
-	@cmake --build $(AL_INSTALL_DIR) --config Release
+	@cmake --build $(AL_INSTALL_DIR)
 
 # Install Dependencies and Build Project
 .PHONY: build
-build: trust-project install-deps build-cmake
+build: trust-project build-cmake
 
 .PHONY: ctest
 ctest:
@@ -56,3 +58,8 @@ dtest-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
 	@cd $(DART_SRC); $(MAKE) deps
 	$(MAKE) dtest
+
+.PHONY: apk
+apk: export ANDROID_SDK_ROOT ?= /tmp/android-sdk-linux
+apk:
+	@cd $(FLUTTER_EXAMPLE); flutter build apk

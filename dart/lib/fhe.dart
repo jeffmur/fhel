@@ -1,14 +1,14 @@
 library fhe;
 
 import 'dart:ffi';
-import 'package:fhe/afhe/codec.dart';
-import 'package:fhe/afhe/crypto.dart';
-import 'package:fhe/ffi.dart' show dylib;
+import 'package:fhel/afhe/codec.dart';
+import 'package:fhel/afhe/crypto.dart';
+import 'package:fhel/ffi.dart' show dylib;
 import 'package:ffi/ffi.dart'; // for Utf8
-import 'package:fhe/afhe/type.dart';
-import 'package:fhe/afhe/plaintext.dart';
-import 'package:fhe/afhe/ciphertext.dart';
-import 'package:fhe/afhe/operation.dart';
+import 'package:fhel/afhe/type.dart';
+import 'package:fhel/afhe/plaintext.dart';
+import 'package:fhel/afhe/ciphertext.dart';
+import 'package:fhel/afhe/operation.dart';
 
 typedef GenContextC = Pointer<Utf8> Function(
     BackendType backend,

@@ -1,6 +1,6 @@
 import 'dart:ffi';
 import 'package:ffi/ffi.dart'; // for Utf8
-import 'package:fhe/ffi.dart' show dylib;
+import 'package:fhel/ffi.dart' show dylib;
 
 // ------------------ Backend FHE Libraries ------------------
 typedef BackendType = Int;
