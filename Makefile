@@ -1,6 +1,7 @@
 PROJECT_ROOT := $(shell pwd)
 DART_SRC ?= $(PROJECT_ROOT)/dart
 FHE_LIB_SRC ?= $(PROJECT_ROOT)/src/backend
+FLUTTER_EXAMPLE ?= $(PROJECT_ROOT)/example
 
 # Abstraction Layer, e.g. hello_world
 AL_INSTALL_DIR ?= $(PROJECT_ROOT)/build
@@ -57,3 +58,7 @@ dtest-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
 	@cd $(DART_SRC); $(MAKE) deps
 	$(MAKE) dtest
+
+.PHONY: apk
+apk:
+	@cd $(FLUTTER_EXAMPLE); flutter build apk
