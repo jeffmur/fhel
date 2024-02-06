@@ -26,6 +26,8 @@ jobs:
       - name: Build Image 🐳
         if: ${{ steps.changes.outputs.source == 'true' }}
         uses: ./.github/actions/build-and-push-image
+        with:
+          token: ""
         
   cpp-tests:
     name: C++ Test ⚙️

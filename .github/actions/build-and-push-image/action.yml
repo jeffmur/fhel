@@ -14,6 +14,10 @@ inputs:
     description: 'Whether to push the image to the registry'
     default: false
     type: boolean
+  ghcr-token:
+    description: 'The token to use to authenticate with the registry'
+    type: string
+    required: true
 
 runs:
   using: composite
@@ -32,7 +36,7 @@ runs:
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ inputs.ghcr-token }}
 
     - name: Image 🐳
       uses: docker/build-push-action@v5
