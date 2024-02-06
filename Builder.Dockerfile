@@ -17,7 +17,6 @@ ENV PATH="${PATH}:/tmp/flutter/bin"
 ENV ANDROID_SDK_ROOT=/tmp/android-sdk-linux
 RUN flutter config --android-sdk /tmp/android-sdk-linux
 RUN flutter channel stable
-RUN flutter config --no-animations
 
 # Mount Backend
 COPY src/backend /tmp/backend
