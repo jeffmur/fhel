@@ -23,5 +23,5 @@ COPY src/backend /tmp/backend
 COPY Makefile /tmp/Makefile
 
 # Compile Backend Libraries
-RUN make build-cmake
+# RUN make install-deps
 
