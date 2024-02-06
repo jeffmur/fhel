@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+permissions:
+  packages: write
+
+env:
+  IMAGE_TAG: ${{ github.sha }}
+
 jobs:
   build:
     name: Builder 👷
@@ -27,7 +33,9 @@ jobs:
         if: ${{ steps.changes.outputs.source == 'true' }}
         uses: ./.github/actions/build-and-push-image
         with:
-          image_tag: '123'
+          image_tag: $IMAGE_TAG
+          push: true
+          token: ${{ secrets.GITHUB_TOKEN }}
         
   cpp-tests:
     name: C++ Test ⚙️
@@ -40,7 +48,7 @@ jobs:
           submodules: 'true'
 
       - name: Unit Tests 🧪
-        uses: docker://ghcr.io/jeffmur/fhel:123
+        uses: docker://ghcr.io/jeffmur/fhel:$IMAGE_TAG
         with:
           args: make ctest-ci
 
@@ -55,7 +63,7 @@ jobs:
           submodules: 'true'
 
       - name: Unit Tests 🧪
-        uses: docker://ghcr.io/jeffmur/fhel:123
+        uses: docker://ghcr.io/jeffmur/fhel:$IMAGE_TAG
         with:
           args: make dtest-ci
 
@@ -70,6 +78,6 @@ jobs:
           submodules: 'true'
 
       - name: Compile Package 📦
-        uses: docker://ghcr.io/jeffmur/fhel:123
+        uses: docker://ghcr.io/jeffmur/fhel:$IMAGE_TAG
         with:
           args: make apk-ci
