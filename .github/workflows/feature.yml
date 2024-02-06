@@ -42,7 +42,7 @@ jobs:
       - name: Dart Test 🎯
         uses: docker://ghcr.io/jeffmur/fhel:builder
         with:
-          args: make dtest-ci\
+          args: make dtest-ci
 
       - name: Android APK 🤖
         uses: docker://ghcr.io/jeffmur/fhel:builder
