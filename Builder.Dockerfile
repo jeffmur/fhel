@@ -20,7 +20,3 @@ RUN flutter channel stable
 # Mount Backend
 COPY src/backend /tmp/backend
 COPY Makefile /tmp/Makefile
-
-# Compile Backend Libraries
-# RUN make install-deps
-

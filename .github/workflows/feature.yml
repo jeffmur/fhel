@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Feature Build 🏗️
+    name: Builder 👷
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -70,4 +70,4 @@ jobs:
       - name: Compile Package 📦
         uses: docker://ghcr.io/jeffmur/fhel:builder
         with:
-          args: make apk
+          args: make apk-ci
