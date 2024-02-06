@@ -60,6 +60,6 @@ dtest-ci: build-cmake
 	$(MAKE) dtest
 
 .PHONY: apk
-apk: export ANDROID_SDK_ROOT = /tmp/android-sdk-linux
+apk: export ANDROID_SDK_ROOT ?= /tmp/android-sdk-linux
 apk:
 	@cd $(FLUTTER_EXAMPLE); flutter build apk
