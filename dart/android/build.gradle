@@ -45,23 +45,31 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags ""
-                arguments "-DSEAL_BUILD_SEAL_C=1",
-                          "-DSEAL_USE_INTRIN=1",
+                arguments "-DSEAL_BUILD_DEPS=OFF", "-DSEAL_USE_MSGSL=OFF", "-DSEAL_USE_ZLIB=OFF", "-DSEAL_USE_ZSTD=OFF",
+                        // "-DSEAL_USE_INTRIN=1",
+                        //   "-DSEAL_BUILD_SEAL_C=1",
                         //   "-DSEAL_USE_ZLIB=OFF",
                         //   "-DBUILD_SHARED_LIBS=ON",
-                          "-DSEAL_ARM64_EXITCODE=0",
-                          "-DSEAL_ARM64_EXITCODE__TRYRUN_OUTPUT=''",
+                        //   "-DSEAL_ARM64_EXITCODE=0",
+                        //   "-DSEAL_ARM64_EXITCODE__TRYRUN_OUTPUT=''",
                           "-DSEAL___BUILTIN_CLZLL_FOUND_EXITCODE=0",
-                          "-DSEAL___BUILTIN_CLZLL_FOUND_EXITCODE__TRYRUN_OUTPUT=''",
-                          "-DSEAL__ADDCARRY_U64_FOUND_EXITCODE=0",
-                          "-DSEAL__ADDCARRY_U64_FOUND_EXITCODE__TRYRUN_OUTPUT=''",
-                          "-DSEAL__SUBBORROW_U64_FOUND_EXITCODE=0",
-                          "-DSEAL__SUBBORROW_U64_FOUND_EXITCODE__TRYRUN_OUTPUT=''"
+                          "-DSEAL___BUILTIN_CLZLL_FOUND_EXITCODE__TRYRUN_OUTPUT=''"
+                        //   "-DSEAL__ADDCARRY_U64_FOUND_EXITCODE=0",
+                        //   "-DSEAL__ADDCARRY_U64_FOUND_EXITCODE__TRYRUN_OUTPUT=''",
+                        //   "-DSEAL__SUBBORROW_U64_FOUND_EXITCODE=0",
+                        //   "-DSEAL__SUBBORROW_U64_FOUND_EXITCODE__TRYRUN_OUTPUT=''"
             }
         }
         ndk {
-            abiFilters 'x86_64'
+            /**
+             * Specifies the ABI (Application Binary Interface) filters for native libraries.
+             * The supported options for `abiFilters` are: [arm64-v8a, armeabi-v7a, x86, x86_64]
+             * Multiple filters can be specified by separating them with commas.
+             */
+            // abiFilters 'armeabi-v7a'
             abiFilters 'arm64-v8a'
+            // abiFilters 'x86'
+            // abiFilters 'x86_64'
         }
     }
 

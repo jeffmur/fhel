@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:fhel/fhe.dart' as fhel;
+import 'package:fhel/afhe/plaintext.dart' show Plaintext;
 
 void main() {
   runApp(const MyApp());
@@ -15,13 +16,24 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late String ctxStatus;
   late int sumResult;
   late Future<int> sumAsyncResult;
 
   @override
   void initState() {
     super.initState();
-    final fhe = fhel.FHE('seal');
+    final fhe = fhel.FHE.withScheme('seal', 'bfv');
+    ctxStatus =
+        fhe.genContext({'polyModDegree': 4096, 'ptMod': 1024, 'secLevel': 128});
+    fhe.genKeys();
+    final pt_x = Plaintext.withValue(fhe.backend, '1');
+    final ct_x = fhe.encrypt(pt_x);
+    final pt_add = Plaintext.withValue(fhe.backend, '2');
+    final ct_add = fhe.encrypt(pt_add);
+    final ct_res = fhe.add(ct_x, ct_add);
+
+    sumResult = int.parse(fhe.decrypt(ct_res).text);
   }
 
   @override
@@ -39,29 +51,15 @@ class _MyAppState extends State<MyApp> {
             child: Column(
               children: [
                 const Text(
-                  'This calls a native function through FFI that is shipped as source in the package. '
-                  'The native code is built as part of the Flutter Runner build.',
+                  'FHE with SEAL and BFV Scheme',
                   style: textStyle,
                   textAlign: TextAlign.center,
                 ),
                 spacerSmall,
                 Text(
-                  'sum(1, 2) = $sumResult',
+                  'add(1, 2) = $sumResult',
                   style: textStyle,
                   textAlign: TextAlign.center,
-                ),
-                spacerSmall,
-                FutureBuilder<int>(
-                  future: sumAsyncResult,
-                  builder: (BuildContext context, AsyncSnapshot<int> value) {
-                    final displayValue =
-                        (value.hasData) ? value.data : 'loading';
-                    return Text(
-                      'await sumAsync(3, 4) = $displayValue',
-                      style: textStyle,
-                      textAlign: TextAlign.center,
-                    );
-                  },
                 ),
               ],
             ),
