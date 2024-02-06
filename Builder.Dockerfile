@@ -23,5 +23,5 @@ COPY src/backend /tmp/backend
 COPY Makefile /tmp/Makefile
 
 # Compile Backend Libraries
-RUN FHE_LIB_SRC=backend make install-deps
+RUN make build-cmake
 
