@@ -14,7 +14,6 @@ COPY --from=builder /usr/local/flutter /tmp/flutter
 RUN git config --global --add safe.directory /tmp/flutter
 
 ENV PATH="${PATH}:/tmp/flutter/bin"
-ENV ANDROID_SDK_ROOT=/tmp/android-sdk-linux
 RUN flutter config --android-sdk /tmp/android-sdk-linux
 RUN flutter channel stable
 
