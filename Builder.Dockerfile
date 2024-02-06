@@ -16,11 +16,3 @@ RUN git config --global --add safe.directory /tmp/flutter
 ENV PATH="${PATH}:/tmp/flutter/bin"
 RUN flutter config --android-sdk /tmp/android-sdk-linux
 RUN flutter channel stable
-
-# Mount Backend
-COPY src/backend /tmp/backend
-COPY Makefile /tmp/Makefile
-
-# Compile Backend Libraries
-RUN make build-cmake
-
