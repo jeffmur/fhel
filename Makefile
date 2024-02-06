@@ -27,11 +27,11 @@ trust-project:
 
 # Build helper, e.g hello_world
 .PHONY: build-cmake
-build-cmake: UNIT_TEST?=ON
+build-cmake: export UNIT_TEST = ON
 build-cmake:
 	@echo "Building project..."
 	@cmake -S . -B $(AL_INSTALL_DIR)
-	@cmake --build $(AL_INSTALL_DIR) --config Release
+	@cmake --build $(AL_INSTALL_DIR)
 
 # Install Dependencies and Build Project
 .PHONY: build
