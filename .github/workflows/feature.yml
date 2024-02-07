@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     container:
-      image: ghcr.io/jeffmur/fhel:${{ needs.build.outputs.IMAGE_TAG }}
+      image: ghcr.io/jeffmur/fhel:${{ needs.build.outputs.IMAGE_TAG || 'builder' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,32 +50,30 @@ jobs:
 
       - run: make ctest-ci
 
-  # dart-tests:
-  #   name: Dart Test 🎯
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #       with:
-  #         submodules: 'true'
+  dart-tests:
+    name: Dart Test 🎯
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: ghcr.io/jeffmur/fhel:${{ needs.build.outputs.IMAGE_TAG || 'builder' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
 
-  #     - name: Unit Tests 🧪
-  #       uses: docker://ghcr.io/jeffmur/fhel:$IMAGE_TAG
-  #       with:
-  #         args: make dtest-ci
+      - run: make dtest-ci
 
-  # android-apk:
-  #   name: Android APK 🤖
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #       with:
-  #         submodules: 'true'
+  android-apk:
+    name: Android APK 🤖
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: ghcr.io/jeffmur/fhel:${{ needs.build.outputs.IMAGE_TAG || 'builder' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
 
-  #     - name: Compile Package 📦
-  #       uses: docker://ghcr.io/jeffmur/fhel:$IMAGE_TAG
-  #       with:
-  #         args: make apk-ci
+      - run: make apk-ci
