@@ -1,67 +1,53 @@
-# Implementation Layer
+<!--
+This README describes the package. If you publish this package to pub.dev,
+this README's contents appear on the landing page for your package.
 
-The [adapter](https://refactoring.guru/design-patterns/adapter) design of this library interfaces with the abstraction layer, [README.md](../include/README.md). Using [dart:ffi](https://pub.dev/packages/ffi), Dart can execute C functions, reference memory addresses of object, and convert primitive data types.
+For information about how to write a good package README, see the guide for
+[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
 
-```mermaid
+For general information about developing packages, see the Dart guide for
+[creating packages](https://dart.dev/guides/libraries/create-library-packages)
+and the Flutter guide for
+[developing packages and plugins](https://flutter.dev/developing-packages).
+-->
 
-classDiagram
-    class Plaintext {
-        String text
-        Backend backend
-        Pointer obj
+# FHEL
 
-        Plaintext(Backend, String)
-        Plaintext(Backend, Pointer)
-    }
+A Fully Homomorphic Encryption Library (FHEL) interface that exposes the basic functionalities of Microsoft [SEAL](https://github.com/microsoft/SEAL). Supports Android and Linux.
 
-    class Ciphertext {
-        Backend backend
-        Pointer library
+## Usage
 
-        Ciphertext(Backend)
-    }
+To use this plugin, add `fhel` as a dependency in your pubspec.yaml
 
-    class Backend {
-        int value
-        String name
-        
-        Backend(String)
-    }
+```dart
 
-    class Scheme {
-        int value
-        String name
+// SEALContext with BFV Scheme
+final fhe = FHE.withScheme('seal', 'bfv');
 
-        Scheme(String)
-    }
+// Generate context w/ parameters
+Map<String, int> ctx = {
+      'polyModDegree': 4096,
+      'ptMod': 1024,
+      'secLevel': 128
+};
+String status = fhe.genContext(context);
+assert(status == 'success: valid', status)
 
-    Plaintext --> FHE
-    Ciphertext --> FHE
-    Backend --> FHE
-    Scheme --> FHE
+// Generate public/private keys
+fhe.genKeys();
 
-    class FHE {
-        Backend backend
-        Scheme scheme
-        Pointer library
+// Create Plaintext obj, contain pointer SEALPlaintext
+final pt_x = Plaintext.withValue(fhe.backend, '1');
+final pt_add = Plaintext.withValue(fhe.backend, '2');
 
-        FHE(String)
+// Create Ciphertext obj, contain pointer to SEALCiphertext
+final ct_x = fhe.encrypt(pt_x);
+final ct_add = fhe.encrypt(pt_add);
 
-        FHE(String, String)
+// Add Ciphertexts, enc(1) + enc(2) = enc(3)
+final ct_res = fhe.add(ct_x, ct_add);
+final pt_res = fhe.decrypt(ct_res);
 
-        genContext(Map): void
-        genKeys()
-        encrypt(Plaintext): Ciphertext
-        decrypt(Ciphertext): Plaintext
-        add(Ciphertext, Ciphertext): Ciphertext
-    }
+assert(pt_res.text == '3', 'Addition Failed')
 
 ```
-
-Legend:
-* `Plaintext`: Represents a plaintext value and provides a `to_string()` method to convert it to a string.
-
-* `Ciphertext`: Represents an encrypted ciphertext value and provides a `size()` method to get its size.
-
-* `FHE`: Models the desired backend FHE library and encryption schemas. Enables callers execute basic FHE functionalities.
-

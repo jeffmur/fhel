@@ -1,16 +1,25 @@
 # fhel_example
 
-Demonstrates how to use the fhel plugin.
+Demonstrates how to use the fhel plugin integrates into an Flutter Application.
+
+Supported OS Release: Android
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Compile AFHEL + Dependencies (SEAL):
 
-A few resources to get you started if this is your first Flutter project:
+From the root of this directory, install via CMakeLists.txt
+```zsh
+cmake -S . -B build -DUNIT_TEST=OFF
+cmake --build build
+cd example && flutter build apk
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Note: `UNIT_TEST` enables/disables GTest Suite. \
+For APK releases, they are not needed, and it may fail compilation.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+OR via Makefile
+```zsh
+make build-cmake
+make apk
+```
