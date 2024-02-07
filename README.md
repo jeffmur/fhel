@@ -88,8 +88,7 @@ class FHE {
     Pointer library
 
     FHE(Backend)
-
-    FHE.withScheme(Backend, Scheme)
+    FHE(Backend, Scheme)
 
     genContext(Map): void
     genKeys()
@@ -101,11 +100,16 @@ class FHE {
 ```
 
 **Legend**:
-* `Plaintext`: Represents a plaintext value and provides a `to_string()` method to convert it to a string.
-
-* `Ciphertext`: Represents an encrypted ciphertext value and provides a `size()` method to get its size.
 
 * `FHE`: Models the desired backend FHE library and encryption schemas. Enables callers execute basic FHE functionalities.
+
+* `Plaintext`: Represents a plaintext value and contains a Pointer with the memory address of AFHE Plaintext.
+
+* `Ciphertext`: Represents an encrypted ciphertext value and contains a Pointer with the memory address of AFHE Ciphertext.
+
+* `Backend`: Contains integer and string value to convert to C Enum backend, for example `backend_t::seal`.
+
+* `Scheme`: Contains integer and string value to convert to C Enum scheme, for example `scheme_t::bfv`.
 
 
 ## AFHE: Abstraction Layer
