@@ -116,7 +116,7 @@ class FHE {
 
 Abstract Fully Homomorphic Encryption Library (AFHE)
 
-The [bridge](https://refactoring.guru/design-patterns/bridge) design of this library implements an abstraction layer over existing Fully Homomorphic Encryption (FHE) libraries. Through abstraction, we can interface with various backend libraries via the same function calls.
+The [bridge](https://refactoring.guru/design-patterns/bridge) design of this library implements an abstraction layer over existing Fully Homomorphic Encryption (FHE) libraries. Through abstraction, we can interface with various backend libraries via the same function calls. The interface layer, FHE, exposes Afhe concrete classes, ex. Aseal, lower level C function to be consumed by the Implementation Layer. Through the use of pointers, we can create/destroy/reference Afhe objects from Dart.
 
 ```mermaid
 
