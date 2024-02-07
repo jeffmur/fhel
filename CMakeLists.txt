@@ -42,8 +42,11 @@ set_target_properties(fhel PROPERTIES
 
 target_compile_definitions(fhel PUBLIC DART_SHARED_LIB)
 
-# Check if UNIT_TEST environment variable is set to ON
-if(DEFINED ENV{UNIT_TEST} AND "$ENV{UNIT_TEST}" STREQUAL "ON")
+# Use -DUNIT_TEST to override default OFF
+set(UNIT_TEST OFF CACHE BOOL "Enable GoogleTest")
+
+# Check if UNIT_TEST variable is set to ON
+if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
     enable_testing()
 
     # Google Test Platform

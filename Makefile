@@ -28,38 +28,46 @@ trust-project:
 
 # Build helper, e.g hello_world
 .PHONY: build-cmake
-build-cmake: export UNIT_TEST = ON
+build-cmake: UNIT_TEST ?= ON
 build-cmake:
 	@echo "Building project..."
-	@cmake -S . -B $(AL_INSTALL_DIR)
+	@cmake -S . -B $(AL_INSTALL_DIR) -DUNIT_TEST=$(UNIT_TEST)
 	@cmake --build $(AL_INSTALL_DIR)
 
 # Install Dependencies and Build Project
 .PHONY: build
 build: trust-project build-cmake
 
+# Test Abstract Layer (AFHEL)
 .PHONY: ctest
 ctest:
 	@echo "Testing cpp..."
 	@cd $(AL_INSTALL_DIR); ctest
 
-.PHONY: ctest-ci
-ctest-ci: build-cmake ctest
-
-# Test Helper
+# Test Implementation Layer (FHE)
 .PHONY: dtest
 dtest:
 	@echo "Testing dart..."
 	@cd $(DART_SRC); $(MAKE) test
 
+# Build the flutter example
+.PHONY: apk
+apk:
+	@cd $(FLUTTER_EXAMPLE); flutter build apk
+
 # Automate testing for github workflows
+.PHONY: ctest-ci
+ctest-ci: build-cmake ctest
+
 .PHONY: dtest-ci
 dtest-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
 	@cd $(DART_SRC); $(MAKE) deps
 	$(MAKE) dtest
 
-.PHONY: apk
-apk: export ANDROID_SDK_ROOT ?= /tmp/android-sdk-linux
-apk:
-	@cd $(FLUTTER_EXAMPLE); flutter build apk
+.PHONY: apk-ci
+apk-ci: export UNIT_TEST = OFF # Disable unit test for release
+apk-ci: export ANDROID_SDK_ROOT ?= /tmp/android-sdk-linux
+apk-ci: build-cmake
+	@git config --global --add safe.directory /tmp/flutter
+	$(MAKE) apk
