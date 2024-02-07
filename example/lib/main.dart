@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 import 'package:fhel/fhe.dart' as fhel;
-import 'package:fhel/afhe/plaintext.dart' show Plaintext;
 
 void main() {
   runApp(const MyApp());
+}
+
+String listToString(List<int> list) {
+  String result = '[';
+  for (int i = 0; i < list.length; i++) {
+    result += list[i].toString();
+    if (i < list.length - 1) result += ", ";
+  }
+  return "$result]";
 }
 
 class MyApp extends StatefulWidget {
@@ -17,23 +23,29 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late String ctxStatus;
-  late int sumResult;
-  late Future<int> sumAsyncResult;
+  late List<int> sumResult;
+  // late Future<int> sumAsyncResult;
 
   @override
   void initState() {
     super.initState();
     final fhe = fhel.FHE.withScheme('seal', 'bfv');
-    ctxStatus =
-        fhe.genContext({'polyModDegree': 4096, 'ptMod': 1024, 'secLevel': 128});
+    ctxStatus = fhe
+        .genContext({'polyModDegree': 4096, 'ptModBit': 20, 'secLevel': 128});
     fhe.genKeys();
-    final pt_x = Plaintext.withValue(fhe.backend, '1');
-    final ct_x = fhe.encrypt(pt_x);
-    final pt_add = Plaintext.withValue(fhe.backend, '2');
-    final ct_add = fhe.encrypt(pt_add);
-    final ct_res = fhe.add(ct_x, ct_add);
 
-    sumResult = int.parse(fhe.decrypt(ct_res).text);
+    List<int> x = [1, 2, 3, 4];
+    final pt_x = fhe.encodeVecInt(x);
+    final ct_x = fhe.encrypt(pt_x);
+
+    List<int> add = [2, 4, 6, 8];
+    final pt_add = fhe.encodeVecInt(add);
+    final ct_add = fhe.encrypt(pt_add);
+
+    final ct_res = fhe.add(ct_x, ct_add);
+    final pt_res = fhe.decrypt(ct_res);
+
+    sumResult = fhe.decodeVecInt(pt_res, x.length);
   }
 
   @override
@@ -57,10 +69,11 @@ class _MyAppState extends State<MyApp> {
                 ),
                 spacerSmall,
                 Text(
-                  'add(1, 2) = $sumResult',
+                  'add(${[1, 2, 3, 4].toString()}, ${[2, 4, 6, 8].toString()})',
                   style: textStyle,
                   textAlign: TextAlign.center,
                 ),
+                Text("=> ${sumResult.toString()}", style: textStyle, textAlign: TextAlign.center,),
               ],
             ),
           ),
