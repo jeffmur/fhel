@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'main'
-      - 'composite-action'
 
 permissions:
   packages: write
@@ -41,9 +40,9 @@ jobs:
         with:
           submodules: 'true'
 
-      - uses: ./.github/actions/build-and-push-image
+      - name: Build Image 🐳
+        uses: ./.github/actions/build-and-push-image
         with:
-          push: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
   stable:
