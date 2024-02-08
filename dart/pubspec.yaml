@@ -1,11 +1,11 @@
 name: fhel
 description: Dart library for Fully Homomorphic Encryption
-version: 0.0.1-dev-1
+version: 0.0.2
 repository: https://github.com/jeffmur/fhel
 
 environment:
   sdk: '>=3.1.5 <4.0.0'
-  flutter: ">=1.17.0"
+  flutter: ">=1.20.0"
 
 dependencies:
   ffi: ^2.1.0
