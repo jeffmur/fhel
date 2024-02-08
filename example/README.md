@@ -23,3 +23,12 @@ OR via Makefile
 make build-cmake
 make apk
 ```
+
+## Artifacts
+
+In the provided code sample, we add two vectors.
+
+| Simple Addition | Vector Addition |
+| --- | --- |
+![Android Simple Addition](./res/simple-addition.png ) | ![Android Vector Addition](./res/vector-addition.png)
+|  | 
