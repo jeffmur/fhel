@@ -26,9 +26,6 @@ make apk
 
 ## Artifacts
 
-In the provided code sample, we add two vectors.
+In the provided code sample, [addition.dart](./lib/addition.dart), we expose `addInt` and `addVector`.
 
-| Simple Addition | Vector Addition |
-| --- | --- |
-![Android Simple Addition](./res/simple-addition.png ) | ![Android Vector Addition](./res/vector-addition.png)
-|  | 
+<img src="./res/bfv-addition.png" alt="BFV Addition Flutter App" width="50%">
