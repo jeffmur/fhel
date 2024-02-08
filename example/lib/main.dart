@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:fhel/fhe.dart' as fhel;
-import 'package:fhel/afhe/plaintext.dart' show Plaintext;
+import 'addition.dart' show addVector, addInt;
 
 void main() {
   runApp(const MyApp());
 }
+
+int intX = 1234;
+int intAdd = 2468;
+List<int> vecX = [1, 2, 3, 4];
+List<int> vecAdd = [2, 4, 6, 8];
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -17,47 +19,70 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late String ctxStatus;
-  late int sumResult;
-  late Future<int> sumAsyncResult;
+  bool showIntResult = false;
+  late int sumIntResult;
+  bool showVecResult = false;
+  late List<int> sumVecResult;
+  late Map<String, int> intCtx;
+  late Map<String, int> vecCtx;
 
   @override
   void initState() {
     super.initState();
-    final fhe = fhel.FHE.withScheme('seal', 'bfv');
-    ctxStatus =
-        fhe.genContext({'polyModDegree': 4096, 'ptMod': 1024, 'secLevel': 128});
-    fhe.genKeys();
-    final pt_x = Plaintext.withValue(fhe.backend, '1');
-    final ct_x = fhe.encrypt(pt_x);
-    final pt_add = Plaintext.withValue(fhe.backend, '2');
-    final ct_add = fhe.encrypt(pt_add);
-    final ct_res = fhe.add(ct_x, ct_add);
+    intCtx = {'polyModDegree': 4096, 'ptMod': 4096, 'secLevel': 128};
+    sumIntResult = addInt(intCtx, intX, intAdd);
+    // sumIntResult = -1;
 
-    sumResult = int.parse(fhe.decrypt(ct_res).text);
+    vecCtx = {'polyModDegree': 4096, 'ptModBit': 20, 'secLevel': 128};
+    sumVecResult = addVector(vecCtx, vecX, vecAdd);
+    // sumVecResult = [];
   }
 
   @override
   Widget build(BuildContext context) {
     const textStyle = TextStyle(fontSize: 25);
     const spacerSmall = SizedBox(height: 10);
+    const spacerLarge = SizedBox(height: 20);
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Native Packages'),
+          title: const Text('FHEL using Microsoft SEAL'),
         ),
         body: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             child: Column(
               children: [
                 const Text(
-                  'FHE with SEAL and BFV Scheme',
+                  'BFV: Add Integers',
                   style: textStyle,
                   textAlign: TextAlign.center,
                 ),
                 spacerSmall,
                 Text(
-                  'add(1, 2) = $sumResult',
+                  '${intX.toString()} + ${intAdd.toString()}',
+                  style: textStyle,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "=> ${sumIntResult.toString()}",
+                  style: textStyle,
+                  textAlign: TextAlign.center,
+                ),
+                spacerLarge,
+                const Text(
+                  'BFV: Add List<int>',
+                  style: textStyle,
+                  textAlign: TextAlign.center,
+                ),
+                spacerSmall,
+                Text(
+                  '${vecX.toString()} + ${vecAdd.toString()}',
+                  style: textStyle,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "=> ${sumVecResult.toString()}",
                   style: textStyle,
                   textAlign: TextAlign.center,
                 ),

@@ -23,3 +23,9 @@ OR via Makefile
 make build-cmake
 make apk
 ```
+
+## Artifacts
+
+In the provided code sample, [addition.dart](./lib/addition.dart), we expose `addInt` and `addVector`.
+
+<img src="./res/bfv-addition.png" alt="BFV Addition Flutter App" width="50%">
