@@ -31,9 +31,11 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     intCtx = {'polyModDegree': 4096, 'ptMod': 4096, 'secLevel': 128};
     sumIntResult = addInt(intCtx, intX, intAdd);
+    // sumIntResult = -1;
 
     vecCtx = {'polyModDegree': 4096, 'ptModBit': 20, 'secLevel': 128};
     sumVecResult = addVector(vecCtx, vecX, vecAdd);
+    // sumVecResult = [];
   }
 
   @override
