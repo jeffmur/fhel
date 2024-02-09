@@ -38,8 +38,11 @@ string Aseal::ContextGen(scheme scheme,
   // Initialize parameters
   EncryptionParameters param(scheme_map_to_seal[scheme]);
 
-  // BFV
-  if (scheme == scheme::bfv)
+  /*
+   * BGV encodes plaintext with “least significant bits” 
+   * BFV uses the “most significant bits”
+  */
+  if (scheme == scheme::bfv || scheme == scheme::bgv)
   {
     // Set polynomial modulus degree
     param.set_poly_modulus_degree(poly_modulus_degree);
