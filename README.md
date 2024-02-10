@@ -94,7 +94,11 @@ class FHE {
     genKeys()
     encrypt(Plaintext): Ciphertext
     decrypt(Ciphertext): Plaintext
+    invariantNoiseBudget(Ciphertext): int
+    encodeVecInt(List~int~): Plaintext
+    decodeVecInt(Plaintext, int): List~int~
     add(Ciphertext, Ciphertext): Ciphertext
+    subtract(Ciphertext, Ciphertext): Ciphertext
 }
 
 ```
@@ -158,17 +162,18 @@ class Afhe {
 
     ContextGen(scheme_t): string
     KeyGen(): void
-    encrypt(Plaintext): Ciphertext
-    decrypt(Ciphertext): Plaintext
-    add(Ciphertext, Ciphertext): Ciphertext
+    encrypt(Plaintext): void
+    decrypt(Ciphertext): void
+    invariant_noise_budget(Ciphertext): int
+    encode_int(vector~uint64_t~, Plaintext): void
+    decode_int(Plaintext, vector~uint64~): void
+    add(Ciphertext, Ciphertext, Ciphertext):
+    subtract(Ciphertext, Ciphertext, Ciphertext): void
 }
 
 class SEAL~Afhe~{
-    get_context(): SEALContext
-    encrypt(SEALPlaintext): SEALCiphertext
-    decrypt(SEALCiphertext): SEALPlaintext
-    invariant_noise_budget(SEALCiphertext): String
-    add(SEALCiphertext, SEALCiphertext): SEALCiphertext
+    setPublicKey(seal::PublicKey)
+    setSecretKey(seal::SecretKey)
 }
 
 class FHE {
@@ -182,8 +187,11 @@ class FHE {
     generate_keys(backend_t, Afhe): void
     encrypt(backend_t, Afhe, Plaintext): Ciphertext
     decrypt(backend_t, Afhe, Ciphertext): Plaintext
-    invariant_noise_budget(backend_t, Afhe, Ciphertext): const char
+    invariant_noise_budget(backend_t, Afhe, Ciphertext): int
+    encode_int(backend_t, Afhe, uint64_t, int): Plaintext
+    decode_int(backend_t, Afhe, Plaintext): unint64
     add(backend_t, Afhe, Ciphertext, Ciphertext): Ciphertext
+    subtract(backend_t, Afhe, Ciphertext, Ciphertext): Ciphertext
 }
 
 Afhe --> FHE

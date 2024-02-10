@@ -191,6 +191,13 @@ extern "C" {
     */
     ACiphertext* add(backend_t backend, Afhe* afhe, ACiphertext* ciphertext1, ACiphertext* ciphertext2);
 
+    /**
+     * @brief Subtract two ciphertexts.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+    */
+    ACiphertext* subtract(backend_t backend, Afhe* afhe, ACiphertext* ciphertext1, ACiphertext* ciphertext2);
+
     // const char* get_secret_key(Afhe* afhe);
 
     // const char* get_public_key(Afhe* afhe);

@@ -192,11 +192,7 @@ public:
   // ------------------ Cryptography ------------------
 
   void encrypt(APlaintext &ptxt, ACiphertext &ctxt) override;
-  // void encrypt_v(vector<shared_ptr<APlaintext>> &ptxts, vector<shared_ptr<ACiphertext>> &ctxts);
-
   void decrypt(ACiphertext &ctxt, APlaintext &ptxt) override;
-  // void decrypt_v(vector<shared_ptr<ACiphertext>> &ctxts, vector<shared_ptr<APlaintext>> &ptxts);
-
   int invariant_noise_budget(ACiphertext &ctxt) override;
 
   // -------------------- Codec --------------------
@@ -207,6 +203,7 @@ public:
   // ------------------ Arithmetic ------------------
 
   void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
+  void subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
 };
 
 #endif /* ASEAL_H */
