@@ -74,7 +74,8 @@ class FHE {
   }
 
   String genBGVContext(Map context) {
-    return "Not Implemented";
+    // No parameter changes
+    return genBFVContext(context);
   }
 
   String genCKKSContext(Map context) {
