@@ -95,7 +95,7 @@ class FHE {
     encrypt(Plaintext): Ciphertext
     decrypt(Ciphertext): Plaintext
     invariantNoiseBudget(Ciphertext): int
-    encodeVecInt(List~int~ vec): Plaintext
+    encodeVecInt(List~int~): Plaintext
     decodeVecInt(Plaintext, int): List~int~
     add(Ciphertext, Ciphertext): Ciphertext
     subtract(Ciphertext, Ciphertext): Ciphertext
