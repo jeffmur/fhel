@@ -2,7 +2,7 @@
 #include <aseal.h>       /* Microsoft SEAL */
 #include <map>
 
-TEST(BGV_BFV_Encrypt, InvalidPlainModulus) {
+TEST(Encrypt, InvalidPlainModulus) {
   Aseal* fhe = new Aseal();
   
   for (const auto& scheme : {scheme::bgv, scheme::bfv}) {
@@ -19,7 +19,7 @@ TEST(BGV_BFV_Encrypt, InvalidPlainModulus) {
   }
 }
 
-TEST(BGV_BFV_Encrypt, ConvertToHexadecimal) {
+TEST(Encrypt, ConvertToHexadecimal) {
 
   Aseal* fhe = new Aseal();
 
@@ -61,7 +61,7 @@ TEST(BGV_BFV_Encrypt, ConvertToHexadecimal) {
   }
 }
 
-TEST(BGV_BFV_Encrypt, NoPlaintextConversion) {
+TEST(Encrypt, NoPlaintextConversion) {
 
   Aseal* fhe = new Aseal();
 
@@ -102,7 +102,7 @@ TEST(BGV_BFV_Encrypt, NoPlaintextConversion) {
   }
 }
 
-TEST(BGV_BFV_Encrypt, EncryptVectorInteger) {
+TEST(Encrypt, EncryptVectorInteger) {
 
   Aseal* fhe = new Aseal();
 

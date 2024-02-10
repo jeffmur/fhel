@@ -1,7 +1,7 @@
 #include <gtest/gtest.h> // NOLINT
 #include <aseal.h>       /* Microsoft SEAL */
 
-TEST(BFV, ValidParameters) {
+TEST(BGV_BFV, ValidParameters) {
   Aseal* fhe = new Aseal();
 
   for (const auto& scheme : {scheme::bgv, scheme::bfv}) {

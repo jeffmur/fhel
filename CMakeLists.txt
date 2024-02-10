@@ -61,9 +61,9 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
 
     add_executable(
         seal_test
-        test/seal/bgv_bfv_context.cpp
-        test/seal/bgv_bfv_encrypt.cpp
-        test/seal/bgv_bfv_addition.cpp
+        test/seal/context.cpp
+        test/seal/encrypt.cpp
+        test/seal/addition.cpp
     )
 
     target_link_libraries(
