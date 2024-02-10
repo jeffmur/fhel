@@ -192,11 +192,7 @@ public:
   // ------------------ Cryptography ------------------
 
   void encrypt(APlaintext &ptxt, ACiphertext &ctxt) override;
-  // void encrypt_v(vector<shared_ptr<APlaintext>> &ptxts, vector<shared_ptr<ACiphertext>> &ctxts);
-
   void decrypt(ACiphertext &ctxt, APlaintext &ptxt) override;
-  // void decrypt_v(vector<shared_ptr<ACiphertext>> &ctxts, vector<shared_ptr<APlaintext>> &ptxts);
-
   int invariant_noise_budget(ACiphertext &ctxt) override;
 
   // -------------------- Codec --------------------
