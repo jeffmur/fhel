@@ -5,18 +5,17 @@ import 'package:fhel/afhe/plaintext.dart';
 // Least Significant Bit (LSB), Most Significant Bit (MSB)
 const schemes = ['bgv', 'bfv'];
 
-String sealAddition(
-  String scheme, String a, String b, Map<String, int> context) {
-    final fhe = FHE.withScheme('seal', scheme);
-    String status = fhe.genContext(context);
-    expect(status, 'success: valid');
-    fhe.genKeys();
-    final pt_x = Plaintext.withValue(fhe.backend, a);
-    final ct_x = fhe.encrypt(pt_x);
-    final pt_add = Plaintext.withValue(fhe.backend, b);
-    final ct_add = fhe.encrypt(pt_add);
-    final ct_res = fhe.add(ct_x, ct_add);
-    final pt_res = fhe.decrypt(ct_res);
+String sealAddition(String scheme, String a, String b, Map<String, int> ctx) {
+  final fhe = FHE.withScheme('seal', scheme);
+  String status = fhe.genContext(ctx);
+  expect(status, 'success: valid');
+  fhe.genKeys();
+  final pt_x = Plaintext.withValue(fhe.backend, a);
+  final ct_x = fhe.encrypt(pt_x);
+  final pt_add = Plaintext.withValue(fhe.backend, b);
+  final ct_add = fhe.encrypt(pt_add);
+  final ct_res = fhe.add(ct_x, ct_add);
+  final pt_res = fhe.decrypt(ct_res);
   return pt_res.text.toLowerCase();
 }
 
