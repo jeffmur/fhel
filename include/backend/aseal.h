@@ -207,6 +207,7 @@ public:
   // ------------------ Arithmetic ------------------
 
   void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
+  void subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
 };
 
 #endif /* ASEAL_H */

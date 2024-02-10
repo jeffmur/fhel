@@ -191,6 +191,17 @@ public:
    */
   virtual void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) = 0;
 
+  /**
+   * @brief Subtracts two ciphertexts and stores the result in another ciphertext.
+   *
+   * This function performs the subtraction operation on two ciphertexts and stores the result in a third ciphertext.
+   *
+   * @param ctxt1 The ciphertext to be subtracted from.
+   * @param ctxt2 The ciphertext to be subtracted.
+   * @param ctxt_res The ciphertext where the result will be stored.
+   */
+  virtual void subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) = 0;
+
 };
 
 /**

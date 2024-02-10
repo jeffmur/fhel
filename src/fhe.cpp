@@ -181,6 +181,25 @@ ACiphertext* add(backend_t backend, Afhe* afhe, ACiphertext* ctxt1, ACiphertext*
     }
 }
 
+ACiphertext* subtract(backend_t backend, Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
+    switch(backend)
+    {
+    case backend_t::seal_t:
+    {
+        ACiphertext* ctxt = init_ciphertext(backend);
+        try {
+            afhe->subtract(*ctxt1, *ctxt2, *ctxt);
+        }
+        catch (invalid_argument &e) {
+            cout << "error: [subtract] " << e.what() << endl;
+        }
+        return ctxt;
+    }
+    default:
+        return init_ciphertext(backend);
+    }
+}
+
 APlaintext* encode_int(backend_t backend, Afhe* afhe, uint64_t* data, int size) {
     switch(backend)
     {
