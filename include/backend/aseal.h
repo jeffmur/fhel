@@ -185,6 +185,7 @@ public:
 
   void KeyGen() override;
   void RelinKeyGen() override;
+  void relinearize(ACiphertext &ctxt) override;
   // string get_secret_key() override;
   // string get_public_key() override;
 

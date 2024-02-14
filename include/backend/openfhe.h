@@ -40,6 +40,9 @@ public:
     void RelinKeyGen() override {
         return;
     }
+    void relinearize(ACiphertext &ctxt) override {
+        return;
+    }
     // string get_secret_key() override {
     //     return "Not Implemented";
     // }

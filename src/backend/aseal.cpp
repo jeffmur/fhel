@@ -109,6 +109,18 @@ void Aseal::RelinKeyGen()
   keyGenObj->create_relin_keys(*relinKeys);
 }
 
+void Aseal::relinearize(ACiphertext &ctxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Relinearize using casted types
+  this->evaluator->relinearize_inplace(_to_ciphertext(ctxt), *this->relinKeys);
+}
+
 // string Aseal::get_secret_key()
 // {
 //     return this->secretKey.get()->data();

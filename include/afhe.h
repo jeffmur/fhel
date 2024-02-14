@@ -100,6 +100,15 @@ public:
    */
   virtual void RelinKeyGen() = 0;
 
+  /**
+   * @brief Relinearizes a ciphertext.
+   *
+   * This is a technique to manage and reduce this noise, allowing for more computations on the encrypted data.
+   *
+   * @param ctxt The ciphertext to be relinearized, inplace.
+   */
+  virtual void relinearize(ACiphertext &ctxt) = 0;
+
   // virtual string get_secret_key() = 0;
   // virtual string get_public_key() = 0;
 
