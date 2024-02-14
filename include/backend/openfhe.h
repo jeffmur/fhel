@@ -37,6 +37,9 @@ public:
     void KeyGen() override {
         return;
     }
+    void RelinKeyGen() override {
+        return;
+    }
     // string get_secret_key() override {
     //     return "Not Implemented";
     // }
