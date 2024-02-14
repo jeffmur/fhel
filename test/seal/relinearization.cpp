@@ -1,12 +1,15 @@
 #include <gtest/gtest.h> // NOLINT
 #include <aseal.h>       /* Microsoft SEAL */
 
-// TODO: Handle error when context is not set
-// TEST(ERROR, Relinearization) {
-//   Aseal* fhe = new Aseal();
+TEST(Error, RelinKeyGen) {
+  Aseal* fhe = new Aseal();
 
-//   fhe->RelinKeyGen();
-// }
+  try {
+    fhe->RelinKeyGen();
+  } catch (std::exception const & e) {
+    EXPECT_STREQ(e.what(), "<Aseal>: Context not initialized");
+  }
+}
 
 TEST(BGV_BFV, RelinKeyGen) {
   Aseal* fhe = new Aseal();
