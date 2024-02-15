@@ -47,10 +47,12 @@ void main() {
     };
 
     for (var sch in schemes) {
-      expect(280.toRadixString(16),
-          sealAddition(sch, 200.toRadixString(16), 80.toRadixString(16), ctx));
-      expect(280.toRadixString(16),
-          sealAddition(sch, 200.toRadixString(16), 80.toRadixString(16), ctx, encryptAddend: false));
+      expect(
+        280.toRadixString(16),
+        sealAddition(sch, 200.toRadixString(16), 80.toRadixString(16), ctx));
+      expect(
+        280.toRadixString(16),
+        sealAddition(sch, 200.toRadixString(16), 80.toRadixString(16), ctx, encryptAddend: false));
     }
 
     // Otherwise, you are forced to increase plaintext modulus,
@@ -65,11 +67,11 @@ void main() {
     ctx['ptMod'] = 4196;
     for (var sch in schemes) {
       expect(
-          2800.toRadixString(16).toLowerCase(),
-          sealAddition(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx));
+        2800.toRadixString(16).toLowerCase(),
+        sealAddition(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx));
       expect(
-          2800.toRadixString(16).toLowerCase(),
-          sealAddition(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx, encryptAddend: false));
+        2800.toRadixString(16).toLowerCase(),
+        sealAddition(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx, encryptAddend: false));
     }
   });
 

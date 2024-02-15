@@ -67,4 +67,7 @@ public:
     void subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_out) override {
         return;
     }
+    void subtract(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_out) override {
+        return;
+    }
 };

@@ -150,4 +150,12 @@ class FHE {
     ctx.library = ptr;
     return ctx;
   }
+
+  Ciphertext subtractPlain(Ciphertext a, Plaintext b) {
+    Pointer ptr = c_subtract_plain(backend.value, library, a.library, b.obj);
+
+    Ciphertext ctx = Ciphertext(backend);
+    ctx.library = ptr;
+    return ctx;
+  }
 }

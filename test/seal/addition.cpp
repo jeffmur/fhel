@@ -39,10 +39,14 @@ TEST(Add, IntegersToHexadecimal) {
 
       AsealPlaintext pt_res = AsealPlaintext();
       AsealCiphertext ct_res = AsealCiphertext();
+      AsealPlaintext pt_res_cipher = AsealPlaintext();
+      AsealCiphertext ct_res_cipher = AsealCiphertext();
 
       fhe->add(ct_x, ct_y, ct_res);
+      fhe->add(ct_x, pt_y, ct_res_cipher);
 
       fhe->decrypt(ct_res, pt_res);
+      fhe->decrypt(ct_res_cipher, pt_res_cipher);
 
       int expect = plaintext + plaintext;
 
@@ -50,6 +54,10 @@ TEST(Add, IntegersToHexadecimal) {
       string res_hex = pt_res.to_string();
       int res_int = hex_to_uint64(res_hex);
       EXPECT_EQ(res_int, expect);
+
+      string res_hex_cipher = pt_res_cipher.to_string();
+      int res_int_cipher = hex_to_uint64(res_hex_cipher);
+      EXPECT_EQ(res_int_cipher, expect);
     }
   }
 }
@@ -116,69 +124,27 @@ TEST(Add, VectorInteger) {
 
       AsealPlaintext pt_res = AsealPlaintext();
       AsealCiphertext ct_res = AsealCiphertext();
+      AsealCiphertext ct_res_cipher = AsealCiphertext();
+
       fhe->add(ct_x, ct_add, ct_res);
+      fhe->add(ct_x, pt_add, ct_res_cipher);
 
       AsealPlaintext decrypt_res = AsealPlaintext();
+      AsealPlaintext decrypt_res_cipher = AsealPlaintext();
       fhe->decrypt(ct_res, decrypt_res);
+      fhe->decrypt(ct_res_cipher, decrypt_res_cipher);
 
       vector<uint64_t> decode_res;
+      vector<uint64_t> decode_res_cipher;
       fhe->decode_int(decrypt_res, decode_res);
+      fhe->decode_int(decrypt_res_cipher, decode_res_cipher);
 
       // Plaintext x and decoded_x must be equal.
       vector<uint16_t> expect = {3, 6, 9, 12, 0, 0, 0, 0};
       for (int i = 0; i < x.size(); i++) {
         EXPECT_EQ(expect[i], decode_res[i]);
+        EXPECT_EQ(expect[i], decode_res_cipher[i]);
       }
-    }
-  }
-}
-
-TEST(Add, PlaintextWithCiphertext) {
-  std::map<int, int> plaintextToModulus = {
-    {100, 1024},
-    {200, 1024},
-    {300, 1024},
-    {400, 1024},
-    {500, 1024},
-    {1000, 2048},
-    {2000, 4196},
-    {4000, 8392},
-    {5000, 16784}
-  };
-
-  for (const auto& scheme : {scheme::bgv, scheme::bfv}) {
-
-    for (const auto& pair : plaintextToModulus) {
-      int plaintext = pair.first;
-      int modulus = pair.second;
-
-      Aseal* fhe = new Aseal();
-
-      string ctx = fhe->ContextGen(scheme, 1024, 0, modulus, 128);
-
-      // Expect two strings not to be equal.
-      EXPECT_STREQ(ctx.c_str(), "success: valid");
-
-      fhe->KeyGen();
-      // Add plaintext (x) with ciphertext (y)
-      AsealPlaintext pt_x = AsealPlaintext(uint64_to_hex(plaintext));
-      AsealPlaintext pt_y = AsealPlaintext(uint64_to_hex(plaintext));
-      AsealCiphertext ct_x = AsealCiphertext();
-      AsealCiphertext ct_res = AsealCiphertext();
-
-      // Only one is required to be encrypted.
-      fhe->encrypt(pt_x, ct_x);
-      fhe->add(ct_x, pt_y, ct_res);
-
-      AsealPlaintext pt_res = AsealPlaintext();
-      fhe->decrypt(ct_res, pt_res);
-
-      int expect = plaintext + plaintext;
-
-      // Convert hexademical string to uint_64.
-      string res_hex = pt_res.to_string();
-      int res_int = hex_to_uint64(res_hex);
-      EXPECT_EQ(res_int, expect);
     }
   }
 }

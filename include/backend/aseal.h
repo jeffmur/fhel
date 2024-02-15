@@ -204,6 +204,7 @@ public:
 
   void add(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) override;
   void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
+  void subtract(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) override;
   void subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
 };
 

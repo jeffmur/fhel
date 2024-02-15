@@ -30,3 +30,11 @@ typedef Sub = Pointer Function(
     int backend, Pointer library, Pointer ciphertext1, Pointer ciphertext2);
 
 final Sub c_subtract = dylib.lookup<NativeFunction<SubC>>('subtract').asFunction();
+
+typedef SubPlainC = Pointer Function(
+    Int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
+
+typedef SubPlain = Pointer Function(
+    int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
+
+final SubPlain c_subtract_plain = dylib.lookup<NativeFunction<SubPlainC>>('subtract_plain').asFunction();

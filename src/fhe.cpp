@@ -200,6 +200,25 @@ ACiphertext* add_plain(backend_t backend, Afhe* afhe, ACiphertext* ctxt, APlaint
     }
 }
 
+ACiphertext* subtract_plain(backend_t backend, Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
+    switch(backend)
+    {
+    case backend_t::seal_t:
+    {
+        ACiphertext* ctxt_res = init_ciphertext(backend);
+        try {
+            afhe->subtract(*ctxt, *ptxt, *ctxt_res);
+        }
+        catch (invalid_argument &e) {
+            cout << "error: [subtract_plain] " << e.what() << endl;
+        }
+        return ctxt_res;
+    }
+    default:
+        return init_ciphertext(backend);
+    }
+}
+
 ACiphertext* subtract(backend_t backend, Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
     switch(backend)
     {
