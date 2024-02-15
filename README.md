@@ -98,7 +98,9 @@ class FHE {
     encodeVecInt(List~int~): Plaintext
     decodeVecInt(Plaintext, int): List~int~
     add(Ciphertext, Ciphertext): Ciphertext
+    addPlain(Ciphertext, Plaintext): Ciphertext
     subtract(Ciphertext, Ciphertext): Ciphertext
+    subtractPlain(Ciphertext, Plaintext): Ciphertext
 }
 
 ```
@@ -167,7 +169,7 @@ class Afhe {
     invariant_noise_budget(Ciphertext): int
     encode_int(vector~uint64_t~, Plaintext): void
     decode_int(Plaintext, vector~uint64~): void
-    add(Ciphertext, Ciphertext, Ciphertext):
+    add(Ciphertext, Ciphertext, Ciphertext): void
     subtract(Ciphertext, Ciphertext, Ciphertext): void
 }
 
@@ -191,7 +193,9 @@ class FHE {
     encode_int(backend_t, Afhe, uint64_t, int): Plaintext
     decode_int(backend_t, Afhe, Plaintext): unint64
     add(backend_t, Afhe, Ciphertext, Ciphertext): Ciphertext
+    add_plain(backend_t, Afhe, Ciphertext, Plaintext): Ciphertext
     subtract(backend_t, Afhe, Ciphertext, Ciphertext): Ciphertext
+    add_subtract(backend_t, Afhe, Ciphertext, Plaintext): Ciphertext
 }
 
 Afhe --> FHE
