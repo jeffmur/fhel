@@ -176,6 +176,18 @@ void Aseal::decode_int(APlaintext &ptxt, vector<uint64_t> &data)
   this->encoder->decode(_to_plaintext(ptxt), data);
 }
 
+void Aseal::add(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Add using casted types
+  this->evaluator->add_plain(_to_ciphertext(ctxt), _to_plaintext(ptxt), _to_ciphertext(ctxt_res));
+}
+
 void Aseal::add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res)
 {
   // Gather current context, resolves object

@@ -13,6 +13,14 @@ typedef Add = Pointer Function(
 
 final Add c_add = dylib.lookup<NativeFunction<AddC>>('add').asFunction();
 
+typedef AddPlainC = Pointer Function(
+    Int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
+
+typedef AddPlain = Pointer Function(
+    int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
+
+final AddPlain c_add_plain = dylib.lookup<NativeFunction<AddPlainC>>('add_plain').asFunction();
+
 // --- subtract ---
 
 typedef SubC = Pointer Function(
