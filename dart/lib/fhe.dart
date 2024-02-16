@@ -99,19 +99,19 @@ class FHE {
     final ptr = c_encrypt(backend.value, library, plaintext.obj);
 
     Ciphertext ctx = Ciphertext(backend);
-    ctx.library = ptr;
+    ctx.obj = ptr;
     return ctx;
   }
 
   Plaintext decrypt(Ciphertext ciphertext) {
-    Pointer ptr = c_decrypt(backend.value, library, ciphertext.library);
+    Pointer ptr = c_decrypt(backend.value, library, ciphertext.obj);
 
     Plaintext ptx = Plaintext.fromObject(backend, ptr);
     return ptx;
   }
 
   int invariantNoiseBudget(Ciphertext ciphertext) {
-    return c_invariant_noise_budget(backend.value, library, ciphertext.library);
+    return c_invariant_noise_budget(backend.value, library, ciphertext.obj);
   }
 
   Plaintext encodeVecInt(List<int> vec) {
@@ -128,34 +128,34 @@ class FHE {
   }
 
   Ciphertext add(Ciphertext a, Ciphertext b) {
-    Pointer ptr = c_add(backend.value, library, a.library, b.library);
+    Pointer ptr = c_add(backend.value, library, a.obj, b.obj);
 
     Ciphertext ctx = Ciphertext(backend);
-    ctx.library = ptr;
+    ctx.obj = ptr;
     return ctx;
   }
 
   Ciphertext addPlain(Ciphertext a, Plaintext b) {
-    Pointer ptr = c_add_plain(backend.value, library, a.library, b.obj);
+    Pointer ptr = c_add_plain(backend.value, library, a.obj, b.obj);
 
     Ciphertext ctx = Ciphertext(backend);
-    ctx.library = ptr;
+    ctx.obj = ptr;
     return ctx;
   }
 
   Ciphertext subtract(Ciphertext a, Ciphertext b) {
-    Pointer ptr = c_subtract(backend.value, library, a.library, b.library);
+    Pointer ptr = c_subtract(backend.value, library, a.obj, b.obj);
 
     Ciphertext ctx = Ciphertext(backend);
-    ctx.library = ptr;
+    ctx.obj = ptr;
     return ctx;
   }
 
   Ciphertext subtractPlain(Ciphertext a, Plaintext b) {
-    Pointer ptr = c_subtract_plain(backend.value, library, a.library, b.obj);
+    Pointer ptr = c_subtract_plain(backend.value, library, a.obj, b.obj);
 
     Ciphertext ctx = Ciphertext(backend);
-    ctx.library = ptr;
+    ctx.obj = ptr;
     return ctx;
   }
 }

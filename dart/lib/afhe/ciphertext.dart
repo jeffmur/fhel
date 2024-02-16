@@ -12,10 +12,10 @@ final InitCiphertext c_init_ciphertext = dylib
 class Ciphertext {
   String text = "";
   Backend backend = Backend();
-  Pointer library = nullptr;
+  Pointer obj = nullptr;
 
   Ciphertext(this.backend) {
-    library = c_init_ciphertext(backend.value);
+    obj = c_init_ciphertext(backend.value);
   }
 }
 
