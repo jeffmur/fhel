@@ -17,7 +17,6 @@
 
 // Include Backend Libraries
 #include <aseal.h>   /* Microsoft SEAL */
-#include <openfhe.h> /* OpenFHE */
 
 extern "C" {
     /**
@@ -28,7 +27,6 @@ extern "C" {
     {
         no_t = 0,      /* No Library Set */
         seal_t = 1,    /* Microsoft SEAL */
-        openfhe_t = 2, /* OpenFHE */
     };
 
     /**
@@ -79,7 +77,6 @@ static map<const char*, scheme_t, cmp_str> scheme_t_map{
 static map<const char*, backend_t, cmp_str> backend_t_map{
   {"none", backend_t::no_t},
   {"seal", backend_t::seal_t},
-  {"openfhe", backend_t::openfhe_t},
 };
 
 extern "C" {

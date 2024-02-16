@@ -31,7 +31,7 @@ jobs:
       - name: Image Tag 🏷️
         if: ${{ steps.changes.outputs.source == 'true' }}
         id: tag
-        run: echo ::set-output name=TAG::${{ github.sha}}
+        run: echo "TAG=${{ github.sha}}" >> $GITHUB_OUTPUT
 
       - name: Build Image 🐳
         uses: ./.github/actions/build-and-push-image
