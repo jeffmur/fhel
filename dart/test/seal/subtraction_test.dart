@@ -1,18 +1,16 @@
 import 'package:test/test.dart';
-import 'package:fhel/fhe.dart' show FHE;
-import 'package:fhel/afhe/plaintext.dart';
+import 'package:fhel/seal.dart' show Seal;
 
-// Least Significant Bit (LSB), Most Significant Bit (MSB)
 const schemes = ['bgv', 'bfv'];
 
-String sealSubtraction(String scheme, String a, String b, Map<String, int> ctx, {bool encryptSubtrahend = true}) {
-  final fhe = FHE.withScheme('seal', scheme);
+String sub(String scheme, String a, String b, Map<String, int> ctx, {bool encryptSubtrahend = true}) {
+  final fhe = Seal(scheme);
   String status = fhe.genContext(ctx);
   expect(status, 'success: valid');
   fhe.genKeys();
-  final pt_x = Plaintext.withValue(fhe.backend, a);
+  final pt_x = fhe.plain(a);
   final ct_x = fhe.encrypt(pt_x);
-  final pt_sub = Plaintext.withValue(fhe.backend, b);
+  final pt_sub = fhe.plain(b);
 
   var ct_res;
   if (encryptSubtrahend) {
@@ -33,8 +31,8 @@ void main() {
       'secLevel': 128
     };
     for (var sch in schemes) {
-      expect('0', sealSubtraction(sch, '100', '100', ctx));
-      expect('0', sealSubtraction(sch, '100', '100', ctx, encryptSubtrahend: false));
+      expect('0', sub(sch, '100', '100', ctx));
+      expect('0', sub(sch, '100', '100', ctx, encryptSubtrahend: false));
     }
   });
 
@@ -48,18 +46,18 @@ void main() {
     for (var sch in schemes) {
       expect(
         120.toRadixString(16),
-        sealSubtraction(sch, 200.toRadixString(16), 80.toRadixString(16), ctx));
+        sub(sch, 200.toRadixString(16), 80.toRadixString(16), ctx));
       expect(
         120.toRadixString(16),
-        sealSubtraction(sch, 200.toRadixString(16), 80.toRadixString(16), ctx, encryptSubtrahend: false));
+        sub(sch, 200.toRadixString(16), 80.toRadixString(16), ctx, encryptSubtrahend: false));
     }
 
     // Otherwise, you are forced to increase plaintext modulus,
     // resulting in more noise growth and failed decryption
     ctx['ptMod'] = 67136;
     for (var sch in schemes) {
-      expect('0', sealSubtraction(sch, '2000', '2000', ctx));
-      expect('0', sealSubtraction(sch, '2000', '2000', ctx, encryptSubtrahend: false));
+      expect('0', sub(sch, '2000', '2000', ctx));
+      expect('0', sub(sch, '2000', '2000', ctx, encryptSubtrahend: false));
     }
 
     // When using hexadecimal, plain modulus can be lower
@@ -67,16 +65,16 @@ void main() {
     for (var sch in schemes) {
       expect(
         1200.toRadixString(16).toLowerCase(),
-        sealSubtraction(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx));
+        sub(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx));
       expect(
         1200.toRadixString(16).toLowerCase(),
-        sealSubtraction(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx, encryptSubtrahend: false));
+        sub(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx, encryptSubtrahend: false));
     }
   });
 
   test("SEAL List<int> Subtraction", () {
     for (var sch in schemes) {
-      final fhe = FHE.withScheme('seal', sch);
+      final fhe = Seal(sch);
       Map<String, int> ctx = {
         'polyModDegree': 8192,
         'ptModBit': 20,

@@ -1,16 +1,16 @@
-import 'dart:ffi';
-import 'dart:io' show Directory, Platform;
-import 'package:path/path.dart' as path;
+part of '../afhe.dart';
 
 const String _libName = 'fhel';
 
+/// Interop with the Abstract C FHE library via [dart:ffi](https://pub.dev/packages/ffi).
 final DynamicLibrary dylib = () {
   var pathPrefix = "";
-  // Development
+  // Development (test)
   // * Build from project root (parent of dart folder)
   if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
     pathPrefix = path.join(Directory.current.parent.path, 'build');
   }
+  // Release (pub)
   if (Platform.isIOS || Platform.isMacOS) {
     return DynamicLibrary.open(path.join(pathPrefix, 'lib$_libName.dylib'));
   }

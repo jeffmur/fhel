@@ -1,19 +1,18 @@
-import 'dart:ffi';
-import 'package:ffi/ffi.dart';
-import 'package:fhel/afhe/type.dart' show BackendType;
-import 'package:fhel/ffi.dart' show dylib;
+/// This file contains the FFI bindings for the encode and decode methods.
+part of '../afhe.dart';
 
-// encode
+// --- encode ---
 
-typedef EncodeVectorIntC = Pointer Function(
+typedef _EncodeVectorIntC = Pointer Function(
     BackendType backend, Pointer library, Pointer<Uint64> vec, Int size);
 
-typedef EncodeVectorInt = Pointer Function(
+typedef _EncodeVectorInt = Pointer Function(
     int backend, Pointer library, Pointer<Uint64> vec, int size);
 
-final EncodeVectorInt c_encode_vector_int =
-    dylib.lookupFunction<EncodeVectorIntC, EncodeVectorInt>('encode_int');
+final _EncodeVectorInt _c_encode_vector_int =
+    dylib.lookupFunction<_EncodeVectorIntC, _EncodeVectorInt>('encode_int');
 
+/// Convert Dart int list to C uint64 array.
 Pointer<Uint64> intListToArray(List<int> list) {
   final length = list.length;
   final pointer = calloc<Uint64>(length + 1); // +1 if null-terminated.
@@ -23,17 +22,18 @@ Pointer<Uint64> intListToArray(List<int> list) {
   return pointer;
 }
 
-// decode
+// --- decode ---
 
-typedef DecodeVectorIntC = Pointer<Uint64> Function(
+typedef _DecodeVectorIntC = Pointer<Uint64> Function(
     BackendType backend, Pointer library, Pointer plaintext);
 
-typedef DecodeVectorInt = Pointer<Uint64> Function(
+typedef _DecodeVectorInt = Pointer<Uint64> Function(
     int backend, Pointer library, Pointer plaintext);
 
-final DecodeVectorInt c_decode_vector_int =
-    dylib.lookupFunction<DecodeVectorIntC, DecodeVectorInt>('decode_int');
+final _DecodeVectorInt _c_decode_vector_int =
+    dylib.lookupFunction<_DecodeVectorIntC, _DecodeVectorInt>('decode_int');
 
+/// Convert C uint64 array to Dart int list.
 List<int> arrayToIntList(Pointer<Uint64> ptr, int length) {
   final list = <int>[];
   for (var i = 0; i < length; i++) {
