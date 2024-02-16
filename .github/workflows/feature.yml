@@ -37,7 +37,7 @@ jobs:
         uses: ./.github/actions/build-and-push-image
         if: ${{ steps.tag.outcome == 'success' }}
         with:
-          image_tag: ${{ steps.tag.outputs.IMAGE_TAG }}
+          image_tag: ${{ steps.tag.outputs.TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
   docs:
