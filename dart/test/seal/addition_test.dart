@@ -1,18 +1,16 @@
 import 'package:test/test.dart';
-import 'package:fhel/fhe.dart' show FHE;
-import 'package:fhel/afhe/plaintext.dart';
+import 'package:fhel/seal.dart' show Seal;
 
-// Least Significant Bit (LSB), Most Significant Bit (MSB)
 const schemes = ['bgv', 'bfv'];
 
-String sealAddition(String scheme, String a, String b, Map<String, int> ctx, {bool encryptAddend=true}) {
-  final fhe = FHE.withScheme('seal', scheme);
+String add(String scheme, String a, String b, Map<String, int> ctx, {bool encryptAddend=true}) {
+  final fhe = Seal(scheme);
   String status = fhe.genContext(ctx);
   expect(status, 'success: valid');
   fhe.genKeys();
-  final pt_x = Plaintext.withValue(fhe.backend, a);
+  final pt_x = fhe.plain(a);
   final ct_x = fhe.encrypt(pt_x);
-  final pt_add = Plaintext.withValue(fhe.backend, b);
+  final pt_add = fhe.plain(b);
 
   // Optionally, addend can be plaintext
   var ct_res;
@@ -34,8 +32,8 @@ void main() {
       'secLevel': 128
     };
     for (var sch in schemes) {
-      expect('280', sealAddition(sch, '200', '80', ctx));
-      expect('280', sealAddition(sch, '200', '80', ctx, encryptAddend: false));
+      expect('280', add(sch, '200', '80', ctx));
+      expect('280', add(sch, '200', '80', ctx, encryptAddend: false));
     }
   });
 
@@ -49,18 +47,18 @@ void main() {
     for (var sch in schemes) {
       expect(
         280.toRadixString(16),
-        sealAddition(sch, 200.toRadixString(16), 80.toRadixString(16), ctx));
+        add(sch, 200.toRadixString(16), 80.toRadixString(16), ctx));
       expect(
         280.toRadixString(16),
-        sealAddition(sch, 200.toRadixString(16), 80.toRadixString(16), ctx, encryptAddend: false));
+        add(sch, 200.toRadixString(16), 80.toRadixString(16), ctx, encryptAddend: false));
     }
 
     // Otherwise, you are forced to increase plaintext modulus,
     // resulting in more noise growth and failed decryption
     ctx['ptMod'] = 67136;
     for (var sch in schemes) {
-      expect('4000', sealAddition(sch, '2000', '2000', ctx));
-      expect('4000', sealAddition(sch, '2000', '2000', ctx, encryptAddend: false));
+      expect('4000', add(sch, '2000', '2000', ctx));
+      expect('4000', add(sch, '2000', '2000', ctx, encryptAddend: false));
     }
 
     // When using hexadecimal, plain modulus can be lower
@@ -68,16 +66,16 @@ void main() {
     for (var sch in schemes) {
       expect(
         2800.toRadixString(16).toLowerCase(),
-        sealAddition(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx));
+        add(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx));
       expect(
         2800.toRadixString(16).toLowerCase(),
-        sealAddition(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx, encryptAddend: false));
+        add(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx, encryptAddend: false));
     }
   });
 
   test("List<int> Addition", () {
     for (var sch in schemes) {
-      final fhe = FHE.withScheme('seal', sch);
+      final fhe = Seal(sch);
       Map<String, int> ctx = {
         'polyModDegree': 8192,
         'ptModBit': 20,

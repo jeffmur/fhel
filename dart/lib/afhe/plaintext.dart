@@ -1,56 +1,50 @@
-import 'dart:ffi';
-import 'package:ffi/ffi.dart'; // for Utf8
-import 'package:fhel/ffi.dart' show dylib;
-import 'package:fhel/afhe/type.dart' show BackendType, Backend;
+/// This file contains the `Ciphertext` class and its associated FFI bindings.
+part of '../afhe.dart';
 
-typedef InitPlaintextC = Pointer Function(BackendType backend);
-typedef InitPlaintext = Pointer Function(int backend);
+typedef _InitPlaintextC = Pointer Function(BackendType backend);
+typedef _InitPlaintext = Pointer Function(int backend);
 
-final InitPlaintext c_init_plaintext =
-    dylib.lookup<NativeFunction<InitPlaintextC>>('init_plaintext').asFunction();
+final _InitPlaintext _c_init_plaintext =
+    dylib.lookup<NativeFunction<_InitPlaintextC>>('init_plaintext').asFunction();
 
-typedef InitPlaintextValueC = Pointer Function(
-    BackendType backend, Pointer<Utf8> text);
-typedef InitPlaintextValue = Pointer Function(int backend, Pointer<Utf8> text);
+typedef _InitPlaintextValueC = Pointer Function(BackendType backend, Pointer<Utf8> text);
+typedef _InitPlaintextValue = Pointer Function(int backend, Pointer<Utf8> text);
 
-final InitPlaintextValue c_init_plaintext_value = dylib
-    .lookup<NativeFunction<InitPlaintextValueC>>('init_plaintext_value')
+final _InitPlaintextValue _c_init_plaintext_value = dylib
+    .lookup<NativeFunction<_InitPlaintextValueC>>('init_plaintext_value')
     .asFunction();
 
-typedef GetPlaintextC = Pointer<Utf8> Function(Pointer plaintext);
-typedef GetPlaintext = Pointer<Utf8> Function(Pointer plaintext);
+typedef _PlaintextC = Pointer<Utf8> Function(Pointer plaintext);
 
-final GetPlaintext c_get_plaintext = dylib
-    .lookup<NativeFunction<GetPlaintextC>>('get_plaintext_value')
+final _PlaintextC _c_get_plaintext = dylib
+    .lookup<NativeFunction<_PlaintextC>>('get_plaintext_value')
     .asFunction();
 
+/// Represents an underlying C plaintext object.
+///
+/// A plaintext is a message that has not been encrypted. It is the input to the encryption and
+/// operation functions, and the output of the decryption function.
+///
 class Plaintext {
+  /// Represents the value of the plaintext.
   String text = "";
+  /// Selects the [Backend] used for the encryption scheme.
   Backend backend = Backend();
+  /// A pointer to the memory address of the underlying C++ object.
   Pointer obj = nullptr;
 
+  /// Initializes a plaintext using the provided backend.
   Plaintext(this.backend) {
-    obj = c_init_plaintext(backend.value);
+    obj = _c_init_plaintext(backend.value);
   }
 
+  /// Initializes a plaintext C [obj] with [text] using the provided [Backend].
   Plaintext.withValue(this.backend, this.text) {
-    // print(obj);
-    obj = c_init_plaintext_value(backend.value, text.toNativeUtf8());
-    // print(obj);
+    obj = _c_init_plaintext_value(backend.value, text.toNativeUtf8());
   }
 
+  /// Initializes a plaintext from an existing C [obj].
   Plaintext.fromObject(this.backend, this.obj) {
-    text = c_get_plaintext(obj).toDartString();
+    text = _c_get_plaintext(obj).toDartString();
   }
 }
-
-// void main() {
-//   final backend = Backend.set("seal");
-//   final plaintext = Plaintext(backend);
-//   print(plaintext.backend.name);
-//   print(plaintext.text);
-
-//   final plaintext2 = Plaintext.withValue(backend, "1234");
-//   print(plaintext2.backend.name);
-//   print(plaintext2.text);
-// }

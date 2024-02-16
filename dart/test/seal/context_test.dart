@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:fhel/fhe.dart' show FHE;
+import 'package:fhel/seal.dart' show Seal;
 
 // Least Significant Bit (LSB), Most Significant Bit (MSB)
 const schemes = ['bgv', 'bfv'];
@@ -7,7 +7,7 @@ const schemes = ['bgv', 'bfv'];
 void main() {
   test('Valid Parameters', () {
     for (var sch in schemes) {
-      final fhe = FHE.withScheme("seal", sch);
+      final fhe = Seal(sch);
       final context = fhe
           .genContext({'polyModDegree': 4096, 'ptMod': 1024, 'secLevel': 128});
       expect(context, "success: valid");
@@ -16,7 +16,7 @@ void main() {
 
   test('Invalid Plaintext Mod Degree', () {
     for (var sch in schemes) {
-      final fhe = FHE.withScheme("seal", sch);
+      final fhe = Seal(sch);
       final context =
           fhe.genContext({'polyModDegree': 0, 'ptMod': 1024, 'secLevel': 128});
       expect(context, "invalid_argument: non-standard poly_modulus_degree");
@@ -27,7 +27,7 @@ void main() {
   // (e.g. 1024, 2048, 4096, 8192, 16384, or 32768).
   test('Invalid Plaintext Mod Bit Count', () {
     for (var sch in schemes) {
-      final fhe = FHE.withScheme("seal", sch);
+      final fhe = Seal(sch);
       final context =
           fhe.genContext({'polyModDegree': 4096, 'ptMod': 0, 'secLevel': 128});
       expect(
