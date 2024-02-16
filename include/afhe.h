@@ -226,6 +226,19 @@ public:
    */
   virtual void subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) = 0;
 
+  /**
+   * @brief Multiplies two ciphertexts and stores the result in another ciphertext.
+   *
+   * This function performs the multiplication operation on two ciphertexts and stores the result in a third ciphertext.
+  */
+  virtual void multiply(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) = 0;
+
+  /**
+   * @brief Multiplies a ciphertext by a plaintext and stores the result in another ciphertext.
+   *
+   * This function performs the multiplication operation on a ciphertext and a plaintext and stores the result in a ciphertext.
+  */
+  virtual void multiply(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) = 0;
 };
 
 /**
