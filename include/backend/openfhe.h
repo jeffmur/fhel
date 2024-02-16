@@ -64,10 +64,16 @@ public:
     int invariant_noise_budget(ACiphertext &ctxt) override {
         return -1;
     }
+    void add(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) override {
+        return;
+    }
     void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_out) override {
         return;
     }
     void subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_out) override {
+        return;
+    }
+    void subtract(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_out) override {
         return;
     }
 };

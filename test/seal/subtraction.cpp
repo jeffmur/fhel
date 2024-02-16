@@ -39,10 +39,14 @@ TEST(Subtract, IntegersToHexadecimal) {
 
       AsealPlaintext pt_res = AsealPlaintext();
       AsealCiphertext ct_res = AsealCiphertext();
+      AsealPlaintext pt_res_cipher = AsealPlaintext();
+      AsealCiphertext ct_res_cipher = AsealCiphertext();
 
       fhe->subtract(ct_x, ct_y, ct_res);
+      fhe->subtract(ct_x, pt_y, ct_res_cipher);
 
       fhe->decrypt(ct_res, pt_res);
+      fhe->decrypt(ct_res_cipher, pt_res_cipher);
 
       int expect = plaintext - plaintext;
 
@@ -50,6 +54,10 @@ TEST(Subtract, IntegersToHexadecimal) {
       string res_hex = pt_res.to_string();
       int res_int = hex_to_uint64(res_hex);
       EXPECT_EQ(res_int, expect);
+
+      string res_hex_cipher = pt_res_cipher.to_string();
+      int res_int_cipher = hex_to_uint64(res_hex_cipher);
+      EXPECT_EQ(res_int_cipher, expect);
     }
   }
 }
@@ -116,18 +124,27 @@ TEST(Subtract, VectorInteger) {
 
       AsealPlaintext pt_res = AsealPlaintext();
       AsealCiphertext ct_res = AsealCiphertext();
+      AsealPlaintext pt_res_cipher = AsealPlaintext();
+      AsealCiphertext ct_res_cipher = AsealCiphertext();
+
       fhe->subtract(ct_x, ct_sub, ct_res);
+      fhe->subtract(ct_x, pt_sub, ct_res_cipher);
 
       AsealPlaintext decrypt_res = AsealPlaintext();
+      AsealPlaintext decrypt_res_cipher = AsealPlaintext();
       fhe->decrypt(ct_res, decrypt_res);
+      fhe->decrypt(ct_res_cipher, decrypt_res_cipher);
 
       vector<uint64_t> decode_res;
+      vector<uint64_t> decode_res_cipher;
       fhe->decode_int(decrypt_res, decode_res);
+      fhe->decode_int(decrypt_res_cipher, decode_res_cipher);
 
       // Plaintext x and decoded_x must be equal.
       vector<uint16_t> expect = {1, 2, 3, 4, 0, 0, 0, 0};
       for (int i = 0; i < x.size(); i++) {
         EXPECT_EQ(expect[i], decode_res[i]);
+        EXPECT_EQ(expect[i], decode_res_cipher[i]);
       }
     }
   }

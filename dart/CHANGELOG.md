@@ -1,3 +1,9 @@
+## 0.0.3
+
+Library Restructure
+* Afhe: Adapter of fully homomorphic encryption. Exposes Classes
+* Seal: Expose end user APIs. Extends Afhe
+
 ## 0.0.2
 
 Android Release

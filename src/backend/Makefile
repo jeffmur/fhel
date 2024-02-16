@@ -14,8 +14,6 @@ trust:
 	@git config --global --add safe.directory $(INSTALL_DIR)/thirdparty/zlib-src
 	@git config --global --add safe.directory $(INSTALL_DIR)/thirdparty/zstd-src
 
-# TODO: How can we install dependencies in CMakeLists.txt?
-
 .PHONY: build
 build: trust
 	@echo "Building seal...$(INSTALL_DIR)"

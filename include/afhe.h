@@ -195,6 +195,18 @@ public:
   // ------------------ Arithmetic ------------------
 
   /**
+   * @brief Adds plaintext to ciphertexts and stores the result in another ciphertext.
+   *
+   * This function performs the addition operation on plaintext and ciphertext and stores the result in a ciphertext.
+   * Can be used as an alternative to relinearization.
+   *
+   * @param ptx The plaintext to be added.
+   * @param ctxt The ciphertext to be added.
+   * @param ctxt_res The ciphertext where the result will be stored.
+   */
+  virtual void add(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) = 0;
+
+  /**
    * @brief Adds two ciphertexts and stores the result in another ciphertext.
    *
    * This function performs the addition operation on two ciphertexts and stores the result in a third ciphertext.
@@ -204,6 +216,18 @@ public:
    * @param ctxt_res The ciphertext where the result will be stored.
    */
   virtual void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) = 0;
+
+  /**
+   * @brief Subtracts a plaintext from a ciphertext and stores the result in another ciphertext.
+   *
+   * This function performs the subtraction operation on a ciphertext and a plaintext and stores the result in a ciphertext.
+   * Can be used as an alternative to relinearization.
+   *
+   * @param ctxt The ciphertext to be subtracted from.
+   * @param ptxt The plaintext to be subtracted.
+   * @param ctxt_res The ciphertext where the result will be stored.
+   */
+  virtual void subtract(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) = 0;
 
   /**
    * @brief Subtracts two ciphertexts and stores the result in another ciphertext.

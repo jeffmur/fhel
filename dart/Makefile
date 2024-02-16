@@ -5,3 +5,7 @@ deps:
 .PHONY: test
 test:
 	@dart test
+
+.PHONY: docs
+docs:
+	@dart doc

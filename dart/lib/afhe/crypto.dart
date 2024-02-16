@@ -1,26 +1,49 @@
-import 'dart:ffi';
-// import 'package:ffi/ffi.dart'; // for Utf8
-// import 'package:fhel/afhe/plaintext.dart';
-import 'package:fhel/ffi.dart' show dylib;
+/// This file contains the FFI bindings for encryption and decryption methods.
+part of '../afhe.dart';
+
+// --- encryption parameters ---
+
+typedef _GenContextC = Pointer<Utf8> Function(
+    BackendType backend,
+    Pointer library,
+    Int32 scheme,
+    Int64 poly_mod_degree,
+    Int64 pt_mod_bit,
+    Int64 pt_mod,
+    Int64 sec_level);
+
+typedef _GenContext = Pointer<Utf8> Function(int backend, Pointer library,
+    int scheme, int poly_mod_degree, int pt_mod_bit, int pt_mod, int sec_level);
+
+final _GenContext _c_gen_context =
+    dylib.lookup<NativeFunction<_GenContextC>>('generate_context').asFunction();
+
+// --- encryption keys ---
+
+typedef _GenKeysC = Void Function(BackendType backend, Pointer library);
+typedef _GenKeys = void Function(int backend, Pointer library);
+
+final _GenKeys _c_gen_keys =
+    dylib.lookup<NativeFunction<_GenKeysC>>('generate_keys').asFunction();
 
 // --- encrypt ---
 
-typedef EncryptC = Pointer Function(
+typedef _EncryptC = Pointer Function(
     Int backend, Pointer library, Pointer plaintext);
 
-typedef Encrypt = Pointer Function(
+typedef _Encrypt = Pointer Function(
     int backend, Pointer library, Pointer plaintext);
 
-final Encrypt c_encrypt =
-    dylib.lookup<NativeFunction<EncryptC>>('encrypt').asFunction();
+final _Encrypt _c_encrypt =
+    dylib.lookup<NativeFunction<_EncryptC>>('encrypt').asFunction();
 
 // --- decrypt ---
 
-typedef DecryptC = Pointer Function(
+typedef _DecryptC = Pointer Function(
     Int backend, Pointer library, Pointer plaintext);
 
-typedef Decrypt = Pointer Function(
+typedef _Decrypt = Pointer Function(
     int backend, Pointer library, Pointer plaintext);
 
-final Decrypt c_decrypt =
-    dylib.lookup<NativeFunction<EncryptC>>('decrypt').asFunction();
+final _Decrypt _c_decrypt =
+    dylib.lookup<NativeFunction<_EncryptC>>('decrypt').asFunction();

@@ -1,6 +1,5 @@
 import 'package:test/test.dart';
-import 'package:fhel/fhe.dart' show FHE;
-import 'package:fhel/afhe/plaintext.dart';
+import 'package:fhel/seal.dart' show Seal;
 
 // Least Significant Bit (LSB), Most Significant Bit (MSB)
 const schemes = ['bgv', 'bfv'];
@@ -8,15 +7,15 @@ const schemes = ['bgv', 'bfv'];
 void main() {
   test('Encrypt Hexidecimal', () {
     for (var sch in schemes) {
-      final fhe = FHE.withScheme("seal", sch);
-      final context = fhe
-          .genContext({'polyModDegree': 4096, 'ptMod': 4096, 'secLevel': 128});
+      final fhe = Seal(sch);
+      final context = fhe.genContext(
+        {'polyModDegree': 4096, 'ptMod': 4096, 'secLevel': 128});
       expect(context, "success: valid");
       fhe.genKeys();
 
       int pt_int = 2500;
       String pt = pt_int.toRadixString(16);
-      final plaintext = Plaintext.withValue(fhe.backend, pt);
+      final plaintext = fhe.plain(pt);
       final ciphertext = fhe.encrypt(plaintext);
       final decrypted = fhe.decrypt(ciphertext);
 
@@ -33,9 +32,10 @@ void main() {
 
   test('Encrypt List<int>', () {
     for (var sch in schemes) {
-      final fhe = FHE.withScheme("seal", sch);
-      fhe.genContext(
+      final fhe = Seal(sch);
+      final context = fhe.genContext(
         {'polyModDegree': 8192, 'ptModBit': 20, 'ptMod': 0, 'secLevel': 128});
+      expect(context, "success: valid");
       fhe.genKeys();
 
       List<int> vec = [1, 2, 3, 4];

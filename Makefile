@@ -38,6 +38,11 @@ build-cmake:
 .PHONY: build
 build: trust-project build-cmake
 
+# Generate html dart api docs
+.PHONY: docs
+docs:
+	@cd $(DART_SRC); $(MAKE) docs
+
 # Test Abstract Layer (AFHEL)
 .PHONY: ctest
 ctest:
