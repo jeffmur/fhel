@@ -83,6 +83,14 @@ class Afhe {
     _c_gen_keys(backend.value, library);
   }
 
+  /// Generates the relinearization keys derived from the secret key.
+  ///
+  /// Requires the secret key to be generated first via genKeys().
+  void genRelinKeys() {
+    // TODO: Add check for secret key
+    _c_gen_relin_keys(backend.value, library);
+  }
+
   /// Encrypts the plaintext message.
   Ciphertext encrypt(Plaintext plaintext) {
     final ptr = _c_encrypt(backend.value, library, plaintext.obj);
@@ -96,7 +104,7 @@ class Afhe {
   Plaintext decrypt(Ciphertext ciphertext) {
     Pointer ptr = _c_decrypt(backend.value, library, ciphertext.obj);
 
-    Plaintext ptx = Plaintext.fromObject(backend, ptr);
+    Plaintext ptx = Plaintext.fromPointer(backend, ptr);
     return ptx;
   }
 
@@ -110,7 +118,7 @@ class Afhe {
     Pointer ptr = _c_encode_vector_int(
         backend.value, library, intListToArray(vec), vec.length);
 
-    return Plaintext.fromObject(backend, ptr);
+    return Plaintext.fromPointer(backend, ptr);
   }
 
   /// Decodes a plaintext into a list of integers.
@@ -118,6 +126,16 @@ class Afhe {
     return arrayToIntList(
         _c_decode_vector_int(backend.value, library, plaintext.obj),
         arrayLength);
+  }
+
+  /// Relinearizes the [Ciphertext].
+  ///
+  /// Typically, the size of the ciphertext grows with each homomorphic operation.
+  /// The relinearization process reduces the size of the ciphertext (2).
+  Ciphertext relinearize(Ciphertext ciphertext) {
+    Pointer ptr = _c_relin_ciphertext(backend.value, library, ciphertext.obj);
+
+    return Ciphertext.fromPointer(backend, ptr);
   }
 
   /// Adds two ciphertexts.
@@ -154,5 +172,19 @@ class Afhe {
     Ciphertext ctx = Ciphertext(backend);
     ctx.obj = ptr;
     return ctx;
+  }
+
+  /// Multiplies two ciphertexts.
+  Ciphertext multiply(Ciphertext a, Ciphertext b) {
+    Pointer ptr = _c_multiply(backend.value, library, a.obj, b.obj);
+
+    return Ciphertext.fromPointer(backend, ptr);
+  }
+
+  /// Multiplies a ciphertext by a plaintext.
+  Ciphertext multiplyPlain(Ciphertext a, Plaintext b) {
+    Pointer ptr = _c_multiply_plain(backend.value, library, a.obj, b.obj);
+
+    return Ciphertext.fromPointer(backend, ptr);
   }
 }

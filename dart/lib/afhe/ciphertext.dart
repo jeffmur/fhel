@@ -8,6 +8,14 @@ final _InitCiphertext _c_init_ciphertext = dylib
     .lookup<NativeFunction<_InitCiphertextC>>('init_ciphertext')
     .asFunction();
 
+typedef _GetCiphertextSizeC = Int32 Function(Pointer ciphertext);
+typedef _GetCiphertextSize = int Function(Pointer ciphertext);
+
+final _GetCiphertextSize _c_get_ciphertext_size = dylib
+    .lookup<NativeFunction<_GetCiphertextSizeC>>('get_ciphertext_size')
+    .asFunction();
+
+
 /// Represents an underlying C ciphertext object.
 ///
 /// A ciphertext is an encrypted message. It is the output of the encryption function,
@@ -24,6 +32,14 @@ class Ciphertext {
   /// Initializes a ciphertext using the provided backend.
   Ciphertext(this.backend) {
     obj = _c_init_ciphertext(backend.value);
+  }
+
+  /// Initializes a ciphertext using the provided [Backend] and [Pointer].
+  Ciphertext.fromPointer(this.backend, this.obj);
+
+  /// Returns the size of the ciphertext.
+  int size() {
+    return _c_get_ciphertext_size(obj);
   }
 }
 
