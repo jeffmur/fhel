@@ -39,6 +39,17 @@ void generate_keys(backend_t backend, Afhe* afhe)
     }
 }
 
+void generate_relin_keys(backend_t backend, Afhe* afhe)
+{
+    switch (backend)
+    {
+    case backend_t::seal_t:
+        afhe->RelinKeyGen();
+    default:
+        break;
+    }
+}
+
 Afhe* init_backend(backend_t backend) {
     switch (backend)
     {
@@ -87,15 +98,9 @@ ACiphertext* init_ciphertext(backend_t backend) {
     }
 }
 
-// const char* get_secret_key(Afhe* afhe)
-// {
-//     return afhe->get_secret_key().c_str();
-// }
-
-// const char* get_private_key(Afhe* afhe)
-// {
-//     return afhe->get_private_key().c_str();
-// }
+int get_ciphertext_size(ACiphertext* ciphertext) {
+    return ciphertext->size();
+}
 
 ACiphertext* encrypt(backend_t backend, Afhe* afhe, APlaintext* ptxt) {
     switch (backend)
@@ -149,6 +154,24 @@ int invariant_noise_budget(backend_t backend, Afhe* afhe, ACiphertext* ctxt) {
     }
     default:
         return -1; //"error: [invariant_noise_budget] No backend set";
+    }
+}
+
+ACiphertext* relinearize(backend_t backend, Afhe* afhe, ACiphertext* ctxt) {
+    switch(backend)
+    {
+    case backend_t::seal_t:
+    {
+        try {
+            afhe->relinearize(*ctxt);
+        }
+        catch (invalid_argument &e) {
+            cout << "error: [relinearize] " << e.what() << endl;
+        }
+        return ctxt;
+    }
+    default:
+        return init_ciphertext(backend);
     }
 }
 
@@ -222,6 +245,44 @@ ACiphertext* subtract(backend_t backend, Afhe* afhe, ACiphertext* ctxt1, ACipher
             cout << "error: [subtract] " << e.what() << endl;
         }
         return ctxt;
+    }
+    default:
+        return init_ciphertext(backend);
+    }
+}
+
+ACiphertext* multiply(backend_t backend, Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
+    switch(backend)
+    {
+    case backend_t::seal_t:
+    {
+        ACiphertext* ctxt = init_ciphertext(backend);
+        try {
+            afhe->multiply(*ctxt1, *ctxt2, *ctxt);
+        }
+        catch (invalid_argument &e) {
+            cout << "error: [multiply] " << e.what() << endl;
+        }
+        return ctxt;
+    }
+    default:
+        return init_ciphertext(backend);
+    }
+}
+
+ACiphertext* multiply_plain(backend_t backend, Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
+    switch(backend)
+    {
+    case backend_t::seal_t:
+    {
+        ACiphertext* ctxt_res = init_ciphertext(backend);
+        try {
+            afhe->multiply(*ctxt, *ptxt, *ctxt_res);
+        }
+        catch (invalid_argument &e) {
+            cout << "error: [multiply_plain] " << e.what() << endl;
+        }
+        return ctxt_res;
     }
     default:
         return init_ciphertext(backend);

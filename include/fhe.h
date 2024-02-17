@@ -118,9 +118,15 @@ extern "C" {
      * @brief Generate keys for the backend library.
      * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
-     * @return String representing the keys.
     */
     void generate_keys(backend_t backend, Afhe* afhe);
+
+    /**
+     * @brief Generate relinearization keys for the backend library.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+    */
+    void generate_relin_keys(backend_t backend, Afhe* afhe);
 
     /**
      * @brief Initialize the backend library.
@@ -159,6 +165,13 @@ extern "C" {
     ACiphertext* init_ciphertext(backend_t backend);
 
     /**
+     * @brief Get the size of a ciphertext.
+     * @param ciphertext Pointer to the ciphertext.
+     * @return Size of the ciphertext.
+     */
+    int get_ciphertext_size(ACiphertext* ciphertext);
+
+    /**
      * @brief Encrypt a plaintext.
      * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
@@ -180,6 +193,15 @@ extern "C" {
      * @brief Calculate the added noise to the ciphertext.
     */
     int invariant_noise_budget(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
+
+    /**
+     * @brief Relinearize a ciphertext.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext Pointer to the ciphertext.
+     * @return Pointer to the relinearized ciphertext.
+    */
+    ACiphertext* relinearize(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
 
     /**
      * @brief Add two ciphertexts.
@@ -210,9 +232,25 @@ extern "C" {
     */
     ACiphertext* subtract_plain(backend_t backend, Afhe* afhe, ACiphertext* ciphertext, APlaintext* plaintext);
 
-    // const char* get_secret_key(Afhe* afhe);
+    /**
+     * @brief Multiply two ciphertexts.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext1 Pointer to the first ciphertext.
+     * @param ciphertext2 Pointer to the second ciphertext.
+     * @return Pointer to the resulting ciphertext.
+    */
+    ACiphertext* multiply(backend_t backend, Afhe* afhe, ACiphertext* ciphertext1, ACiphertext* ciphertext2);
 
-    // const char* get_public_key(Afhe* afhe);
+    /**
+     * @brief Multiply a ciphertext by a plaintext.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext Pointer to the ciphertext.
+     * @param plaintext Pointer to the plaintext.
+     * @return Pointer to the resulting ciphertext.
+    */
+    ACiphertext* multiply_plain(backend_t backend, Afhe* afhe, ACiphertext* ciphertext, APlaintext* plaintext);
 
     /**
      * @brief Encode a vector of integers into a plaintext.

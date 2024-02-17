@@ -95,6 +95,20 @@ public:
   */
   virtual void KeyGen() = 0;
 
+  /**
+   * @brief Generates a public and private key pair; derived from the private key.
+   */
+  virtual void RelinKeyGen() = 0;
+
+  /**
+   * @brief Relinearizes a ciphertext.
+   *
+   * This is a technique to manage and reduce this noise, allowing for more computations on the encrypted data.
+   *
+   * @param ctxt The ciphertext to be relinearized, inplace.
+   */
+  virtual void relinearize(ACiphertext &ctxt) = 0;
+
   // virtual string get_secret_key() = 0;
   // virtual string get_public_key() = 0;
 
@@ -226,6 +240,19 @@ public:
    */
   virtual void subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) = 0;
 
+  /**
+   * @brief Multiplies two ciphertexts and stores the result in another ciphertext.
+   *
+   * This function performs the multiplication operation on two ciphertexts and stores the result in a third ciphertext.
+  */
+  virtual void multiply(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) = 0;
+
+  /**
+   * @brief Multiplies a ciphertext by a plaintext and stores the result in another ciphertext.
+   *
+   * This function performs the multiplication operation on a ciphertext and a plaintext and stores the result in a ciphertext.
+  */
+  virtual void multiply(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) = 0;
 };
 
 /**

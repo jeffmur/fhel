@@ -129,6 +129,7 @@ private:
   shared_ptr<seal::KeyGenerator> keyGenObj;  /** Key generator.*/
   shared_ptr<seal::SecretKey> secretKey;     /** Secret key.*/
   shared_ptr<seal::PublicKey> publicKey;     /** Public key.*/
+  shared_ptr<seal::RelinKeys> relinKeys;     /** Relin keys.*/
 
   shared_ptr<seal::Encryptor> encryptor;     /** Requires a Public Key.*/
   shared_ptr<seal::Evaluator> evaluator;     /** Requires a context.*/
@@ -183,6 +184,8 @@ public:
   // ------------------ Keys ------------------
 
   void KeyGen() override;
+  void RelinKeyGen() override;
+  void relinearize(ACiphertext &ctxt) override;
   // string get_secret_key() override;
   // string get_public_key() override;
 
@@ -206,6 +209,8 @@ public:
   void add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
   void subtract(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) override;
   void subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
+  void multiply(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
+  void multiply(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) override;
 };
 
 #endif /* ASEAL_H */

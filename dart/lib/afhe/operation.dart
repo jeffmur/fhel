@@ -36,3 +36,15 @@ typedef _SubPlain = Pointer Function(
     int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
 
 final _SubPlain _c_subtract_plain = dylib.lookup<NativeFunction<_SubPlainC>>('subtract_plain').asFunction();
+
+// --- multiply ---
+
+typedef _MultiplyC = Pointer Function(Int backend, Pointer library, Pointer ciphertext1, Pointer ciphertext2);
+typedef _Multiply = Pointer Function(int backend, Pointer library, Pointer ciphertext1, Pointer ciphertext2);
+
+final _Multiply _c_multiply = dylib.lookup<NativeFunction<_MultiplyC>>('multiply').asFunction();
+
+typedef _MultiplyPlainC = Pointer Function(Int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
+typedef _MultiplyPlain = Pointer Function(int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
+
+final _MultiplyPlain _c_multiply_plain = dylib.lookup<NativeFunction<_MultiplyPlainC>>('multiply_plain').asFunction();

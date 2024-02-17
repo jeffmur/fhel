@@ -14,17 +14,6 @@
 using namespace std;
 using namespace seal;
 
-// https://github.com/ibarrond/Pyfhel/blob/master/Pyfhel/Afhel/Afseal.cpp
-
-// Aseal::Aseal(const Aseal &other){
-//   this->context = make_shared<SEALContext>(other.context->first_context_data()->param());
-
-//   // TODO: Verify behavior of other.publicKey
-//   this->encryptor = make_shared<Encryptor>(*context, **other.publicKey);
-
-//   this->bfvEncoder = make_shared<BatchEncoder>(*context);
-// };
-
 Aseal::~Aseal(){};
 
 string Aseal::ContextGen(scheme scheme,
@@ -39,7 +28,7 @@ string Aseal::ContextGen(scheme scheme,
   EncryptionParameters param(scheme_map_to_seal[scheme]);
 
   /*
-   * BGV encodes plaintext with “least significant bits” 
+   * BGV encodes plaintext with “least significant bits”
    * BFV uses the “most significant bits”
   */
   if (scheme == scheme::bfv || scheme == scheme::bgv)
@@ -105,6 +94,34 @@ void Aseal::KeyGen()
 
   // Refresh Encryptor, Evaluator, and Decryptor objects
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
+}
+
+void Aseal::RelinKeyGen()
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize KeyGen object
+  if (this->keyGenObj == nullptr)
+  {
+    throw logic_error("<Aseal>: KeyGen() must be called before RelinKeyGen()");
+  }
+
+  // Generate Relin Key
+  this->relinKeys = make_shared<RelinKeys>();
+  keyGenObj->create_relin_keys(*relinKeys);
+}
+
+void Aseal::relinearize(ACiphertext &ctxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Relinearize using casted types
+  this->evaluator->relinearize_inplace(_to_ciphertext(ctxt), *this->relinKeys);
 }
 
 // string Aseal::get_secret_key()
@@ -222,4 +239,28 @@ void Aseal::subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_r
 
   // Subtract using casted types
   this->evaluator->sub(_to_ciphertext(ctxt1), _to_ciphertext(ctxt2), _to_ciphertext(ctxt_res));
+}
+
+void Aseal::multiply(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Multiply using casted types
+  this->evaluator->multiply(_to_ciphertext(ctxt1), _to_ciphertext(ctxt2), _to_ciphertext(ctxt_res));
+}
+
+void Aseal::multiply(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Multiply using casted types
+  this->evaluator->multiply_plain(_to_ciphertext(ctxt), _to_plaintext(ptxt), _to_ciphertext(ctxt_res));
 }

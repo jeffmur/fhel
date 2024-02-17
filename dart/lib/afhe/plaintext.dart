@@ -44,7 +44,7 @@ class Plaintext {
   }
 
   /// Initializes a plaintext from an existing C [obj].
-  Plaintext.fromObject(this.backend, this.obj) {
+  Plaintext.fromPointer(this.backend, this.obj) {
     text = _c_get_plaintext(obj).toDartString();
   }
 }
