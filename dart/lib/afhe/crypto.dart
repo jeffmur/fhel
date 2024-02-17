@@ -26,6 +26,23 @@ typedef _GenKeys = void Function(int backend, Pointer library);
 final _GenKeys _c_gen_keys =
     dylib.lookup<NativeFunction<_GenKeysC>>('generate_keys').asFunction();
 
+// --- relinearization ---
+
+typedef _GenRelinKeysC = Void Function(BackendType backend, Pointer library);
+typedef _GenRelinKeys = void Function(int backend, Pointer library);
+
+final _GenRelinKeys _c_gen_relin_keys =
+    dylib.lookup<NativeFunction<_GenRelinKeysC>>('generate_relin_keys').asFunction();
+
+typedef _RelinCiphertextC = Pointer Function(
+    BackendType backend, Pointer library, Pointer ciphertext);
+typedef _RelinCiphertext = Pointer Function(
+    int backend, Pointer library, Pointer ciphertext);
+
+final _RelinCiphertext _c_relin_ciphertext = dylib
+    .lookup<NativeFunction<_RelinCiphertextC>>('relinearize')
+    .asFunction();
+
 // --- encrypt ---
 
 typedef _EncryptC = Pointer Function(

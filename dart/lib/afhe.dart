@@ -1,4 +1,8 @@
-/// Abstract Fully Homomorphic Encryption
+/// Adapter for Fully Homomorphic Encryption (FHE) libraries.
+///
+/// This library provides a flexible interface for users to interact with supported C++ FHE libraries.
+/// Typically, the user will interact with an implementation of the [Afhe] class, rather than the abstract class directly.
+///
 library afhe;
 
 import 'dart:ffi';
@@ -83,76 +87,101 @@ class Afhe {
     _c_gen_keys(backend.value, library);
   }
 
+  /// Generates the relinearization keys derived from the secret key.
+  ///
+  /// Requires the secret key to be generated first via genKeys().
+  void genRelinKeys() {
+    // TODO: Add check for secret key
+    _c_gen_relin_keys(backend.value, library);
+  }
+
   /// Encrypts the plaintext message.
   Ciphertext encrypt(Plaintext plaintext) {
     final ptr = _c_encrypt(backend.value, library, plaintext.obj);
 
-    Ciphertext ctx = Ciphertext(backend);
-    ctx.obj = ptr;
-    return ctx;
+    return Ciphertext.fromPointer(backend, ptr);
   }
 
   /// Decrypts the ciphertext message.
   Plaintext decrypt(Ciphertext ciphertext) {
     Pointer ptr = _c_decrypt(backend.value, library, ciphertext.obj);
 
-    Plaintext ptx = Plaintext.fromObject(backend, ptr);
-    return ptx;
+    return Plaintext.fromPointer(backend, ptr);
   }
 
-  /// Returns the invariant noise budget of the ciphertext.
+  /// Returns the invariant noise budget of the [Ciphertext].
   int invariantNoiseBudget(Ciphertext ciphertext) {
     return _c_invariant_noise_budget(backend.value, library, ciphertext.obj);
   }
 
-  /// Encodes a list of integers into a plaintext.
+  /// Encodes a list of integers into a [Plaintext].
   Plaintext encodeVecInt(List<int> vec) {
     Pointer ptr = _c_encode_vector_int(
         backend.value, library, intListToArray(vec), vec.length);
 
-    return Plaintext.fromObject(backend, ptr);
+    return Plaintext.fromPointer(backend, ptr);
   }
 
-  /// Decodes a plaintext into a list of integers.
+  /// Decodes a [Plaintext] into a list of integers.
   List<int> decodeVecInt(Plaintext plaintext, int arrayLength) {
     return arrayToIntList(
         _c_decode_vector_int(backend.value, library, plaintext.obj),
         arrayLength);
   }
 
-  /// Adds two ciphertexts.
+  /// Relinearizes the [Ciphertext].
+  ///
+  /// Typically, the size of the ciphertext grows with each homomorphic operation.
+  /// The relinearization process reduces the size of the ciphertext (2).
+  Ciphertext relinearize(Ciphertext ciphertext) {
+    Pointer ptr = _c_relin_ciphertext(backend.value, library, ciphertext.obj);
+
+    return Ciphertext.fromPointer(backend, ptr);
+  }
+
+  /// Adds two [Ciphertext]s.
   Ciphertext add(Ciphertext a, Ciphertext b) {
     Pointer ptr = _c_add(backend.value, library, a.obj, b.obj);
 
-    Ciphertext ctx = Ciphertext(backend);
-    ctx.obj = ptr;
-    return ctx;
+    return Ciphertext.fromPointer(backend, ptr);
   }
 
-  /// Adds a plaintext to a ciphertext.
+  /// Adds value of [Plaintext] to the value of [Ciphertext].
   Ciphertext addPlain(Ciphertext a, Plaintext b) {
     Pointer ptr = _c_add_plain(backend.value, library, a.obj, b.obj);
 
-    Ciphertext ctx = Ciphertext(backend);
-    ctx.obj = ptr;
-    return ctx;
+    return Ciphertext.fromPointer(backend, ptr);
   }
 
-  /// Subtracts two ciphertexts.
+  /// Subtracts two [Ciphertext]s.
+  ///
+  /// Results in a new [Ciphertext] with the value of [a] minus the value of [b].
   Ciphertext subtract(Ciphertext a, Ciphertext b) {
     Pointer ptr = _c_subtract(backend.value, library, a.obj, b.obj);
 
-    Ciphertext ctx = Ciphertext(backend);
-    ctx.obj = ptr;
-    return ctx;
+    return Ciphertext.fromPointer(backend, ptr);
   }
 
-  /// Subtracts a plaintext from a ciphertext.
+  /// Subtracts value of [Plaintext] from the value of [Ciphertext].
+  ///
+  /// Results in a new [Ciphertext] with the value of [a] minus the value of [b].
   Ciphertext subtractPlain(Ciphertext a, Plaintext b) {
     Pointer ptr = _c_subtract_plain(backend.value, library, a.obj, b.obj);
 
-    Ciphertext ctx = Ciphertext(backend);
-    ctx.obj = ptr;
-    return ctx;
+    return Ciphertext.fromPointer(backend, ptr);
+  }
+
+  /// Multiplies two [Ciphertext]s.
+  Ciphertext multiply(Ciphertext a, Ciphertext b) {
+    Pointer ptr = _c_multiply(backend.value, library, a.obj, b.obj);
+
+    return Ciphertext.fromPointer(backend, ptr);
+  }
+
+  /// Multiplies a [Ciphertext] by a [Plaintext].
+  Ciphertext multiplyPlain(Ciphertext a, Plaintext b) {
+    Pointer ptr = _c_multiply_plain(backend.value, library, a.obj, b.obj);
+
+    return Ciphertext.fromPointer(backend, ptr);
   }
 }

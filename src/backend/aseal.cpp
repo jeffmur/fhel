@@ -14,17 +14,6 @@
 using namespace std;
 using namespace seal;
 
-// https://github.com/ibarrond/Pyfhel/blob/master/Pyfhel/Afhel/Afseal.cpp
-
-// Aseal::Aseal(const Aseal &other){
-//   this->context = make_shared<SEALContext>(other.context->first_context_data()->param());
-
-//   // TODO: Verify behavior of other.publicKey
-//   this->encryptor = make_shared<Encryptor>(*context, **other.publicKey);
-
-//   this->bfvEncoder = make_shared<BatchEncoder>(*context);
-// };
-
 Aseal::~Aseal(){};
 
 string Aseal::ContextGen(scheme scheme,
@@ -39,7 +28,7 @@ string Aseal::ContextGen(scheme scheme,
   EncryptionParameters param(scheme_map_to_seal[scheme]);
 
   /*
-   * BGV encodes plaintext with “least significant bits” 
+   * BGV encodes plaintext with “least significant bits”
    * BFV uses the “most significant bits”
   */
   if (scheme == scheme::bfv || scheme == scheme::bgv)
@@ -105,6 +94,34 @@ void Aseal::KeyGen()
 
   // Refresh Encryptor, Evaluator, and Decryptor objects
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
+}
+
+void Aseal::RelinKeyGen()
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize KeyGen object
+  if (this->keyGenObj == nullptr)
+  {
+    throw logic_error("<Aseal>: KeyGen() must be called before RelinKeyGen()");
+  }
+
+  // Generate Relin Key
+  this->relinKeys = make_shared<RelinKeys>();
+  keyGenObj->create_relin_keys(*relinKeys);
+}
+
+void Aseal::relinearize(ACiphertext &ctxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Relinearize using casted types
+  this->evaluator->relinearize_inplace(_to_ciphertext(ctxt), *this->relinKeys);
 }
 
 // string Aseal::get_secret_key()

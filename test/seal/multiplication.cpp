@@ -2,6 +2,42 @@
 #include <aseal.h>       /* Microsoft SEAL */
 #include <map>
 
+// Encrypt a plaintext.
+AsealCiphertext encrypt(Aseal* fhe, AsealPlaintext pt) {
+  AsealCiphertext ct = AsealCiphertext();
+  fhe->encrypt(pt, ct);
+  return ct;
+}
+
+// Decrypt a ciphertext.
+AsealPlaintext decrypt(Aseal* fhe, AsealCiphertext ct) {
+  AsealPlaintext pt = AsealPlaintext();
+  fhe->decrypt(ct, pt);
+  return pt;
+}
+
+// Multiply two ciphertexts.
+AsealCiphertext multiply(Aseal* fhe, AsealCiphertext ct_x, AsealCiphertext ct_y) {
+  AsealCiphertext ct_res = AsealCiphertext();
+  fhe->multiply(ct_x, ct_y, ct_res);
+  // Decryption can be incorrect when noise budget is zero.
+  EXPECT_GT(fhe->invariant_noise_budget(ct_res), 0);
+  // When multiplying two ciphertexts, the size grows to 3.
+  EXPECT_EQ(ct_res.size(), 3);
+  return ct_res;
+}
+
+// Multiply a ciphertext by a plaintext.
+AsealCiphertext multiply(Aseal* fhe, AsealCiphertext ct_x, AsealPlaintext pt_y) {
+  AsealCiphertext ct_res = AsealCiphertext();
+  fhe->multiply(ct_x, pt_y, ct_res);
+  // Decryption can be incorrect when noise budget is zero.
+  EXPECT_GT(fhe->invariant_noise_budget(ct_res), 0);
+  // When multiplying cipher x plain, the size should not grow.
+  EXPECT_EQ(ct_res.size(), 2);
+  return ct_res;
+}
+
 TEST(Multiply, IntegersToHexadecimal) {
   std::map<int, int> plaintextToModulus = {
     {10, 1024},
@@ -17,45 +53,39 @@ TEST(Multiply, IntegersToHexadecimal) {
 
       Aseal* fhe = new Aseal();
 
-      string ctx = fhe->ContextGen(scheme, 2048, 0, modulus, 128);
-
-      // Expect two strings not to be equal.
+      // poly_mod_degree = 4096, => max coeff_modulus bit-length = 109
+      string ctx = fhe->ContextGen(scheme, 4096, 0, modulus, 128);
       EXPECT_STREQ(ctx.c_str(), "success: valid");
-
       fhe->KeyGen();
+
+      /**
+       * @brief Without relinearization, limited to multiply Ciphertext by Plaintext
+      */
       AsealPlaintext pt_x = AsealPlaintext(uint64_to_hex(plaintext));
-      AsealCiphertext ct_x = AsealCiphertext();
-      fhe->encrypt(pt_x, ct_x);
-
+      AsealCiphertext ct_x = encrypt(fhe, pt_x);
       AsealPlaintext pt_y = AsealPlaintext(uint64_to_hex(plaintext));
-      AsealCiphertext ct_y = AsealCiphertext();
-      fhe->encrypt(pt_y, ct_y);
 
-      AsealPlaintext pt_res = AsealPlaintext();
-      AsealCiphertext ct_res = AsealCiphertext();
-      AsealPlaintext pt_res_cipher = AsealPlaintext();
-      AsealCiphertext ct_res_cipher = AsealCiphertext();
-
-      // fhe->multiply(ct_x, ct_y, ct_res); // TODO: Relinearization
-      fhe->multiply(ct_x, pt_y, ct_res_cipher);
-
-      // Zero indicates that the decryption is incorrect.
-      // EXPECT_GT(fhe->invariant_noise_budget(ct_res), 0);
-      EXPECT_GT(fhe->invariant_noise_budget(ct_res_cipher), 0);
-
-      // fhe->decrypt(ct_res, pt_res);
-      fhe->decrypt(ct_res_cipher, pt_res_cipher);
+      // Ciphertext x Plaintext
+      AsealCiphertext ct_x_pt_y = multiply(fhe, ct_x, pt_y);
+      AsealPlaintext pt_no_relin = decrypt(fhe, ct_x_pt_y);
 
       int expect = plaintext * plaintext;
+      EXPECT_EQ(hex_to_uint64(pt_no_relin.to_string()), expect);
 
-      // Convert hexademical string to uint_64.
-      // string res_hex = pt_res.to_string();
-      // int res_int = hex_to_uint64(res_hex);
-      // EXPECT_EQ(res_int, expect);
+      /**
+       * @brief Using relinearization to reduce ciphertext size from 3 -> 2.
+       * This occurs when multiplying Ciphertext x Ciphertext
+      */
+      fhe->RelinKeyGen();
 
-      string res_hex_cipher = pt_res_cipher.to_string();
-      int res_int_cipher = hex_to_uint64(res_hex_cipher);
-      EXPECT_EQ(res_int_cipher, expect);
+      // Ciphertext x Ciphertext
+      AsealCiphertext ct_y = encrypt(fhe, pt_y);
+      AsealCiphertext ct_x_ct_y = multiply(fhe, ct_x, ct_y);
+      // When multiplying two ciphertexts, the size grows to 3.
+      fhe->relinearize(ct_x_ct_y);
+      AsealPlaintext pt_relin = decrypt(fhe, ct_x_ct_y);
+
+      EXPECT_EQ(hex_to_uint64(pt_relin.to_string()), expect);
     }
   }
 }
@@ -64,89 +94,63 @@ TEST(Multiply, VectorInteger) {
 
   Aseal* fhe = new Aseal();
 
-  std::map<int, int> modulusToBitSize = {
-    // {1024, 17}, /* modulus too small */
-    {2048, 18},
-    {4096, 19},
-    {8192, 20},
-    {16384, 21}
-  };
-
   for (const auto& scheme : {scheme::bgv, scheme::bfv}) {
+    string ctx = fhe->ContextGen(scheme, 8192, 20, -1, 128);
+    EXPECT_STREQ(ctx.c_str(), "success: valid");
 
-    for (const auto& pair : modulusToBitSize) {
-      int modulus = pair.first;
-      int bitSize = pair.second;
+    fhe->KeyGen();
+    AsealPlaintext pt_x = AsealPlaintext();
+    AsealPlaintext pt_m = AsealPlaintext();
+    /*
+      Here we create the following arrays:
+          x = [ 1,  2,  3,  4,  0,  0,  0,  0 ]
+          m = [ 2,  4,  6,  8,  0,  0,  0,  0 ]
+    */
+    vector<uint64_t> x(8, 0ULL);
+    x[0] = 1ULL;
+    x[1] = 2ULL;
+    x[2] = 3ULL;
+    x[3] = 4ULL;
 
-      string ctx = fhe->ContextGen(scheme, modulus, bitSize, -1, 128);
+    fhe->encode_int(x, pt_x);
+    AsealCiphertext ct_x = encrypt(fhe, pt_x);
 
-      // Expect two strings not to be equal.
-      EXPECT_STREQ(ctx.c_str(), "success: valid");
+    vector<uint64_t> m(8, 0ULL);
+    m[0] = 2ULL;
+    m[1] = 4ULL;
+    m[2] = 6ULL;
+    m[3] = 8ULL;
 
-      fhe->KeyGen();
+    fhe->encode_int(m, pt_m);
+    AsealCiphertext ct_m = encrypt(fhe, pt_m);
 
-      AsealPlaintext pt_x = AsealPlaintext();
+    /**
+     * @brief Without relinearization, limited to multiply Ciphertext by Plaintext
+    */
+    AsealCiphertext ct_x_pt_m = multiply(fhe, ct_x, pt_m);
+    AsealPlaintext pt_x_pt_m = decrypt(fhe, ct_x_pt_m);
 
-      /*
-        Here we create the following arrays:
-            x = [ 1,  2,  3,  4,  0,  0,  0,  0 ]
-          add = [ 2,  4,  6,  8,  0,  0,  0,  0 ]
-      */
-      vector<uint64_t> x(8, 0ULL);
-      x[0] = 1ULL;
-      x[1] = 2ULL;
-      x[2] = 3ULL;
-      x[3] = 4ULL;
+    vector<uint64_t> vec_ct_x_pt_m;
+    fhe->decode_int(pt_x_pt_m, vec_ct_x_pt_m);
 
-      fhe->encode_int(x, pt_x);
+    vector<uint16_t> expect = {2, 8, 18, 32, 0, 0, 0, 0};
+    for (int i = 0; i < x.size(); i++) {
+      EXPECT_EQ(expect[i], vec_ct_x_pt_m[i]);
+    }
 
-      AsealCiphertext ct_x = AsealCiphertext();
-      fhe->encrypt(pt_x, ct_x);
+    /**
+     * @brief Using relinearization to reduce ciphertext size from 3 -> 2.
+    */
+    fhe->RelinKeyGen();
+    AsealCiphertext ct_x_ct_m = multiply(fhe, ct_x, ct_m);
+    fhe->relinearize(ct_x_ct_m);
+    AsealPlaintext pt_x_ct_m = decrypt(fhe, ct_x_ct_m);
 
-      // Decryption can be incorrect when noise budget is zero.
-      EXPECT_GT(fhe->invariant_noise_budget(ct_x), 0);
+    vector<uint64_t> vec_ct_x_ct_m;
+    fhe->decode_int(pt_x_ct_m, vec_ct_x_ct_m);
 
-      AsealPlaintext pt_add = AsealPlaintext();
-      vector<uint64_t> add(8, 0ULL);
-      add[0] = 2ULL;
-      add[1] = 4ULL;
-      add[2] = 6ULL;
-      add[3] = 8ULL;
-
-      fhe->encode_int(add, pt_add);
-      AsealCiphertext ct_add = AsealCiphertext();
-      fhe->encrypt(pt_add, ct_add);
-
-      // Decryption can be incorrect when noise budget is zero.
-      EXPECT_GT(fhe->invariant_noise_budget(ct_add), 0);
-
-      AsealPlaintext pt_res = AsealPlaintext();
-      AsealCiphertext ct_res = AsealCiphertext();
-      AsealCiphertext ct_res_cipher = AsealCiphertext();
-
-      fhe->multiply(ct_x, ct_add, ct_res);
-      fhe->multiply(ct_x, pt_add, ct_res_cipher);
-
-      // Decryption can be incorrect when noise budget is zero.
-      // EXPECT_GT(fhe->invariant_noise_budget(ct_res), 0);
-      EXPECT_GT(fhe->invariant_noise_budget(ct_res_cipher), 0);
-
-      AsealPlaintext decrypt_res = AsealPlaintext();
-      AsealPlaintext decrypt_res_cipher = AsealPlaintext();
-      fhe->decrypt(ct_res, decrypt_res);
-      fhe->decrypt(ct_res_cipher, decrypt_res_cipher);
-
-      vector<uint64_t> decode_res;
-      vector<uint64_t> decode_res_cipher;
-      fhe->decode_int(decrypt_res, decode_res);
-      fhe->decode_int(decrypt_res_cipher, decode_res_cipher);
-
-      // Plaintext x and decoded_x must be equal.
-      vector<uint16_t> expect = {2, 8, 18, 32, 0, 0, 0, 0};
-      for (int i = 0; i < x.size(); i++) {
-        // EXPECT_EQ(expect[i], decode_res[i]); // TODO: relinearization
-        EXPECT_EQ(expect[i], decode_res_cipher[i]);
-      }
+    for (int i = 0; i < x.size(); i++) {
+      EXPECT_EQ(expect[i], vec_ct_x_ct_m[i]);
     }
   }
 }
