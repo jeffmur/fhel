@@ -1,4 +1,8 @@
-/// Abstract Fully Homomorphic Encryption
+/// Adapter for Fully Homomorphic Encryption (FHE) libraries.
+///
+/// This library provides a flexible interface for users to interact with supported C++ FHE libraries.
+/// Typically, the user will interact with an implementation of the [Afhe] class, rather than the abstract class directly.
+///
 library afhe;
 
 import 'dart:ffi';
@@ -95,25 +99,22 @@ class Afhe {
   Ciphertext encrypt(Plaintext plaintext) {
     final ptr = _c_encrypt(backend.value, library, plaintext.obj);
 
-    Ciphertext ctx = Ciphertext(backend);
-    ctx.obj = ptr;
-    return ctx;
+    return Ciphertext.fromPointer(backend, ptr);
   }
 
   /// Decrypts the ciphertext message.
   Plaintext decrypt(Ciphertext ciphertext) {
     Pointer ptr = _c_decrypt(backend.value, library, ciphertext.obj);
 
-    Plaintext ptx = Plaintext.fromPointer(backend, ptr);
-    return ptx;
+    return Plaintext.fromPointer(backend, ptr);
   }
 
-  /// Returns the invariant noise budget of the ciphertext.
+  /// Returns the invariant noise budget of the [Ciphertext].
   int invariantNoiseBudget(Ciphertext ciphertext) {
     return _c_invariant_noise_budget(backend.value, library, ciphertext.obj);
   }
 
-  /// Encodes a list of integers into a plaintext.
+  /// Encodes a list of integers into a [Plaintext].
   Plaintext encodeVecInt(List<int> vec) {
     Pointer ptr = _c_encode_vector_int(
         backend.value, library, intListToArray(vec), vec.length);
@@ -121,7 +122,7 @@ class Afhe {
     return Plaintext.fromPointer(backend, ptr);
   }
 
-  /// Decodes a plaintext into a list of integers.
+  /// Decodes a [Plaintext] into a list of integers.
   List<int> decodeVecInt(Plaintext plaintext, int arrayLength) {
     return arrayToIntList(
         _c_decode_vector_int(backend.value, library, plaintext.obj),
@@ -138,50 +139,46 @@ class Afhe {
     return Ciphertext.fromPointer(backend, ptr);
   }
 
-  /// Adds two ciphertexts.
+  /// Adds two [Ciphertext]s.
   Ciphertext add(Ciphertext a, Ciphertext b) {
     Pointer ptr = _c_add(backend.value, library, a.obj, b.obj);
 
-    Ciphertext ctx = Ciphertext(backend);
-    ctx.obj = ptr;
-    return ctx;
+    return Ciphertext.fromPointer(backend, ptr);
   }
 
-  /// Adds a plaintext to a ciphertext.
+  /// Adds value of [Plaintext] to the value of [Ciphertext].
   Ciphertext addPlain(Ciphertext a, Plaintext b) {
     Pointer ptr = _c_add_plain(backend.value, library, a.obj, b.obj);
 
-    Ciphertext ctx = Ciphertext(backend);
-    ctx.obj = ptr;
-    return ctx;
+    return Ciphertext.fromPointer(backend, ptr);
   }
 
-  /// Subtracts two ciphertexts.
+  /// Subtracts two [Ciphertext]s.
+  ///
+  /// Results in a new [Ciphertext] with the value of [a] minus the value of [b].
   Ciphertext subtract(Ciphertext a, Ciphertext b) {
     Pointer ptr = _c_subtract(backend.value, library, a.obj, b.obj);
 
-    Ciphertext ctx = Ciphertext(backend);
-    ctx.obj = ptr;
-    return ctx;
+    return Ciphertext.fromPointer(backend, ptr);
   }
 
-  /// Subtracts a plaintext from a ciphertext.
+  /// Subtracts value of [Plaintext] from the value of [Ciphertext].
+  ///
+  /// Results in a new [Ciphertext] with the value of [a] minus the value of [b].
   Ciphertext subtractPlain(Ciphertext a, Plaintext b) {
     Pointer ptr = _c_subtract_plain(backend.value, library, a.obj, b.obj);
 
-    Ciphertext ctx = Ciphertext(backend);
-    ctx.obj = ptr;
-    return ctx;
+    return Ciphertext.fromPointer(backend, ptr);
   }
 
-  /// Multiplies two ciphertexts.
+  /// Multiplies two [Ciphertext]s.
   Ciphertext multiply(Ciphertext a, Ciphertext b) {
     Pointer ptr = _c_multiply(backend.value, library, a.obj, b.obj);
 
     return Ciphertext.fromPointer(backend, ptr);
   }
 
-  /// Multiplies a ciphertext by a plaintext.
+  /// Multiplies a [Ciphertext] by a [Plaintext].
   Ciphertext multiplyPlain(Ciphertext a, Plaintext b) {
     Pointer ptr = _c_multiply_plain(backend.value, library, a.obj, b.obj);
 
