@@ -102,8 +102,10 @@ void Aseal::RelinKeyGen()
   auto &seal_context = *(this->get_context());
 
   // Initialize KeyGen object
-  // TODO: raise error when not initialized
-  // this->keyGenObj = make_shared<KeyGenerator>(seal_context);
+  if (this->keyGenObj == nullptr)
+  {
+    throw logic_error("<Aseal>: KeyGen() must be called before RelinKeyGen()");
+  }
 
   // Generate Relin Key
   this->relinKeys = make_shared<RelinKeys>();
