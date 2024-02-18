@@ -10,7 +10,7 @@ TEST(Relinearization, LogicError) {
     try {
         fhe->RelinKeyGen();
     } catch (const logic_error& e) {
-        EXPECT_STREQ(e.what(), "<Aseal>: KeyGen() must be called before RelinKeyGen()");
+        EXPECT_STREQ(e.what(), "KeyGen() must be called before RelinKeyGen()");
     }
 
     AsealCiphertext ct = AsealCiphertext();

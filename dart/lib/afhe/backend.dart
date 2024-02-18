@@ -30,6 +30,7 @@ class Backend {
   Backend.set(String fromName) {
     String lowerName = fromName.toLowerCase();
     value = _c_string_to_backend_type(lowerName.toNativeUtf8());
+    raiseForStatus();
     name = fromName;
   }
 }

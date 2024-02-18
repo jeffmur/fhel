@@ -14,6 +14,7 @@
 #include <string> /* string class */
 #include <map>    /* map */
 #include "afhe.h" /* Abstraction Layer */
+#include "error_handling.h" /* Error Handling */
 
 // Include Backend Libraries
 #include <aseal.h>   /* Microsoft SEAL */
@@ -86,6 +87,17 @@ extern "C" {
      * @return String representing the backend library.
      */
     // const char* backend_t_to_string(backend_t backend);
+
+    /**
+     * @brief Check for an error.
+     * @return Reference to the error translator.
+    */
+    const char* check_for_error();
+
+    /**
+     * @brief Clear the error.
+    */
+    void clear_error();
 
     /**
      * @brief Convert string to backend type.
