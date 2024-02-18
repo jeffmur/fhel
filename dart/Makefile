@@ -4,7 +4,7 @@ deps:
 
 .PHONY: test
 test:
-	@dart test
+	@dart test --concurrency=1
 
 .PHONY: docs
 docs:
