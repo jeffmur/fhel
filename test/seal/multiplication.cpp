@@ -85,6 +85,11 @@ TEST(Multiply, IntegersToHexadecimal) {
       fhe->relinearize(ct_x_ct_y);
       AsealPlaintext pt_relin = decrypt(fhe, ct_x_ct_y);
 
+      int before_mod_switch = fhe->invariant_noise_budget(ct_x_ct_y);
+      fhe->mod_switch_to_next(ct_x_ct_y);
+      int after_mod_switch = fhe->invariant_noise_budget(ct_x_ct_y);
+      EXPECT_LT(after_mod_switch, before_mod_switch);
+
       EXPECT_EQ(hex_to_uint64(pt_relin.to_string()), expect);
     }
   }
@@ -144,6 +149,12 @@ TEST(Multiply, VectorInteger) {
     fhe->RelinKeyGen();
     AsealCiphertext ct_x_ct_m = multiply(fhe, ct_x, ct_m);
     fhe->relinearize(ct_x_ct_m);
+
+    int before_mod_switch = fhe->invariant_noise_budget(ct_x_ct_m);
+    fhe->mod_switch_to_next(ct_x_ct_m);
+    int after_mod_switch = fhe->invariant_noise_budget(ct_x_ct_m);
+    EXPECT_LT(after_mod_switch, before_mod_switch);
+
     AsealPlaintext pt_x_ct_m = decrypt(fhe, ct_x_ct_m);
 
     vector<uint64_t> vec_ct_x_ct_m;
