@@ -56,7 +56,7 @@ class Afhe {
         context['ptModBit'] ?? 0, // Only used when batching
         context['ptMod'] ?? 0, // Not used when batching
         context['secLevel']);
-
+    raiseForStatus();
     return ptr.toDartString();
   }
 
@@ -68,7 +68,7 @@ class Afhe {
 
   /// Generates a context for the Cheon-Kim-Kim-Song (CKKS) scheme.
   String _contextCKKS(Map context) {
-    return "Not Implemented";
+    throw (Exception("Unsupported scheme ckks"));
   }
 
   /// Generates a context for the encryption scheme.
