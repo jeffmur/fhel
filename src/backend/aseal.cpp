@@ -70,7 +70,7 @@ shared_ptr<SEALContext> inline Aseal::get_context()
 {
   if (this->context == nullptr)
   {
-    throw logic_error("<Aseal>: Context not initialized");
+    throw logic_error("Context is not initialized");
   }
   return (this->context);
 }
@@ -104,7 +104,7 @@ void Aseal::RelinKeyGen()
   // Initialize KeyGen object
   if (this->keyGenObj == nullptr)
   {
-    throw logic_error("<Aseal>: KeyGen() must be called before RelinKeyGen()");
+    throw logic_error("KeyGen() must be called before RelinKeyGen()");
   }
 
   // Generate Relin Key

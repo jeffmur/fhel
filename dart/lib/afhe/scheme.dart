@@ -32,6 +32,7 @@ class Scheme {
   Scheme.set(String fromName) {
     String lowerName = fromName.toLowerCase();
     value = _c_string_to_scheme_type(lowerName.toNativeUtf8());
+    raiseForStatus();
     name = fromName;
   }
 }
