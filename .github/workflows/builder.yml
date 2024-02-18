@@ -9,25 +9,6 @@ permissions:
   packages: write
 
 jobs:
-  preview:
-    name: Preview 👁️
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: 'true'
-
-      - name: C++ Tests ⚙️
-        uses: docker://ghcr.io/jeffmur/fhel:builder
-        with:
-          args: make ctest-ci
-
-      - name: Dart Tests 🎯
-        uses: docker://ghcr.io/jeffmur/fhel:builder
-        with:
-          args: make dtest-ci
-
   deploy:
     name: Push 📤
     runs-on: ubuntu-latest
