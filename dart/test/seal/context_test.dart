@@ -37,6 +37,16 @@ void main() {
     }
   });
 
+  test('CKKS not yet supported', () {
+    final fhe = Seal('ckks');
+    expect(
+        () => fhe
+            .genContext({'polyModDegree': 4096, 'ptMod': 0, 'secLevel': 128}),
+        throwsA(predicate((e) =>
+            e is Exception &&
+            e.toString() == 'Exception: Unsupported scheme ckks')));
+  });
+
   /* TODO: Security level is not checked during parameter validation */
   // However, there are only 3 options: 128, 192, 256 in SEAL
   // test('Invalid Security Level', () {

@@ -56,7 +56,7 @@ class Afhe {
         context['ptModBit'] ?? 0, // Only used when batching
         context['ptMod'] ?? 0, // Not used when batching
         context['secLevel']);
-
+    raiseForStatus();
     return ptr.toDartString();
   }
 
@@ -68,7 +68,7 @@ class Afhe {
 
   /// Generates a context for the Cheon-Kim-Kim-Song (CKKS) scheme.
   String _contextCKKS(Map context) {
-    return "Not Implemented";
+    throw (Exception("Unsupported scheme ckks"));
   }
 
   /// Generates a context for the encryption scheme.
@@ -128,7 +128,8 @@ class Afhe {
 
   /// Decodes a [Plaintext] into a list of integers.
   List<int> decodeVecInt(Plaintext plaintext, int arrayLength) {
-    Pointer<Uint64> ptr = _c_decode_vector_int(backend.value, library, plaintext.obj);
+    Pointer<Uint64> ptr =
+        _c_decode_vector_int(backend.value, library, plaintext.obj);
     raiseForStatus();
     return arrayToIntList(ptr, arrayLength);
   }
