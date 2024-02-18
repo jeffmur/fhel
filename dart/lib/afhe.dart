@@ -128,8 +128,7 @@ class Afhe {
 
   /// Decodes a [Plaintext] into a list of integers.
   List<int> decodeVecInt(Plaintext plaintext, int arrayLength) {
-    Pointer<Uint64> ptr =
-        _c_decode_vector_int(backend.value, library, plaintext.obj);
+    Pointer<Uint64> ptr = _c_decode_vector_int(backend.value, library, plaintext.obj);
     raiseForStatus();
     return arrayToIntList(ptr, arrayLength);
   }
