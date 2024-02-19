@@ -43,51 +43,27 @@ scheme_t scheme_t_from_string(const char* scheme)
 
 const char* generate_context(Afhe* afhe, scheme_t scheme_type, long poly_mod_degree, long pt_mod_bit, long pt_mod, long sec_level)
 {
-    switch (afhe->backend_lib)
-    {
-    case backend_t::seal_b:
-    {
-        try {
-            scheme a_scheme = scheme_t_map_scheme[scheme_type];
-            string ctx = afhe->ContextGen(a_scheme, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
-            // !Important: Must copy string to char* to avoid memory leak
-            char *cpy = new char[ctx.size()+1] ;
-            strcpy(cpy, ctx.c_str());
-            return cpy;
-        }
-        catch (exception &e) { return set_error(e); }
+    try {
+        scheme a_scheme = scheme_t_map_scheme[scheme_type];
+        string ctx = afhe->ContextGen(a_scheme, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
+        // !Important: Must copy string to char* to avoid memory leak
+        char *cpy = new char[ctx.size()+1] ;
+        strcpy(cpy, ctx.c_str());
+        return cpy;
     }
-    default:
-        return set_error(logic_error("[generate_context] No backend set"));
-    }
+    catch (exception &e) { return set_error(e); }
 }
 
 void generate_keys(Afhe* afhe)
 {
-    switch (afhe->backend_lib)
-    {
-    case backend_t::seal_b:
-    {
-        try { afhe->KeyGen(); }
-        catch (exception &e) { set_error(e); }
-    }
-    default:
-        break;
-    }
+    try { afhe->KeyGen(); }
+    catch (exception &e) { set_error(e); }
 }
 
 void generate_relin_keys(Afhe* afhe)
 {
-    switch (afhe->backend_lib)
-    {
-    case backend_t::seal_b:
-    {
-        try { afhe->RelinKeyGen(); }
-        catch (exception &e) { set_error(e); }
-    }
-    default:
-        break;
-    }
+    try { afhe->RelinKeyGen(); }
+    catch (exception &e) { set_error(e); }
 }
 
 Afhe* init_backend(backend_t backend) {
@@ -148,249 +124,129 @@ int get_ciphertext_size(ACiphertext* ciphertext) {
 
 ACiphertext* encrypt(Afhe* afhe, APlaintext* ptxt) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        ACiphertext* ctxt = init_ciphertext(lib);
-        try {
-            afhe->encrypt(*ptxt, *ctxt);
-        }
-        catch (exception &e) { set_error(e); }
-        return ctxt;
+    ACiphertext* ctxt = init_ciphertext(lib);
+    try {
+        afhe->encrypt(*ptxt, *ctxt);
     }
-    default:
-        set_error(logic_error("[encrypt] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    return ctxt;
 }
 
 APlaintext* decrypt(Afhe* afhe, ACiphertext* ctxt) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        APlaintext* ptxt = init_plaintext(lib);
-        try {
-            afhe->decrypt(*ctxt, *ptxt);
-        }
-        catch (exception &e) { set_error(e); }
-        return ptxt;
+    APlaintext* ptxt = init_plaintext(lib);
+    try {
+        afhe->decrypt(*ctxt, *ptxt);
     }
-    default:
-        set_error(logic_error("[decrypt] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    return ptxt;
 }
 
 int invariant_noise_budget(Afhe* afhe, ACiphertext* ctxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        int noise_budget = -1;
-        try {
-            noise_budget = afhe->invariant_noise_budget(*ctxt);
-        }
-        catch (exception &e) { set_error(e); }
-        return noise_budget;
+    int noise_budget = -1;
+    try {
+        noise_budget = afhe->invariant_noise_budget(*ctxt);
     }
-    default:
-        set_error(logic_error("[invariant_noise_budget] No backend set"));
-        return -1;
-    }
+    catch (exception &e) { set_error(e); }
+    return noise_budget;
 }
 
 ACiphertext* relinearize(Afhe* afhe, ACiphertext* ctxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        try {
-            afhe->relinearize(*ctxt);
-        }
-        catch (exception &e) { set_error(e); }
-        return ctxt;
+    try {
+        afhe->relinearize(*ctxt);
     }
-    default:
-        set_error(logic_error("[relinearize] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    return ctxt;
 }
 
 void mod_switch_to_next(Afhe* afhe, ACiphertext* ctxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        try {
-            afhe->mod_switch_to_next(*ctxt);
-            return;
-        }
-        catch (exception &e) { set_error(e); }
+    try {
+        afhe->mod_switch_to_next(*ctxt);
     }
-    default:
-        set_error(logic_error("[mod_switch_to_next] No backend set"));
-    }
+    catch (exception &e) { set_error(e); }
 }
 
 ACiphertext* add(Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        ACiphertext* ctxt = init_ciphertext(lib);
-        try {
-            afhe->add(*ctxt1, *ctxt2, *ctxt);
-        }
-        catch (exception &e) { set_error(e); }
-        return ctxt;
+    ACiphertext* ctxt = init_ciphertext(lib);
+    try {
+        afhe->add(*ctxt1, *ctxt2, *ctxt);
     }
-    default:
-        set_error(logic_error("[add] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    return ctxt;
 }
 
 ACiphertext* add_plain(Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        ACiphertext* ctxt_res = init_ciphertext(lib);
-        try {
-            afhe->add(*ctxt, *ptxt, *ctxt_res);
-        }
-        catch (exception &e) { set_error(e); }
-        return ctxt_res;
+    ACiphertext* ctxt_res = init_ciphertext(lib);
+    try {
+        afhe->add(*ctxt, *ptxt, *ctxt_res);
     }
-    default:
-        set_error(logic_error("[add_plain] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    return ctxt_res;
 }
 
 ACiphertext* subtract(Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        ACiphertext* ctxt = init_ciphertext(lib);
-        try {
-            afhe->subtract(*ctxt1, *ctxt2, *ctxt);
-        }
-        catch (exception &e) { set_error(e); }
-        return ctxt;
+    ACiphertext* ctxt = init_ciphertext(lib);
+    try {
+        afhe->subtract(*ctxt1, *ctxt2, *ctxt);
     }
-    default:
-        set_error(logic_error("[subtract] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    return ctxt;
 }
 
 ACiphertext* subtract_plain(Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        ACiphertext* ctxt_res = init_ciphertext(lib);
-        try {
-            afhe->subtract(*ctxt, *ptxt, *ctxt_res);
-        }
-        catch (exception &e) { set_error(e); }
-        return ctxt_res;
+    ACiphertext* ctxt_res = init_ciphertext(lib);
+    try {
+        afhe->subtract(*ctxt, *ptxt, *ctxt_res);
     }
-    default:
-        set_error(logic_error("[subtract_plain] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    return ctxt_res;
 }
 
 ACiphertext* multiply(Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        ACiphertext* ctxt = init_ciphertext(lib);
-        try {
-            afhe->multiply(*ctxt1, *ctxt2, *ctxt);
-        }
-        catch (exception &e) { set_error(e); }
-        return ctxt;
+    ACiphertext* ctxt = init_ciphertext(lib);
+    try {
+        afhe->multiply(*ctxt1, *ctxt2, *ctxt);
     }
-    default:
-        set_error(logic_error("[multiply] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    return ctxt;
 }
 
 ACiphertext* multiply_plain(Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        ACiphertext* ctxt_res = init_ciphertext(lib);
-        try {
-            afhe->multiply(*ctxt, *ptxt, *ctxt_res);
-        }
-        catch (exception &e) { set_error(e); }
-        return ctxt_res;
+    ACiphertext* ctxt_res = init_ciphertext(lib);
+    try {
+        afhe->multiply(*ctxt, *ptxt, *ctxt_res);
     }
-    default:
-        set_error(logic_error("[multiply_plain] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    return ctxt_res;
 }
 
 APlaintext* encode_int(Afhe* afhe, uint64_t* data, int size) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        APlaintext* ptxt = init_plaintext(lib);
-        try {
-            // Convert array to vector
-            vector<uint64_t> data_vec(data, data + size);
-            afhe->encode_int(data_vec, *ptxt);
-        }
-        catch (exception &e) { set_error(e); }
-        return ptxt;
+    APlaintext* ptxt = init_plaintext(lib);
+    try {
+        // Convert array to vector
+        vector<uint64_t> data_vec(data, data + size);
+        afhe->encode_int(data_vec, *ptxt);
     }
-    default:
-        set_error(logic_error("[encode_int] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    return ptxt;
 }
 
 uint64_t* decode_int(Afhe* afhe, APlaintext* ptxt) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
-    switch (lib)
-    {
-    case backend_t::seal_b:
-    {
-        vector<uint64_t> data;
-        try {
-            afhe->decode_int(*ptxt, data);
-        }
-        catch (exception &e) { set_error(e); }
-        // Extract vector contents to array
-        uint64_t* result = new uint64_t[data.size()];
-        copy(data.begin(), data.end(), result);
-        return result;
+    vector<uint64_t> data;
+    try {
+        afhe->decode_int(*ptxt, data);
     }
-    default:
-        set_error(logic_error("[decode_int] No backend set"));
-        return nullptr;
-    }
+    catch (exception &e) { set_error(e); }
+    // Extract vector contents to array
+    uint64_t* result = new uint64_t[data.size()];
+    copy(data.begin(), data.end(), result);
+    return result;
 }
