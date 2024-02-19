@@ -18,8 +18,8 @@ void main() {
   });
 
   test('Context is not initialized', () {
-    final seal = Afhe('seal', 'BFV');
-    expect(() => seal.encrypt(Plaintext(seal.backend)),
+    final seal = Seal('BFV');
+    expect(() => seal.genKeys(),
       throwsA(predicate((e) => e is Exception && e.toString() == 'Exception: Context is not initialized')));
   });
 
