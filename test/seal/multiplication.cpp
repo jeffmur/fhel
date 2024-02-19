@@ -165,3 +165,98 @@ TEST(Multiply, VectorInteger) {
     }
   }
 }
+
+TEST(Multiply, VectorDouble) {
+
+  Aseal* fhe = new Aseal();
+
+  string ctx = fhe->ContextGen(scheme::ckks, 8192, 40, -1, -1, {60, 40, 40, 60});
+
+  // Expect two strings not to be equal.
+  EXPECT_STREQ(ctx.c_str(), "success: valid");
+
+  fhe->KeyGen();
+  fhe->RelinKeyGen();
+
+  size_t slot_count = fhe->slot_count();
+
+  /**
+   * Create an input vector with floating point values 0 ... 1.
+  */
+  vector<double> x;
+  x.reserve(slot_count);
+  double curr_point = 0;
+  double step_size = 1.0 / (static_cast<double>(slot_count) - 1);
+  for (size_t i = 0; i < slot_count; i++)
+  {
+      x.push_back(curr_point);
+      curr_point += step_size;
+  }
+  // cout << "X vector: " << endl;
+  // for (size_t i = 0; i < slot_count; i++)
+  // {
+  //     cout << x[i] << " ";
+  // }
+
+  AsealPlaintext pt_x = AsealPlaintext();
+
+  fhe->encode_double(x, pt_x);
+
+  AsealCiphertext ct_x = AsealCiphertext();
+
+  fhe->encrypt(pt_x, ct_x);
+
+  /**
+   * Create an addend vector with floating point values 0 ... 1.
+  */
+  vector<double> m;
+  m.reserve(slot_count);
+  curr_point = 0;
+  step_size = 1.0 / (static_cast<double>(slot_count) - 1);
+  for (size_t i = 0; i < slot_count; i++)
+  {
+      m.push_back(curr_point);
+      curr_point += step_size;
+  }
+  // cout << "Add vector: " << endl;
+  // for (size_t i = 0; i < slot_count; i++)
+  // {
+  //     cout << add[i] << " ";
+  // }
+  AsealPlaintext pt_m = AsealPlaintext();
+  fhe->encode_double(m, pt_m);
+  AsealCiphertext ct_m = AsealCiphertext();
+  fhe->encrypt(pt_m, ct_m);
+
+  AsealCiphertext ct_res = AsealCiphertext();
+
+  fhe->multiply(ct_x, ct_m, ct_res);
+  fhe->relinearize(ct_res);
+
+  AsealPlaintext decrypt_res = AsealPlaintext();
+  fhe->decrypt(ct_res, decrypt_res);
+
+  vector<double> decode_res;
+  fhe->decode_double(decrypt_res, decode_res);
+
+  for (int i = 0; i < x.size(); i++) {
+    double expect = x[i] * m[i];
+    // Compare up to 7 decimal places.
+    EXPECT_NEAR(expect, decode_res[i], 0.0000001);
+  }
+
+  // Without relinearization
+  AsealCiphertext ct_res_no_relin = AsealCiphertext();
+  fhe->multiply(ct_x, pt_m, ct_res_no_relin);
+
+  AsealPlaintext decrypt_res_no_relin = AsealPlaintext();
+  fhe->decrypt(ct_res_no_relin, decrypt_res_no_relin);
+  vector<double> decode_res_no_relin;
+  fhe->decode_double(decrypt_res_no_relin, decode_res_no_relin);
+
+  for (int i = 0; i < x.size(); i++) {
+    double expect = x[i] * m[i];
+    // Compare up to 7 decimal places.
+    EXPECT_NEAR(expect, decode_res_no_relin[i], 0.0000001);
+  }
+}

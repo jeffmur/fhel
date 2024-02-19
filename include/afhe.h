@@ -70,18 +70,17 @@ public:
    *
    * @param scheme The encryption scheme to be used.
    * @param poly_modulus_degree The degree of the polynomial modulus, which determines the size and performance of the FHE operations.
-   * @param plain_modulus_bit_size The bit size of the plaintext modulus.
+   * @param plain_modulus_bit_size The bit size of the plaintext modulus / CKKS encoder scale.
    * @param plain_modulus The plaintext modulus, which affects the precision of the computations.
    * @param sec_level The security level, which affects the hardness of the cryptographic problem underlying the FHE scheme.
    * @param qi_sizes (optional) A vector of sizes for each modulus in the modulus chain.
-   * @param qi_mods (optional) A vector of specific moduli for the modulus chain.
    *
    * @return A string representing the status of generated context.
    */
   virtual string ContextGen(
     scheme scheme, uint64_t poly_modulus_degree,
     uint64_t plain_modulus_bit_size, uint64_t plain_modulus,
-    int sec_level, vector<int> qi_sizes = {}, vector<uint64_t> qi_mods = {}) = 0;
+    int sec_level, vector<int> qi_sizes = {}) = 0;
 
   // virtual vector<uint64_t> get_qi() = 0;
   // virtual uint64_t get_plain_modulus() = 0;
@@ -155,6 +154,11 @@ public:
   // ------------------ Codec ------------------
 
   /**
+   * @brief Returns the number of plaintext slots in an encoded ciphertext.
+  */
+  virtual int slot_count() = 0;
+
+  /**
    * @brief Encodes a vector of integers into a plaintext message.
    *        Used by BGV and BFV schemes.
    *
@@ -170,7 +174,7 @@ public:
    * @param data The vector of floats to be encoded.
    * @param ptxt The plaintext message where the encoded message will be stored.
    */
-  // virtual void encode_float(vector<double> &data, APlainTxt &ptxt) = 0;
+  virtual void encode_double(vector<double> &data, APlaintext &ptxt) = 0;
 
   /**
    * @brief Encodes a vector of complex numbers into a plaintext message.
@@ -197,7 +201,7 @@ public:
    * @param ptxt The plaintext message to be decoded.
    * @param data The vector of floats where the decoded message will be stored.
    */
-  // virtual void decode_float(APlainTxt &ptxt, vector<double> &data) = 0;
+  virtual void decode_double(APlaintext &ptxt, vector<double> &data) = 0;
 
   /**
    * @brief Decodes a plaintext message into a vector of complex numbers.

@@ -21,11 +21,10 @@ string Aseal::ContextGen(scheme scheme,
                          uint64_t plain_modulus_bit_size,
                          uint64_t plain_modulus,
                          int sec_level,
-                         vector<int> qi_sizes,
-                         vector<uint64_t> qi_values)
+                         vector<int> qi_sizes)
 { try {
-  // Initialize parameters
-  EncryptionParameters param(scheme_map_to_seal[scheme]);
+  // Initialize parameters with scheme
+  EncryptionParameters param(scheme_map_to_seal.at(scheme));
 
   /*
    * BGV encodes plaintext with “least significant bits”
@@ -52,8 +51,38 @@ string Aseal::ContextGen(scheme scheme,
       param.set_plain_modulus(plain_modulus);
     }
   }
+  else if (scheme == scheme::ckks)
+  {
+    // Set polynomial modulus degree
+    param.set_poly_modulus_degree(poly_modulus_degree);
+
+    if (qi_sizes.size() == 0)
+    {
+      throw invalid_argument("CKKS requires at least one qi_size");
+    }
+
+    // Set coefficient modulus
+    param.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, qi_sizes));
+
+    // Set CKKS Encoder scale
+    this->cEncoderScale = pow(2.0, plain_modulus_bit_size);
+  }
+
   // Validate parameters by putting them inside a SEALContext
   this->context = make_shared<SEALContext>(param, true, sec_map[sec_level]);
+
+  // Initialize Encoder object
+  if(this->context->parameters_set() && plain_modulus_bit_size > 0)
+  {
+    if (scheme == scheme::bfv || scheme == scheme::bgv)
+    {
+      this->bEncoder = make_shared<BatchEncoder>(*this->context);
+    }
+    else if (scheme == scheme::ckks)
+    {
+      this->cEncoder = make_shared<CKKSEncoder>(*this->context);
+    }
+  }
 
   // Return info about parameter validity.
   //    - 'success: valid' if everything went well
@@ -181,16 +210,30 @@ int Aseal::invariant_noise_budget(ACiphertext &ctxt)
   return this->decryptor->invariant_noise_budget(_to_ciphertext(ctxt));
 }
 
+int Aseal::slot_count()
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  if (this->bEncoder != nullptr) {
+    return this->bEncoder->slot_count();
+  }
+  else if (this->cEncoder != nullptr) {
+    return this->cEncoder->slot_count();
+  }
+  throw logic_error("Encoder is not initialized");
+}
+
 void Aseal::encode_int(vector<uint64_t> &data, APlaintext &ptxt)
 {
   // Gather current context, resolves object
   auto &seal_context = *(this->get_context());
 
   // Initialize Encoder object
-  this->encoder = make_shared<BatchEncoder>(seal_context);
+  // this->bEncoder = make_shared<BatchEncoder>(seal_context);
 
   // Encode using casted types
-  this->encoder->encode(data, _to_plaintext(ptxt));
+  this->bEncoder->encode(data, _to_plaintext(ptxt));
 }
 
 void Aseal::decode_int(APlaintext &ptxt, vector<uint64_t> &data)
@@ -199,10 +242,34 @@ void Aseal::decode_int(APlaintext &ptxt, vector<uint64_t> &data)
   auto &seal_context = *(this->get_context());
 
   // Initialize Encoder object
-  this->encoder = make_shared<BatchEncoder>(seal_context);
+  // this->bEncoder = make_shared<BatchEncoder>(seal_context);
 
   // Decode using casted types
-  this->encoder->decode(_to_plaintext(ptxt), data);
+  this->bEncoder->decode(_to_plaintext(ptxt), data);
+}
+
+void Aseal::encode_double(vector<double> &data, APlaintext &ptxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Encoder object
+  // this->cEncoder = make_shared<CKKSEncoder>(seal_context);
+
+  // Encode using casted types
+  this->cEncoder->encode(data, this->cEncoderScale, _to_plaintext(ptxt));
+}
+
+void Aseal::decode_double(APlaintext &ptxt, vector<double> &data)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Encoder object
+  // this->cEncoder = make_shared<CKKSEncoder>(seal_context);
+
+  // Decode using casted types
+  this->cEncoder->decode(_to_plaintext(ptxt), data);
 }
 
 void Aseal::add(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res)
