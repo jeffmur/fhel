@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 import 'package:fhel/seal.dart' show Seal;
 
 void main() {
-  final fhe = Seal('');
+  final fhe = Seal('bfv'); // cannot exist without a scheme
 
   test('Default Constructor', () {
     final seal_pt = fhe.plain("");

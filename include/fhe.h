@@ -26,8 +26,8 @@ extern "C" {
      */
     enum backend_t : int32_t
     {
-        no_t = 0,      /* No Library Set */
-        seal_t = 1,    /* Microsoft SEAL */
+        no_b = backend::_none,   /* No Backend Set */
+        seal_b = backend::_seal, /* Microsoft SEAL */
     };
 
     /**
@@ -43,6 +43,14 @@ extern "C" {
     };
 
 }
+
+/**
+ * @brief Map (abstract) backend type to backend_t
+*/
+static map<backend, backend_t> backend_map_backend_t{
+  {backend::_none, backend_t::no_b},
+  {backend::_seal, backend_t::seal_b},
+};
 
 /**
  * @brief Map scheme_t to (abstract) scheme type
@@ -66,7 +74,6 @@ struct cmp_str
  * @brief Map string to type for the supported schemes.
 */
 static map<const char*, scheme_t, cmp_str> scheme_t_map{
-  {"none", scheme_t::no_s},
   {"bfv", scheme_t::bfv_s},
   {"ckks", scheme_t::ckks_s},
   {"bgv", scheme_t::bgv_s},
@@ -76,8 +83,7 @@ static map<const char*, scheme_t, cmp_str> scheme_t_map{
  * @brief Map string to type for the supported backend libraries.
 */
 static map<const char*, backend_t, cmp_str> backend_t_map{
-  {"none", backend_t::no_t},
-  {"seal", backend_t::seal_t},
+  {"seal", backend_t::seal_b},
 };
 
 extern "C" {
@@ -115,7 +121,6 @@ extern "C" {
 
     /**
      * @brief Generate a context for the backend library.
-     * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
      * @param scheme Scheme to use.
      * @param poly_mod_degree Polynomial modulus degree.
@@ -124,21 +129,19 @@ extern "C" {
      * @param sec_level Security level.
      * @return String representing the context.
     */
-    const char* generate_context(backend_t backend, Afhe* afhe, scheme_t scheme, long poly_mod_degree, long pt_mod_bit, long pt_mod, long sec_level);
+    const char* generate_context(Afhe* afhe, scheme_t scheme, long poly_mod_degree, long pt_mod_bit, long pt_mod, long sec_level);
 
     /**
      * @brief Generate keys for the backend library.
-     * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
     */
-    void generate_keys(backend_t backend, Afhe* afhe);
+    void generate_keys(Afhe* afhe);
 
     /**
      * @brief Generate relinearization keys for the backend library.
-     * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
     */
-    void generate_relin_keys(backend_t backend, Afhe* afhe);
+    void generate_relin_keys(Afhe* afhe);
 
     /**
      * @brief Initialize the backend library.
@@ -185,110 +188,111 @@ extern "C" {
 
     /**
      * @brief Encrypt a plaintext.
-     * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
      * @param plaintext Pointer to the plaintext.
      * @return Pointer to the ciphertext.
     */
-    ACiphertext* encrypt(backend_t backend, Afhe* afhe, APlaintext* plaintext);
+    ACiphertext* encrypt(Afhe* afhe, APlaintext* plaintext);
 
     /**
      * @brief Decrypt a ciphertext.
-     * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
      * @param ciphertext Pointer to the ciphertext.
      * @return Pointer to the plaintext.
     */
-    APlaintext* decrypt(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
+    APlaintext* decrypt(Afhe* afhe, ACiphertext* ciphertext);
 
     /**
      * @brief Calculate the added noise to the ciphertext.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext Pointer to the ciphertext.
+     * @return Noise added to the ciphertext.
     */
-    int invariant_noise_budget(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
+    int invariant_noise_budget(Afhe* afhe, ACiphertext* ciphertext);
 
     /**
      * @brief Relinearize a ciphertext.
-     * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
      * @param ciphertext Pointer to the ciphertext.
      * @return Pointer to the relinearized ciphertext.
     */
-    ACiphertext* relinearize(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
+    ACiphertext* relinearize(Afhe* afhe, ACiphertext* ciphertext);
 
     /**
      * @brief Mod switch to the next level for a ciphertext.
-     * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
      * @param ciphertext Pointer to the ciphertext.
     */
-    void mod_switch_to_next(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
+    void mod_switch_to_next(Afhe* afhe, ACiphertext* ciphertext);
 
     /**
      * @brief Add two ciphertexts.
-     * @param backend Backend library to use.
-     * @param afhe Pointer to the backend library.
-    */
-    ACiphertext* add(backend_t backend, Afhe* afhe, ACiphertext* ciphertext1, ACiphertext* ciphertext2);
-
-    /**
-     * @brief Add a plaintext to a ciphertext.
-     * @param backend Backend library to use.
-     * @param afhe Pointer to the backend library.
-    */
-    ACiphertext* add_plain(backend_t backend, Afhe* afhe, ACiphertext* ciphertext, APlaintext* plaintext);
-
-    /**
-     * @brief Subtract two ciphertexts.
-     * @param backend Backend library to use.
-     * @param afhe Pointer to the backend library.
-    */
-    ACiphertext* subtract(backend_t backend, Afhe* afhe, ACiphertext* ciphertext1, ACiphertext* ciphertext2);
-
-
-    /**
-     * @brief Subtract a plaintext from a ciphertext.
-     * @param backend Backend library to use.
-     * @param afhe Pointer to the backend library.
-    */
-    ACiphertext* subtract_plain(backend_t backend, Afhe* afhe, ACiphertext* ciphertext, APlaintext* plaintext);
-
-    /**
-     * @brief Multiply two ciphertexts.
-     * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
      * @param ciphertext1 Pointer to the first ciphertext.
      * @param ciphertext2 Pointer to the second ciphertext.
      * @return Pointer to the resulting ciphertext.
     */
-    ACiphertext* multiply(backend_t backend, Afhe* afhe, ACiphertext* ciphertext1, ACiphertext* ciphertext2);
+    ACiphertext* add(Afhe* afhe, ACiphertext* ciphertext1, ACiphertext* ciphertext2);
 
     /**
-     * @brief Multiply a ciphertext by a plaintext.
-     * @param backend Backend library to use.
+     * @brief Add a plaintext to a ciphertext.
      * @param afhe Pointer to the backend library.
      * @param ciphertext Pointer to the ciphertext.
      * @param plaintext Pointer to the plaintext.
      * @return Pointer to the resulting ciphertext.
     */
-    ACiphertext* multiply_plain(backend_t backend, Afhe* afhe, ACiphertext* ciphertext, APlaintext* plaintext);
+    ACiphertext* add_plain(Afhe* afhe, ACiphertext* ciphertext, APlaintext* plaintext);
+
+    /**
+     * @brief Subtract two ciphertexts.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext1 Pointer to the first ciphertext.
+     * @param ciphertext2 Pointer to the second ciphertext.
+     * @return Pointer to the resulting ciphertext.
+    */
+    ACiphertext* subtract(Afhe* afhe, ACiphertext* ciphertext1, ACiphertext* ciphertext2);
+
+    /**
+     * @brief Subtract a plaintext from a ciphertext.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext Pointer to the ciphertext.
+     * @param plaintext Pointer to the plaintext.
+    */
+    ACiphertext* subtract_plain(Afhe* afhe, ACiphertext* ciphertext, APlaintext* plaintext);
+
+    /**
+     * @brief Multiply two ciphertexts.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext1 Pointer to the first ciphertext.
+     * @param ciphertext2 Pointer to the second ciphertext.
+     * @return Pointer to the resulting ciphertext.
+    */
+    ACiphertext* multiply(Afhe* afhe, ACiphertext* ciphertext1, ACiphertext* ciphertext2);
+
+    /**
+     * @brief Multiply a ciphertext by a plaintext.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext Pointer to the ciphertext.
+     * @param plaintext Pointer to the plaintext.
+     * @return Pointer to the resulting ciphertext.
+    */
+    ACiphertext* multiply_plain(Afhe* afhe, ACiphertext* ciphertext, APlaintext* plaintext);
 
     /**
      * @brief Encode a vector of integers into a plaintext.
-     * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
      * @param data Vector of integers to encode.
      * @return Pointer to the plaintext.
     */
-    APlaintext* encode_int(backend_t backend, Afhe* afhe, uint64_t* data, int len);
+    APlaintext* encode_int(Afhe* afhe, uint64_t* data, int len);
 
     /**
      * @brief Decode a plaintext into a vector of integers.
-     * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.
      * @param plaintext Pointer to the plaintext.
      * @return Vector of integers.
     */
-    uint64_t* decode_int(backend_t backend, Afhe* afhe, APlaintext* plaintext);
+    uint64_t* decode_int(Afhe* afhe, APlaintext* plaintext);
 }
 
 #endif /* FHE_H */

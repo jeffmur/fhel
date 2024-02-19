@@ -27,7 +27,6 @@
 #include "afhe.h"      /* Abstraction */
 
 using namespace std;
-using namespace seal;
 
 // Forward Declaration
 class Aseal;
@@ -37,14 +36,14 @@ class AsealPoly;
  * @brief Compression Modes used when compiling SEAL.
  */
 static map<string, seal::compr_mode_type> compr_mode_map {
-    {"none", compr_mode_type::none},
+    {"none", seal::compr_mode_type::none},
 #ifdef SEAL_USE_ZLIB
     // Use ZLIB compression
-    {"zlib", compr_mode_type::zlib},
+    {"zlib", seal::compr_mode_type::zlib},
 #endif
 #ifdef SEAL_USE_ZSTD
     // Use Zstandard compression
-    {"zstd", compr_mode_type::zstd},
+    {"zstd", seal::compr_mode_type::zstd},
 #endif
 };
 
@@ -63,7 +62,7 @@ static map<scheme, seal::scheme_type> scheme_map_to_seal {
 /**
  * @brief Security Levels
  */
-static map<int, sec_level_type> sec_map {
+static map<int, seal::sec_level_type> sec_map {
     {0, seal::sec_level_type::none},
     {128, seal::sec_level_type::tc128},
     {192, seal::sec_level_type::tc192},
@@ -138,12 +137,10 @@ private:
   shared_ptr<seal::Ciphertext> ciphertext;   /** Ciphertext.*/
 
 public:
-  vector<uint64_t> qi; /**< Vector of uint64_t values. */
-
   /**
    * @brief Default constructor for the Aseal class.
    */
-  Aseal(){};
+  Aseal(){ this->backend_lib = backend::_seal; };
 
   /**
    * @brief Copy constructor for the Aseal class.
@@ -179,7 +176,7 @@ public:
    * @return A pointer to the SEAL context object.
    * @throws std::logic_error if the context is not initialized.
   */
-  inline shared_ptr<SEALContext> get_context();
+  inline shared_ptr<seal::SEALContext> get_context();
 
   // ------------------ Keys ------------------
 

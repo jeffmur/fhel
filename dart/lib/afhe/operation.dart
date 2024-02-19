@@ -3,48 +3,18 @@ part of '../afhe.dart';
 
 // --- add ---
 
-typedef _AddC = Pointer Function(
-    Int backend, Pointer library, Pointer ciphertext1, Pointer ciphertext2);
-
-typedef _Add = Pointer Function(
-    int backend, Pointer library, Pointer ciphertext1, Pointer ciphertext2);
-
-final _Add _c_add = dylib.lookup<NativeFunction<_AddC>>('add').asFunction();
-
-typedef _AddPlainC = Pointer Function(
-    Int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
-
-typedef _AddPlain = Pointer Function(
-    int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
-
-final _AddPlain _c_add_plain = dylib.lookup<NativeFunction<_AddPlainC>>('add_plain').asFunction();
+typedef _AddC = Pointer Function(Pointer library, Pointer a, Pointer b);
+final _AddC _c_add = dylib.lookup<NativeFunction<_AddC>>('add').asFunction();
+final _AddC _c_add_plain = dylib.lookup<NativeFunction<_AddC>>('add_plain').asFunction();
 
 // --- subtract ---
 
-typedef _SubC = Pointer Function(
-    Int backend, Pointer library, Pointer ciphertext1, Pointer ciphertext2);
-
-typedef _Sub = Pointer Function(
-    int backend, Pointer library, Pointer ciphertext1, Pointer ciphertext2);
-
-final _Sub _c_subtract = dylib.lookup<NativeFunction<_SubC>>('subtract').asFunction();
-
-typedef _SubPlainC = Pointer Function(
-    Int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
-
-typedef _SubPlain = Pointer Function(
-    int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
-
-final _SubPlain _c_subtract_plain = dylib.lookup<NativeFunction<_SubPlainC>>('subtract_plain').asFunction();
+typedef _SubC = Pointer Function(Pointer library, Pointer a, Pointer b);
+final _SubC _c_subtract = dylib.lookup<NativeFunction<_SubC>>('subtract').asFunction();
+final _SubC _c_subtract_plain = dylib.lookup<NativeFunction<_SubC>>('subtract_plain').asFunction();
 
 // --- multiply ---
 
-typedef _MultiplyC = Pointer Function(Int backend, Pointer library, Pointer ciphertext1, Pointer ciphertext2);
-typedef _Multiply = Pointer Function(int backend, Pointer library, Pointer ciphertext1, Pointer ciphertext2);
-
-final _Multiply _c_multiply = dylib.lookup<NativeFunction<_MultiplyC>>('multiply').asFunction();
-
-typedef _MultiplyPlainC = Pointer Function(Int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
-typedef _MultiplyPlain = Pointer Function(int backend, Pointer library, Pointer ciphertext, Pointer plaintext);
-
-final _MultiplyPlain _c_multiply_plain = dylib.lookup<NativeFunction<_MultiplyPlainC>>('multiply_plain').asFunction();
+typedef _MultiplyC = Pointer Function(Pointer library, Pointer a, Pointer b);
+final _MultiplyC _c_multiply = dylib.lookup<NativeFunction<_MultiplyC>>('multiply').asFunction();
+final _MultiplyC _c_multiply_plain = dylib.lookup<NativeFunction<_MultiplyC>>('multiply_plain').asFunction();

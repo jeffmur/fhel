@@ -21,6 +21,17 @@ class Afhe;        /* Abstract Class */
 
 using namespace std;
 
+// ------------------ Backend Type ------------------
+/**
+ * @brief Enum for the supported backend libraries.
+ * @return Integer representing the backend library type.
+ */
+enum backend : int
+{
+  _none = 0,   /* No Backend Set */
+  _seal = 1,   /* Microsoft SEAL */
+};
+
 // ------------------ Scheme Type ------------------
 /**
  * @brief Enum for the scheme type.
@@ -35,27 +46,21 @@ enum scheme : int
 };
 
 /**
- * @brief Abstract Fully Homomorphic Encryption (AFHE) class.
- */
-class Afhe
-/**
- * @file afhe.h
- * @brief This file contains the declaration of the Afhe class, which represents a Fully Homomorphic Encryption (FHE) scheme.
- */
-
-/**
  * @class Afhe
  * @brief The Afhe class represents a Fully Homomorphic Encryption (FHE) scheme.
  *
  * This class provides methods for generating a context, managing keys, performing encryption and decryption operations,
  * encoding and decoding data, and performing arithmetic operations on ciphertexts.
  */
+class Afhe
 {
 public:
   // Class Management
   Afhe(){};
   // Destructor
   virtual ~Afhe(){};
+
+  backend backend_lib; /* The backend library to be used. */
 
   // ------------------ Parameters ------------------
   /**

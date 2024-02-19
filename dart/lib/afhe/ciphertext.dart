@@ -45,23 +45,18 @@ class Ciphertext {
 
 // --- noise budget ---
 
-typedef _InvariantNoiseBudgetC = Int32 Function(
-    BackendType backend, Pointer library, Pointer ciphertext);
-
-typedef _InvariantNoiseBudget = int Function(
-    int backend, Pointer library, Pointer ciphertext);
+typedef _InvariantNoiseBudgetC = Int32 Function(Pointer library, Pointer ciphertext);
+typedef _InvariantNoiseBudget = int Function(Pointer library, Pointer ciphertext);
 
 /// Returns the invariant noise budget of the ciphertext.
 final _InvariantNoiseBudget _c_invariant_noise_budget = dylib
     .lookup<NativeFunction<_InvariantNoiseBudgetC>>('invariant_noise_budget')
     .asFunction();
 
-typedef _ModSwitchNextC = Void Function(
-    BackendType backend, Pointer library, Pointer ciphertext);
+typedef _ModSwitchNextC = Void Function(Pointer library, Pointer ciphertext);
+typedef _ModSwitchNext = void Function(Pointer library, Pointer ciphertext);
 
-typedef _ModSwitchNext = void Function(
-    int backend, Pointer library, Pointer ciphertext);
-
+/// Modulus switches the ciphertext to the next level.
 final _ModSwitchNext _c_mod_switch_next = dylib
     .lookup<NativeFunction<_ModSwitchNextC>>('mod_switch_to_next')
     .asFunction();
