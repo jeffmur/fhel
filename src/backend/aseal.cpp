@@ -21,7 +21,7 @@ string Aseal::ContextGen(scheme scheme,
                          uint64_t plain_modulus_bit_size,
                          uint64_t plain_modulus,
                          int sec_level,
-                         vector<int> qi_sizes)
+                         vector<int> bit_sizes)
 { try {
   // Initialize parameters with scheme
   EncryptionParameters param(scheme_map_to_seal.at(scheme));
@@ -56,13 +56,13 @@ string Aseal::ContextGen(scheme scheme,
     // Set polynomial modulus degree
     param.set_poly_modulus_degree(poly_modulus_degree);
 
-    if (qi_sizes.size() == 0)
+    if (bit_sizes.size() == 0)
     {
-      throw invalid_argument("CKKS requires at least one qi_size");
+      throw invalid_argument("CKKS requires at least one entry in bit_sizes");
     }
 
     // Set coefficient modulus
-    param.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, qi_sizes));
+    param.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, bit_sizes));
 
     // Set CKKS Encoder scale
     this->cEncoderScale = pow(2.0, plain_modulus_bit_size);

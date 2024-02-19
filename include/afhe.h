@@ -73,7 +73,7 @@ public:
    * @param plain_modulus_bit_size The bit size of the plaintext modulus / CKKS encoder scale.
    * @param plain_modulus The plaintext modulus, which affects the precision of the computations.
    * @param sec_level The security level, which affects the hardness of the cryptographic problem underlying the FHE scheme.
-   * @param qi_sizes (optional) A vector of sizes for each modulus in the modulus chain.
+   * @param qi_sizes (optional) A vector of prime bit sizes for each modulus in the modulus chain.
    *
    * @return A string representing the status of generated context.
    */

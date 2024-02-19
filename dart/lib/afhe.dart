@@ -54,7 +54,8 @@ class Afhe {
         context['polyModDegree'],
         context['ptModBit'] ?? 0, // Only used when batching
         context['ptMod'] ?? 0, // Not used when batching
-        context['secLevel']);
+        context['secLevel'],
+        nullptr, 0);
     raiseForStatus();
     return ptr.toDartString();
   }
@@ -67,13 +68,32 @@ class Afhe {
 
   /// Generates a context for the Cheon-Kim-Kim-Song (CKKS) scheme.
   String _contextCKKS(Map context) {
-    throw (Exception("Unsupported scheme ckks"));
+    if (context['encodeScalar'] == null) {
+      throw ArgumentError('encodeScalar is a required parameter for CKKS');
+    }
+    if (context['qSizes'] == null) {
+      throw ArgumentError('qSizes is a required parameter for CKKS');
+    }
+    if (context['qSizes'] is! List<int>) {
+      throw ArgumentError('qSizes must be a list of integers');
+    }
+    List<int> primeSizes = context['qSizes'];
+    final ptr = _c_gen_context(
+        library,
+        scheme.value,
+        context['polyModDegree'],
+        context['encodeScalar'],
+        0, // Plain Modulus is not used
+        0, // Security Level is not used
+        intListToIntArray(primeSizes), primeSizes.length);
+    raiseForStatus();
+    return ptr.toDartString();
   }
 
   /// Generates a context for the encryption scheme.
   ///
   /// The [context] is a map of parameters used to generate the encryption context for the [Scheme].
-  String genContext(Map<String, int> context) {
+  String genContext(Map context) {
     return switch (scheme.name) {
       "bfv" => _contextBFV(context),
       "bgv" => _contextBGV(context),
@@ -119,7 +139,7 @@ class Afhe {
 
   /// Encodes a list of integers into a [Plaintext].
   Plaintext encodeVecInt(List<int> vec) {
-    Pointer ptr = _c_encode_vector_int(library, intListToArray(vec), vec.length);
+    Pointer ptr = _c_encode_vector_int(library, intListToUint64Array(vec), vec.length);
     raiseForStatus();
     return Plaintext.fromPointer(backend, ptr);
   }

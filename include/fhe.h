@@ -127,9 +127,11 @@ extern "C" {
      * @param pt_mod_bit Plaintext modulus bit size.
      * @param pt_mod Plaintext modulus.
      * @param sec_level Security level.
+     * @param qi_sizes Array of primes for the coefficient modulus.
+     * @param qi_sizes_length Length of the array of primes.
      * @return String representing the context.
     */
-    const char* generate_context(Afhe* afhe, scheme_t scheme, long poly_mod_degree, long pt_mod_bit, long pt_mod, long sec_level);
+    const char* generate_context(Afhe* afhe, scheme_t scheme, int poly_mod_degree, int pt_mod_bit, int pt_mod, int sec_level, const int* qi_sizes, int qi_sizes_length);
 
     /**
      * @brief Generate keys for the backend library.
@@ -293,6 +295,22 @@ extern "C" {
      * @return Vector of integers.
     */
     uint64_t* decode_int(Afhe* afhe, APlaintext* plaintext);
+
+    /**
+     * @brief Encode a vector of doubles into a plaintext.
+     * @param afhe Pointer to the backend library.
+     * @param data Vector of doubles to encode.
+     * @return Pointer to the plaintext.
+    */
+    APlaintext* encode_double(Afhe* afhe, double* data, int len);
+
+    /**
+     * @brief Decode a plaintext into a vector of doubles.
+     * @param afhe Pointer to the backend library.
+     * @param plaintext Pointer to the plaintext.
+     * @return Vector of doubles.
+    */
+    double* decode_double(Afhe* afhe, APlaintext* plaintext);
 }
 
 #endif /* FHE_H */
