@@ -4,11 +4,15 @@ import 'package:fhel/afhe.dart';
 
 void main() {
   test('Unsupported Backend', () {
+    expect(() => Afhe('', ''),
+      throwsA(predicate((e) => e is Exception && e.toString() == 'Exception: Unsupported Backend: null')));
     expect(() => Afhe('invalid', 'BFV'),
       throwsA(predicate((e) => e is Exception && e.toString() == 'Exception: Unsupported Backend: invalid')));
   });
 
   test('Unsupported Scheme', () {
+    expect(() => Seal(''),
+      throwsA(predicate((e) => e is Exception && e.toString() == 'Exception: Unsupported Scheme: null')));
     expect(() => Seal('invalid'),
       throwsA(predicate((e) => e is Exception && e.toString() == 'Exception: Unsupported Scheme: invalid')));
   });
@@ -19,9 +23,4 @@ void main() {
       throwsA(predicate((e) => e is Exception && e.toString() == 'Exception: Context is not initialized')));
   });
 
-  test('No backend set', () {
-    var afhe = Afhe('', '');
-    expect(() => afhe.genKeys(),
-      throwsA(predicate((e) => e is Exception && e.toString() == 'Exception: [init_backend] No backend set')));
-  });
 }

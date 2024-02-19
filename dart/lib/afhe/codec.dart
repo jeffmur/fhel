@@ -3,12 +3,10 @@ part of '../afhe.dart';
 
 // --- encode ---
 
-typedef _EncodeVectorIntC = Pointer Function(
-    BackendType backend, Pointer library, Pointer<Uint64> vec, Int size);
+typedef _EncodeVectorIntC = Pointer Function(Pointer library, Pointer<Uint64> vec, Int size);
+typedef _EncodeVectorInt = Pointer Function(Pointer library, Pointer<Uint64> vec, int size);
 
-typedef _EncodeVectorInt = Pointer Function(
-    int backend, Pointer library, Pointer<Uint64> vec, int size);
-
+/// Encodes a list of integers into a [Plaintext].
 final _EncodeVectorInt _c_encode_vector_int =
     dylib.lookupFunction<_EncodeVectorIntC, _EncodeVectorInt>('encode_int');
 
@@ -24,14 +22,11 @@ Pointer<Uint64> intListToArray(List<int> list) {
 
 // --- decode ---
 
-typedef _DecodeVectorIntC = Pointer<Uint64> Function(
-    BackendType backend, Pointer library, Pointer plaintext);
+typedef _DecodeVectorIntC = Pointer<Uint64> Function(Pointer library, Pointer plaintext);
 
-typedef _DecodeVectorInt = Pointer<Uint64> Function(
-    int backend, Pointer library, Pointer plaintext);
-
-final _DecodeVectorInt _c_decode_vector_int =
-    dylib.lookupFunction<_DecodeVectorIntC, _DecodeVectorInt>('decode_int');
+/// Decodes a [Plaintext] into a list of integers.
+final _DecodeVectorIntC _c_decode_vector_int = dylib
+    .lookupFunction<_DecodeVectorIntC, _DecodeVectorIntC>('decode_int');
 
 /// Convert C uint64 array to Dart int list.
 List<int> arrayToIntList(Pointer<Uint64> ptr, int length) {

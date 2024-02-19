@@ -41,15 +41,14 @@ class Afhe {
   ///
   /// The [library] stores the memory address of the underlying C++ object.
   Afhe(String backendName, String schemeName) {
-    scheme = Scheme.set(schemeName);
     backend = Backend.set(backendName);
+    scheme = Scheme.set(schemeName);
     library = _c_init_backend(backend.value);
   }
 
   /// Generates a context for the Brakerski-Fan-Vercauteren (BFV) scheme.
   String _contextBFV(Map context) {
     final ptr = _c_gen_context(
-        backend.value,
         library,
         scheme.value,
         context['polyModDegree'],
@@ -85,7 +84,7 @@ class Afhe {
 
   /// Generates the public and secret keys for the encryption and decryption.
   void genKeys() {
-    _c_gen_keys(backend.value, library);
+    _c_gen_keys(library);
     raiseForStatus();
   }
 
@@ -93,42 +92,41 @@ class Afhe {
   ///
   /// Requires the secret key to be generated first via genKeys().
   void genRelinKeys() {
-    _c_gen_relin_keys(backend.value, library);
+    _c_gen_relin_keys(library);
     raiseForStatus();
   }
 
   /// Encrypts the plaintext message.
   Ciphertext encrypt(Plaintext plaintext) {
-    final ptr = _c_encrypt(backend.value, library, plaintext.obj);
+    final ptr = _c_encrypt(library, plaintext.obj);
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }
 
   /// Decrypts the ciphertext message.
   Plaintext decrypt(Ciphertext ciphertext) {
-    Pointer ptr = _c_decrypt(backend.value, library, ciphertext.obj);
+    Pointer ptr = _c_decrypt(library, ciphertext.obj);
     raiseForStatus();
     return Plaintext.fromPointer(backend, ptr);
   }
 
   /// Returns the invariant noise budget of the [Ciphertext].
   int invariantNoiseBudget(Ciphertext ciphertext) {
-    int n = _c_invariant_noise_budget(backend.value, library, ciphertext.obj);
+    int n = _c_invariant_noise_budget(library, ciphertext.obj);
     raiseForStatus();
     return n;
   }
 
   /// Encodes a list of integers into a [Plaintext].
   Plaintext encodeVecInt(List<int> vec) {
-    Pointer ptr = _c_encode_vector_int(
-        backend.value, library, intListToArray(vec), vec.length);
+    Pointer ptr = _c_encode_vector_int(library, intListToArray(vec), vec.length);
     raiseForStatus();
     return Plaintext.fromPointer(backend, ptr);
   }
 
   /// Decodes a [Plaintext] into a list of integers.
   List<int> decodeVecInt(Plaintext plaintext, int arrayLength) {
-    Pointer<Uint64> ptr = _c_decode_vector_int(backend.value, library, plaintext.obj);
+    Pointer<Uint64> ptr = _c_decode_vector_int(library, plaintext.obj);
     raiseForStatus();
     return arrayToIntList(ptr, arrayLength);
   }
@@ -138,28 +136,28 @@ class Afhe {
   /// Typically, the size of the ciphertext grows with each homomorphic operation.
   /// The relinearization process reduces the size of the ciphertext (2).
   Ciphertext relinearize(Ciphertext ciphertext) {
-    Pointer ptr = _c_relin_ciphertext(backend.value, library, ciphertext.obj);
+    Pointer ptr = _c_relin_ciphertext(library, ciphertext.obj);
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }
 
   /// Modulus switches the [Ciphertext] to a next lower level.
   Ciphertext modSwitchNext(Ciphertext ciphertext) {
-    _c_mod_switch_next(backend.value, library, ciphertext.obj);
+    _c_mod_switch_next(library, ciphertext.obj);
     raiseForStatus();
     return ciphertext;
   }
 
   /// Adds two [Ciphertext]s.
   Ciphertext add(Ciphertext a, Ciphertext b) {
-    Pointer ptr = _c_add(backend.value, library, a.obj, b.obj);
+    Pointer ptr = _c_add(library, a.obj, b.obj);
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }
 
   /// Adds value of [Plaintext] to the value of [Ciphertext].
   Ciphertext addPlain(Ciphertext a, Plaintext b) {
-    Pointer ptr = _c_add_plain(backend.value, library, a.obj, b.obj);
+    Pointer ptr = _c_add_plain(library, a.obj, b.obj);
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }
@@ -168,7 +166,7 @@ class Afhe {
   ///
   /// Results in a new [Ciphertext] with the value of [a] minus the value of [b].
   Ciphertext subtract(Ciphertext a, Ciphertext b) {
-    Pointer ptr = _c_subtract(backend.value, library, a.obj, b.obj);
+    Pointer ptr = _c_subtract(library, a.obj, b.obj);
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }
@@ -177,21 +175,21 @@ class Afhe {
   ///
   /// Results in a new [Ciphertext] with the value of [a] minus the value of [b].
   Ciphertext subtractPlain(Ciphertext a, Plaintext b) {
-    Pointer ptr = _c_subtract_plain(backend.value, library, a.obj, b.obj);
+    Pointer ptr = _c_subtract_plain(library, a.obj, b.obj);
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }
 
   /// Multiplies two [Ciphertext]s.
   Ciphertext multiply(Ciphertext a, Ciphertext b) {
-    Pointer ptr = _c_multiply(backend.value, library, a.obj, b.obj);
+    Pointer ptr = _c_multiply(library, a.obj, b.obj);
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }
 
   /// Multiplies a [Ciphertext] by a [Plaintext].
   Ciphertext multiplyPlain(Ciphertext a, Plaintext b) {
-    Pointer ptr = _c_multiply_plain(backend.value, library, a.obj, b.obj);
+    Pointer ptr = _c_multiply_plain(library, a.obj, b.obj);
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }
