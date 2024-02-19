@@ -4,6 +4,14 @@ import 'package:fhel/seal.dart' show Seal;
 
 const schemes = ['bgv', 'bfv'];
 
+void modSwitchTest(Seal fhe, Ciphertext ct) {
+  int beforeSwitch = fhe.invariantNoiseBudget(ct);
+  fhe.modSwitchNext(ct);
+  int afterSwitch = fhe.invariantNoiseBudget(ct);
+  // Noise budget should decrease after mod switch
+  expect(beforeSwitch > afterSwitch, true);
+}
+
 Plaintext multiply(Seal fhe, Plaintext pt_x, Plaintext pt_m, {bool encryptMultiplier=true}) {
   fhe.genKeys();
   final ct_x = fhe.encrypt(pt_x);
@@ -21,6 +29,7 @@ Plaintext multiply(Seal fhe, Plaintext pt_x, Plaintext pt_m, {bool encryptMultip
     ct_res = fhe.multiplyPlain(ct_x, pt_m);
     expect(ct_res.size(), 2);
   }
+  modSwitchTest(fhe, ct_res);
 
   return fhe.decrypt(ct_res);
 }

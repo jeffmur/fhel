@@ -27,7 +27,7 @@ backend_t backend_t_from_string(const char* backend)
     catch (out_of_range &e) { set_error(invalid_argument("Unsupported Backend: "+string(backend))); }
     return backend_t::no_t;
 }
-// TODO: Strange behavior with the map, it is not finding the key
+
 scheme_t scheme_t_from_string(const char* scheme)
 {
     if (strcmp(scheme, "") == 0) { return scheme_t::no_s; }
@@ -211,6 +211,22 @@ ACiphertext* relinearize(backend_t backend, Afhe* afhe, ACiphertext* ctxt) {
     default:
         set_error(logic_error("[relinearize] No backend set"));
         return nullptr;
+    }
+}
+
+void mod_switch_to_next(backend_t backend, Afhe* afhe, ACiphertext* ctxt) {
+    switch(backend)
+    {
+    case backend_t::seal_t:
+    {
+        try {
+            afhe->mod_switch_to_next(*ctxt);
+            return;
+        }
+        catch (exception &e) { set_error(e); }
+    }
+    default:
+        set_error(logic_error("[mod_switch_to_next] No backend set"));
     }
 }
 
