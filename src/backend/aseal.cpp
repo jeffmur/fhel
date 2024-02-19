@@ -124,6 +124,18 @@ void Aseal::relinearize(ACiphertext &ctxt)
   this->evaluator->relinearize_inplace(_to_ciphertext(ctxt), *this->relinKeys);
 }
 
+void Aseal::mod_switch_to_next(ACiphertext &ctxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Mod Switch using casted types
+  this->evaluator->mod_switch_to_next_inplace(_to_ciphertext(ctxt));
+}
+
 // string Aseal::get_secret_key()
 // {
 //     return this->secretKey.get()->data();

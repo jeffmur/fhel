@@ -101,13 +101,24 @@ public:
   virtual void RelinKeyGen() = 0;
 
   /**
-   * @brief Relinearizes a ciphertext.
+   * @brief Reduces the size of a ciphertext.
    *
-   * This is a technique to manage and reduce this noise, allowing for more computations on the encrypted data.
+   * This is a technique to reduce the size of the ciphertext typically 
+   * called when ciphertext.size() > 2. Results in a ciphertext.size() == 2.
    *
    * @param ctxt The ciphertext to be relinearized, inplace.
    */
   virtual void relinearize(ACiphertext &ctxt) = 0;
+
+  /**
+   * @brief Reduces the noise in a ciphertext.
+   * 
+   * `Modulus switching' is a technique of changing the ciphertext parameters down
+   *  in the chain. This is done to reduce the noise in the ciphertext.
+   * 
+   * @param ctxt The ciphertext to be mod switched, inplace.
+   */
+  virtual void mod_switch_to_next(ACiphertext &ctxt) = 0;
 
   // virtual string get_secret_key() = 0;
   // virtual string get_public_key() = 0;

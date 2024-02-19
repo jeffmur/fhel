@@ -216,6 +216,14 @@ extern "C" {
     ACiphertext* relinearize(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
 
     /**
+     * @brief Mod switch to the next level for a ciphertext.
+     * @param backend Backend library to use.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext Pointer to the ciphertext.
+    */
+    void mod_switch_to_next(backend_t backend, Afhe* afhe, ACiphertext* ciphertext);
+
+    /**
      * @brief Add two ciphertexts.
      * @param backend Backend library to use.
      * @param afhe Pointer to the backend library.

@@ -143,6 +143,13 @@ class Afhe {
     return Ciphertext.fromPointer(backend, ptr);
   }
 
+  /// Modulus switches the [Ciphertext] to a next lower level.
+  Ciphertext modSwitchNext(Ciphertext ciphertext) {
+    _c_mod_switch_next(backend.value, library, ciphertext.obj);
+    raiseForStatus();
+    return ciphertext;
+  }
+
   /// Adds two [Ciphertext]s.
   Ciphertext add(Ciphertext a, Ciphertext b) {
     Pointer ptr = _c_add(backend.value, library, a.obj, b.obj);
