@@ -1,5 +1,6 @@
 import 'package:test/test.dart';
 import 'package:fhel/seal.dart' show Seal;
+import 'test_utils.dart';
 
 const schemes = ['bgv', 'bfv'];
 
@@ -87,12 +88,12 @@ void main() {
       final pt_x = fhe.encodeVecInt(x);
       final ct_x = fhe.encrypt(pt_x);
 
-      List<int> add = x;
-      final pt_add = fhe.encodeVecInt(add);
-      final ct_add = fhe.encrypt(pt_add);
+      List<int> sub = x;
+      final pt_sub = fhe.encodeVecInt(sub);
+      final ct_sub = fhe.encrypt(pt_sub);
 
-      final ct_res = fhe.subtract(ct_x, ct_add);
-      final ct_res_cipher = fhe.subtractPlain(ct_x, pt_add);
+      final ct_res = fhe.subtract(ct_x, ct_sub);
+      final ct_res_cipher = fhe.subtractPlain(ct_x, pt_sub);
       final pt_res = fhe.decrypt(ct_res);
       final pt_res_cipher = fhe.decrypt(ct_res_cipher);
 
@@ -105,4 +106,44 @@ void main() {
       }
     }
   });
+
+   test("List<double> Subtraction", () {
+    final fhe = Seal('ckks');
+    Map ctx = {
+      'polyModDegree': 8192,
+      'encodeScalar': 40,
+      'qSizes': [60, 40, 40, 60]
+    };
+    fhe.genContext(ctx);
+    fhe.genKeys();
+    List<double> x = [1.1, 2.2, 3.3, 4.4];
+    final pt_x = fhe.encodeVecDouble(x);
+    final ct_x = fhe.encrypt(pt_x);
+
+    List<double> sub = [1.1, 1.1, 1.1, 1.1];
+    final pt_sub = fhe.encodeVecDouble(sub);
+
+    // Optionally, subend can be plaintext
+    final ct_res = fhe.subtractPlain(ct_x, pt_sub);
+    final pt_res = fhe.decrypt(ct_res);
+    final actual = fhe.decodeVecDouble(pt_res, 4);
+
+    final expected = [0.0, 1.1, 2.2, 3.3];
+    for (int i = 0; i < actual.length; i++) {
+      // Up-to 1e-7 precision (7 decimal places)
+      near(actual[i], expected[i], eps: 1e-7);
+    }
+
+    // Traditionally, subtract two ciphertexts
+    final ct_sub_cipher = fhe.encrypt(pt_sub);
+
+    final ct_res_cipher = fhe.subtract(ct_x, ct_sub_cipher);
+    final pt_res_cipher = fhe.decrypt(ct_res_cipher);
+    final actual_cipher = fhe.decodeVecDouble(pt_res_cipher, 4);
+
+    for (int i = 0; i < actual_cipher.length; i++) {
+      near(actual_cipher[i], expected[i], eps: 1e-7);
+    }
+  });
+
 }

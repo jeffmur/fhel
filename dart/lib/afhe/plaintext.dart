@@ -44,7 +44,12 @@ class Plaintext {
   }
 
   /// Initializes a plaintext from an existing C [obj].
-  Plaintext.fromPointer(this.backend, this.obj) {
-    text = _c_get_plaintext(obj).toDartString();
+  /// 
+  /// If [extract] is true, the string [obj] is extracted from the memory address.
+  Plaintext.fromPointer(this.backend, this.obj, {bool extractStr = true}) {
+    if (extractStr)
+    {
+      text = _c_get_plaintext(obj).toDartString();
+    }
   }
 }

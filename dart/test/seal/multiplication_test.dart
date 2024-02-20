@@ -1,6 +1,7 @@
 import 'package:fhel/afhe.dart';
 import 'package:test/test.dart';
 import 'package:fhel/seal.dart' show Seal;
+import 'test_utils.dart';
 
 const schemes = ['bgv', 'bfv'];
 
@@ -12,7 +13,7 @@ void modSwitchTest(Seal fhe, Ciphertext ct) {
   expect(beforeSwitch > afterSwitch, true);
 }
 
-Plaintext multiply(Seal fhe, Plaintext pt_x, Plaintext pt_m, {bool encryptMultiplier=true}) {
+Plaintext multiply(Seal fhe, Plaintext pt_x, Plaintext pt_m, {bool encryptMultiplier=true, bool modSwitch=true}) {
   fhe.genKeys();
   final ct_x = fhe.encrypt(pt_x);
   Ciphertext ct_res;
@@ -29,7 +30,10 @@ Plaintext multiply(Seal fhe, Plaintext pt_x, Plaintext pt_m, {bool encryptMultip
     ct_res = fhe.multiplyPlain(ct_x, pt_m);
     expect(ct_res.size(), 2);
   }
-  modSwitchTest(fhe, ct_res);
+  if (modSwitch)
+  {
+    modSwitchTest(fhe, ct_res);
+  }
 
   return fhe.decrypt(ct_res);
 }
@@ -77,4 +81,34 @@ void main() {
       expect(product, fhe.decodeVecInt(multiply(fhe, pt_x, pt_m, encryptMultiplier: false), arr_len));
     }
   });
+
+  test("List<double> Multiplication", () {
+    Map ctx = {
+      'polyModDegree': 8192,
+      'encodeScalar': 40,
+      'qSizes': [60, 40, 40, 60]
+    };
+    List<double> x = [1.1, 2.2, 3.3, 4.4];
+    List<double> m = [2.2, 4.4, 6.6, 8.8];
+    List<double> product = [2.42, 9.68, 21.78, 38.72];
+    int arr_len = product.length;
+
+    final fhe = Seal('ckks');
+    String status = fhe.genContext(ctx);
+    expect(status, 'success: valid');
+    final pt_x = fhe.encodeVecDouble(x);
+    final pt_m = fhe.encodeVecDouble(m);
+
+    for (int i = 0; i < arr_len; i++) {
+      near(eps: 1e-7, product[i],
+           fhe.decodeVecDouble(
+              multiply(fhe, pt_x, pt_m, modSwitch: false),
+              arr_len)[i]);
+      near(eps: 1e-7, product[i],
+           fhe.decodeVecDouble(
+              multiply(fhe, pt_x, pt_m, modSwitch: false, encryptMultiplier: false),
+              arr_len)[i]);
+    }
+  });
+
 }

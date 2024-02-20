@@ -20,7 +20,8 @@ Pointer<Uint64> intListToUint64Array(List<int> list) {
   return pointer;
 }
 
-Pointer<Int> intListToIntArray(List<int> list) {
+/// Convert Dart int list to C int array.
+Pointer<Int> intListToArray(List<int> list) {
   final length = list.length;
   final pointer = calloc<Int>(length + 1); // +1 if null-terminated.
   for (int index = 0; index < length; index++) {
@@ -55,7 +56,7 @@ final _DecodeVectorIntC _c_decode_vector_int = dylib
     .lookupFunction<_DecodeVectorIntC, _DecodeVectorIntC>('decode_int');
 
 /// Convert C uint64 array to Dart int list.
-List<int> arrayToIntList(Pointer<Uint64> ptr, int length) {
+List<int> uint64ArrayToIntList(Pointer<Uint64> ptr, int length) {
   final list = <int>[];
   for (var i = 0; i < length; i++) {
     list.add(ptr[i].toInt());

@@ -85,7 +85,7 @@ class Afhe {
         context['encodeScalar'],
         0, // Plain Modulus is not used
         0, // Security Level is not used
-        intListToIntArray(primeSizes), primeSizes.length);
+        intListToArray(primeSizes), primeSizes.length);
     raiseForStatus();
     return ptr.toDartString();
   }
@@ -127,6 +127,10 @@ class Afhe {
   Plaintext decrypt(Ciphertext ciphertext) {
     Pointer ptr = _c_decrypt(library, ciphertext.obj);
     raiseForStatus();
+    /// String cannot be extracted from C object
+    if (scheme.name.toLowerCase() == "ckks") {
+      return Plaintext.fromPointer(backend, ptr, extractStr: false);
+    }
     return Plaintext.fromPointer(backend, ptr);
   }
 
@@ -148,7 +152,22 @@ class Afhe {
   List<int> decodeVecInt(Plaintext plaintext, int arrayLength) {
     Pointer<Uint64> ptr = _c_decode_vector_int(library, plaintext.obj);
     raiseForStatus();
-    return arrayToIntList(ptr, arrayLength);
+    return uint64ArrayToIntList(ptr, arrayLength);
+  }
+
+  /// Encodes a list of doubles into a [Plaintext].
+  Plaintext encodeVecDouble(List<double> vec) {
+    Pointer ptr = _c_encode_vector_double(library, doubleListToArray(vec), vec.length);
+    raiseForStatus();
+    // String cannot be extracted from C object for CKKS
+    return Plaintext.fromPointer(backend, ptr, extractStr: false);
+  }
+
+  /// Decodes a [Plaintext] into a list of doubles.
+  List<double> decodeVecDouble(Plaintext plaintext, int arrayLength) {
+    Pointer<Double> ptr = _c_decode_vector_double(library, plaintext.obj);
+    raiseForStatus();
+    return arrayToDoubleList(ptr, arrayLength);
   }
 
   /// Relinearizes the [Ciphertext].
