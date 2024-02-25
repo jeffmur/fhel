@@ -253,8 +253,14 @@ void Aseal::encode_double(vector<double> &data, APlaintext &ptxt)
   // Gather current context, resolves object
   auto &seal_context = *(this->get_context());
 
-  // Initialize Encoder object
-  // this->cEncoder = make_shared<CKKSEncoder>(seal_context);
+  // Encode using casted types
+  this->cEncoder->encode(data, this->cEncoderScale, _to_plaintext(ptxt));
+}
+
+void Aseal::encode_double(double data, APlaintext &ptxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
 
   // Encode using casted types
   this->cEncoder->encode(data, this->cEncoderScale, _to_plaintext(ptxt));

@@ -264,6 +264,16 @@ APlaintext* encode_double(Afhe* afhe, double* data, int size) {
     return ptxt;
 }
 
+APlaintext* encode_double_value(Afhe* afhe, double data) {
+    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    APlaintext* ptxt = init_plaintext(lib);
+    try {
+        afhe->encode_double(data, *ptxt);
+    }
+    catch (exception &e) { set_error(e); }
+    return ptxt;
+}
+
 double* decode_double(Afhe* afhe, APlaintext* ptxt) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
     vector<double> data;

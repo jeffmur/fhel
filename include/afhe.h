@@ -177,6 +177,15 @@ public:
   virtual void encode_double(vector<double> &data, APlaintext &ptxt) = 0;
 
   /**
+   * @brief Encodes a single double into a plaintext message.
+   *        Used by CKKS scheme.
+   *
+   * @param data The double to be encoded.
+   * @param ptxt The plaintext message where the encoded message will be stored.
+   */
+  virtual void encode_double(double data, APlaintext &ptxt) = 0;
+
+  /**
    * @brief Encodes a vector of complex numbers into a plaintext message.
    *        Used by CKKS scheme.
    *

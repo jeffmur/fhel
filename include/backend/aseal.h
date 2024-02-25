@@ -204,6 +204,7 @@ public:
   void encode_int(vector<uint64_t> &data, APlaintext &ptxt) override;
   void decode_int(APlaintext &ptxt, vector<uint64_t> &data) override;
 
+  void encode_double(double data, APlaintext &ptxt) override;
   void encode_double(vector<double> &data, APlaintext &ptxt) override;
   void decode_double(APlaintext &ptxt, vector<double> &data) override;
 

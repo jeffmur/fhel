@@ -305,6 +305,14 @@ extern "C" {
     APlaintext* encode_double(Afhe* afhe, double* data, int len);
 
     /**
+     * @brief Encode a double into a plaintext.
+     * @param afhe Pointer to the backend library.
+     * @param data Double to encode.
+     * @return Pointer to the plaintext.
+    */
+    APlaintext* encode_double_value(Afhe* afhe, double data);
+
+    /**
      * @brief Decode a plaintext into a vector of doubles.
      * @param afhe Pointer to the backend library.
      * @param plaintext Pointer to the plaintext.

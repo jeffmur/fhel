@@ -150,6 +150,25 @@ TEST(Add, VectorInteger) {
   }
 }
 
+TEST(Add, Double) {
+  Aseal* fhe = new Aseal();
+  string ctx = fhe->ContextGen(scheme::ckks, 8192, 40, -1, -1, {60, 40, 40, 60});
+  // Expect two strings not to be equal.
+  EXPECT_STREQ(ctx.c_str(), "success: valid");
+
+  fhe->KeyGen();
+  /*
+  We create plaintexts for PI, 0.4, and 1 using an overload of CKKSEncoder::encode
+  that encodes the given floating-point value to every slot in the vector.
+  */
+  AsealPlaintext plain_coeff3, plain_coeff1, plain_coeff0;
+  fhe->encode_double(3.14159265, plain_coeff3);
+  fhe->encode_double(0.4, plain_coeff1);
+  fhe->encode_double(1.0, plain_coeff0);
+
+  // TODO: Add plaintext (encoded) doubles to vector ciphertexts.
+}
+
 TEST(Add, VectorDouble) {
 
   Aseal* fhe = new Aseal();
