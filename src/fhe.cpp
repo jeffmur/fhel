@@ -41,11 +41,12 @@ scheme_t scheme_t_from_string(const char* scheme)
     return scheme_t::no_s;
 }
 
-const char* generate_context(Afhe* afhe, scheme_t scheme_type, long poly_mod_degree, long pt_mod_bit, long pt_mod, long sec_level)
+const char* generate_context(Afhe* afhe, scheme_t scheme_type, uint64_t poly_mod_degree, uint64_t pt_mod_bit, uint64_t pt_mod, uint64_t sec_level, const uint64_t* qi_sizes, uint64_t qi_sizes_length)
 {
     try {
-        scheme a_scheme = scheme_t_map_scheme[scheme_type];
-        string ctx = afhe->ContextGen(a_scheme, poly_mod_degree, pt_mod_bit, pt_mod, sec_level);
+        scheme a_scheme = scheme_t_map_scheme.at(scheme_type);
+        vector<int> qi_sizes_vec(qi_sizes, qi_sizes + qi_sizes_length);
+        string ctx = afhe->ContextGen(a_scheme, poly_mod_degree, pt_mod_bit, pt_mod, sec_level, qi_sizes_vec);
         // !Important: Must copy string to char* to avoid memory leak
         char *cpy = new char[ctx.size()+1] ;
         strcpy(cpy, ctx.c_str());
@@ -247,6 +248,41 @@ uint64_t* decode_int(Afhe* afhe, APlaintext* ptxt) {
     catch (exception &e) { set_error(e); }
     // Extract vector contents to array
     uint64_t* result = new uint64_t[data.size()];
+    copy(data.begin(), data.end(), result);
+    return result;
+}
+
+APlaintext* encode_double(Afhe* afhe, double* data, int size) {
+    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    APlaintext* ptxt = init_plaintext(lib);
+    try {
+        // Convert array to vector
+        vector<double> data_vec(data, data + size);
+        afhe->encode_double(data_vec, *ptxt);
+    }
+    catch (exception &e) { set_error(e); }
+    return ptxt;
+}
+
+APlaintext* encode_double_value(Afhe* afhe, double data) {
+    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    APlaintext* ptxt = init_plaintext(lib);
+    try {
+        afhe->encode_double(data, *ptxt);
+    }
+    catch (exception &e) { set_error(e); }
+    return ptxt;
+}
+
+double* decode_double(Afhe* afhe, APlaintext* ptxt) {
+    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    vector<double> data;
+    try {
+        afhe->decode_double(*ptxt, data);
+    }
+    catch (exception &e) { set_error(e); }
+    // Extract vector contents to array
+    double* result = new double[data.size()];
     copy(data.begin(), data.end(), result);
     return result;
 }

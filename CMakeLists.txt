@@ -67,6 +67,7 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
         test/seal/subtraction.cpp
         test/seal/multiplication.cpp
         test/seal/relinearization.cpp
+        test/seal/ckks_basics.cpp
     )
 
     target_link_libraries(

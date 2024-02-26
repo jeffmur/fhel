@@ -92,7 +92,7 @@ TEST(Subtract, VectorInteger) {
       /*
         Here we create the following arrays:
             x = [ 1,  2,  3,  4,  0,  0,  0,  0 ]
-          add = [ 2,  4,  6,  8,  0,  0,  0,  0 ]
+          sub = [ 2,  4,  6,  8,  0,  0,  0,  0 ]
       */
       vector<uint64_t> x(8, 0ULL);
       x[0] = 2ULL;
@@ -147,5 +147,100 @@ TEST(Subtract, VectorInteger) {
         EXPECT_EQ(expect[i], decode_res_cipher[i]);
       }
     }
+  }
+}
+
+TEST(Subtract, VectorDouble) {
+
+  Aseal* fhe = new Aseal();
+
+  string ctx = fhe->ContextGen(scheme::ckks, 8192, pow(2.0, 40), -1, -1, {60, 40, 40, 60});
+
+  // Expect two strings not to be equal.
+  EXPECT_STREQ(ctx.c_str(), "success: valid");
+
+  fhe->KeyGen();
+  fhe->RelinKeyGen();
+
+  size_t slot_count = fhe->slot_count();
+
+  /**
+   * Create an input vector with floating point values 0 ... 1.
+  */
+  vector<double> x;
+  x.reserve(slot_count);
+  double curr_point = 0;
+  double step_size = 1.0 / (static_cast<double>(slot_count) - 1);
+  for (size_t i = 0; i < slot_count; i++)
+  {
+      x.push_back(curr_point);
+      curr_point += step_size;
+  }
+  // cout << "X vector: " << endl;
+  // for (size_t i = 0; i < slot_count; i++)
+  // {
+  //     cout << x[i] << " ";
+  // }
+
+  AsealPlaintext pt_x = AsealPlaintext();
+
+  fhe->encode_double(x, pt_x);
+
+  AsealCiphertext ct_x = AsealCiphertext();
+
+  fhe->encrypt(pt_x, ct_x);
+
+  /**
+   * Create an subend vector with floating point values 0 ... 1.
+  */
+  vector<double> sub;
+  sub.reserve(slot_count);
+  curr_point = 0;
+  step_size = 1.0 / (static_cast<double>(slot_count) - 1);
+  for (size_t i = 0; i < slot_count; i++)
+  {
+      sub.push_back(curr_point);
+      curr_point += step_size;
+  }
+  // cout << "Subtract vector: " << endl;
+  // for (size_t i = 0; i < slot_count; i++)
+  // {
+  //     cout << sub[i] << " ";
+  // }
+  AsealPlaintext pt_sub = AsealPlaintext();
+  fhe->encode_double(sub, pt_sub);
+  AsealCiphertext ct_sub = AsealCiphertext();
+  fhe->encrypt(pt_sub, ct_sub);
+
+  AsealCiphertext ct_res = AsealCiphertext();
+
+  fhe->subtract(ct_x, ct_sub, ct_res);
+  fhe->relinearize(ct_res);
+
+  AsealPlaintext decrypt_res = AsealPlaintext();
+  fhe->decrypt(ct_res, decrypt_res);
+
+  vector<double> decode_res;
+  fhe->decode_double(decrypt_res, decode_res);
+
+  for (int i = 0; i < x.size(); i++) {
+    double expect = x[i] - sub[i];
+    // Compare up to 7 decimal places.
+    EXPECT_NEAR(expect, decode_res[i], 0.0000001);
+  }
+
+  // Without relinearization
+  AsealCiphertext ct_res_no_relin = AsealCiphertext();
+  fhe->subtract(ct_x, pt_sub, ct_res_no_relin);
+
+  AsealPlaintext decrypt_res_no_relin = AsealPlaintext();
+  fhe->decrypt(ct_res_no_relin, decrypt_res_no_relin);
+  vector<double> decode_res_no_relin;
+  fhe->decode_double(decrypt_res_no_relin, decode_res_no_relin);
+
+  for (int i = 0; i < x.size(); i++) {
+    double expect = x[i] - sub[i];
+    // Compare up to 7 decimal places.
+    EXPECT_NEAR(expect, decode_res_no_relin[i], 0.0000001);
   }
 }

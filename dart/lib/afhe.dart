@@ -30,10 +30,12 @@ class Afhe {
   ///
   /// The [Scheme] is used to represent one of the supported fhe schemes.
   Scheme scheme = Scheme();
+
   /// The backend library used for the encryption scheme.
   ///
   /// The [Backend] is used to represent one of the supported fhe backends.
   Backend backend = Backend();
+
   /// A pointer to the memory address of the underlying C++ object.
   Pointer library = nullptr;
 
@@ -54,7 +56,9 @@ class Afhe {
         context['polyModDegree'],
         context['ptModBit'] ?? 0, // Only used when batching
         context['ptMod'] ?? 0, // Not used when batching
-        context['secLevel']);
+        context['secLevel'],
+        nullptr,
+        0);
     raiseForStatus();
     return ptr.toDartString();
   }
@@ -67,13 +71,33 @@ class Afhe {
 
   /// Generates a context for the Cheon-Kim-Kim-Song (CKKS) scheme.
   String _contextCKKS(Map context) {
-    throw (Exception("Unsupported scheme ckks"));
+    if (context['encodeScalar'] == null) {
+      throw ArgumentError('encodeScalar is a required parameter for CKKS');
+    }
+    if (context['qSizes'] == null) {
+      throw ArgumentError('qSizes is a required parameter for CKKS');
+    }
+    if (context['qSizes'] is! List<int>) {
+      throw ArgumentError('qSizes must be a list of integers');
+    }
+    List<int> primeSizes = context['qSizes'];
+    final ptr = _c_gen_context(
+        library,
+        scheme.value,
+        context['polyModDegree'],
+        context['encodeScalar'],
+        0, // Plain Modulus is not used
+        0, // Security Level is not used
+        intListToUint64Array(primeSizes),
+        primeSizes.length);
+    raiseForStatus();
+    return ptr.toDartString();
   }
 
   /// Generates a context for the encryption scheme.
   ///
   /// The [context] is a map of parameters used to generate the encryption context for the [Scheme].
-  String genContext(Map<String, int> context) {
+  String genContext(Map context) {
     return switch (scheme.name) {
       "bfv" => _contextBFV(context),
       "bgv" => _contextBGV(context),
@@ -107,6 +131,11 @@ class Afhe {
   Plaintext decrypt(Ciphertext ciphertext) {
     Pointer ptr = _c_decrypt(library, ciphertext.obj);
     raiseForStatus();
+
+    /// String cannot be extracted from C object
+    if (scheme.name.toLowerCase() == "ckks") {
+      return Plaintext.fromPointer(backend, ptr, extractStr: false);
+    }
     return Plaintext.fromPointer(backend, ptr);
   }
 
@@ -119,7 +148,8 @@ class Afhe {
 
   /// Encodes a list of integers into a [Plaintext].
   Plaintext encodeVecInt(List<int> vec) {
-    Pointer ptr = _c_encode_vector_int(library, intListToArray(vec), vec.length);
+    Pointer ptr =
+        _c_encode_vector_int(library, intListToUint64Array(vec), vec.length);
     raiseForStatus();
     return Plaintext.fromPointer(backend, ptr);
   }
@@ -128,7 +158,31 @@ class Afhe {
   List<int> decodeVecInt(Plaintext plaintext, int arrayLength) {
     Pointer<Uint64> ptr = _c_decode_vector_int(library, plaintext.obj);
     raiseForStatus();
-    return arrayToIntList(ptr, arrayLength);
+    return uint64ArrayToIntList(ptr, arrayLength);
+  }
+
+  /// Encodes a double into a [Plaintext].
+  Plaintext encodeDouble(double value) {
+    Pointer ptr = _c_encode_double(library, value);
+    raiseForStatus();
+    // String cannot be extracted from C object for CKKS
+    return Plaintext.fromPointer(backend, ptr, extractStr: false);
+  }
+
+  /// Encodes a list of doubles into a [Plaintext].
+  Plaintext encodeVecDouble(List<double> vec) {
+    Pointer ptr =
+        _c_encode_vector_double(library, doubleListToArray(vec), vec.length);
+    raiseForStatus();
+    // String cannot be extracted from C object for CKKS
+    return Plaintext.fromPointer(backend, ptr, extractStr: false);
+  }
+
+  /// Decodes a [Plaintext] into a list of doubles.
+  List<double> decodeVecDouble(Plaintext plaintext, int arrayLength) {
+    Pointer<Double> ptr = _c_decode_vector_double(library, plaintext.obj);
+    raiseForStatus();
+    return arrayToDoubleList(ptr, arrayLength);
   }
 
   /// Relinearizes the [Ciphertext].

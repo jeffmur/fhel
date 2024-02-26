@@ -37,14 +37,36 @@ void main() {
     }
   });
 
-  test('CKKS not yet supported', () {
+  test('CKKS Required Parameters', () {
     final fhe = Seal('ckks');
     expect(
         () => fhe
-            .genContext({'polyModDegree': 4096, 'ptMod': 0, 'secLevel': 128}),
+            .genContext({'polyModDegree': 4096}),
         throwsA(predicate((e) =>
-            e is Exception &&
-            e.toString() == 'Exception: Unsupported scheme ckks')));
+            e is ArgumentError &&
+            e.message == 'encodeScalar is a required parameter for CKKS')));
+    expect(
+        () => fhe
+            .genContext({'polyModDegree': 4096, 'encodeScalar': 0}),
+        throwsA(predicate((e) =>
+            e is ArgumentError &&
+            e.message == 'qSizes is a required parameter for CKKS')));
+  });
+
+  test('Invalid qSizes', () {
+    final fhe = Seal('ckks');
+    expect(
+        () => fhe
+            .genContext({'polyModDegree': 4096, 'encodeScalar': 0, 'qSizes': 0}),
+        throwsA(predicate((e) =>
+            e is ArgumentError &&
+            e.message == 'qSizes must be a list of integers')));
+    expect(
+        () => fhe
+            .genContext({'polyModDegree': 4096, 'encodeScalar': 0, 'qSizes': []}),
+        throwsA(predicate((e) =>
+            e is ArgumentError &&
+            e.message == 'qSizes must be a list of integers')));
   });
 
   /* TODO: Security level is not checked during parameter validation */

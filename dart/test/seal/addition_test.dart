@@ -1,5 +1,7 @@
 import 'package:test/test.dart';
 import 'package:fhel/seal.dart' show Seal;
+import 'test_utils.dart';
+import 'dart:math';
 
 const schemes = ['bgv', 'bfv'];
 
@@ -111,6 +113,45 @@ void main() {
       for (int i = 0; i < actual.length; i++) {
         expect(actual_cipher[i], expected[i]);
       }
+    }
+  });
+
+ test("List<double> Addition", () {
+    final fhe = Seal('ckks');
+    Map ctx = {
+      'polyModDegree': 8192,
+      'encodeScalar': pow(2, 40),
+      'qSizes': [60, 40, 40, 60]
+    };
+    fhe.genContext(ctx);
+    fhe.genKeys();
+    List<double> x = [1.1, 2.2, 3.3, 4.4];
+    final pt_x = fhe.encodeVecDouble(x);
+    final ct_x = fhe.encrypt(pt_x);
+
+    List<double> add = [1.1, 1.1, 1.1, 1.1];
+    final pt_add = fhe.encodeVecDouble(add);
+
+    // Optionally, addend can be plaintext
+    final ct_res = fhe.addPlain(ct_x, pt_add);
+    final pt_res = fhe.decrypt(ct_res);
+    final actual = fhe.decodeVecDouble(pt_res, 4);
+
+    final expected = [2.2, 3.3, 4.4, 5.5];
+    for (int i = 0; i < actual.length; i++) {
+      // Up-to 1e-7 precision (7 decimal places)
+      near(actual[i], expected[i], eps: 1e-7);
+    }
+
+    // Traditionally, add two ciphertexts
+    final ct_add_cipher = fhe.encrypt(pt_add);
+
+    final ct_res_cipher = fhe.add(ct_x, ct_add_cipher);
+    final pt_res_cipher = fhe.decrypt(ct_res_cipher);
+    final actual_cipher = fhe.decodeVecDouble(pt_res_cipher, 4);
+
+    for (int i = 0; i < actual_cipher.length; i++) {
+      near(actual_cipher[i], expected[i], eps: 1e-7);
     }
   });
 }

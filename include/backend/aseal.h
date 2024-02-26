@@ -110,6 +110,12 @@ public:
   size_t size() override {
     return seal::Ciphertext::size();
   }
+  double scale() override {
+    return seal::Ciphertext::scale();
+  }
+  void set_scale(double scale) override {
+    seal::Ciphertext::scale() = scale;
+  }
 };
 
 // DYNAMIC CASTING
@@ -123,8 +129,9 @@ inline AsealCiphertext& _to_ciphertext(ACiphertext& c){
 class Aseal : public Afhe {
 private:
   shared_ptr<seal::SEALContext> context;     /**< Pointer to the SEAL context object. */
-  shared_ptr<seal::BatchEncoder> encoder;    /**< Pointer to the BatchEncoder object. */
-
+  shared_ptr<seal::BatchEncoder> bEncoder;   /**< Pointer to the BatchEncoder object. */
+  shared_ptr<seal::CKKSEncoder> cEncoder;    /**< Pointer to the CKKSEncoder object. */
+  double cEncoderScale;                      /**< Scale for CKKSEncoder. */
   shared_ptr<seal::KeyGenerator> keyGenObj;  /** Key generator.*/
   shared_ptr<seal::SecretKey> secretKey;     /** Secret key.*/
   shared_ptr<seal::PublicKey> publicKey;     /** Public key.*/
@@ -170,20 +177,30 @@ public:
   string ContextGen(
     scheme scheme, uint64_t poly_modulus_degree = 1024,
     uint64_t plain_modulus_bit_size = 0, uint64_t plain_modulus = 0,
-    int sec_level = 128, vector<int> qi_sizes = {}, vector<uint64_t> qi_values = {}) override;
+    int sec_level = 128, vector<int> qi_sizes = {}) override;
 
   /**
    * @return A pointer to the SEAL context object.
    * @throws std::logic_error if the context is not initialized.
   */
-  inline shared_ptr<seal::SEALContext> get_context();
+  inline shared_ptr<seal::SEALContext> get_context() {
+    if (this->context == nullptr)
+    {
+      throw logic_error("Context is not initialized");
+    }
+    return this->context;
+  }
 
   // ------------------ Keys ------------------
 
   void KeyGen() override;
   void RelinKeyGen() override;
   void relinearize(ACiphertext &ctxt) override;
+  void mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt) override;
+  void mod_switch_to(ACiphertext &to, ACiphertext &from) override;
+  void mod_switch_to_next(APlaintext &ptxt) override;
   void mod_switch_to_next(ACiphertext &ctxt) override;
+  void rescale_to_next(ACiphertext &ctxt) override;
   // string get_secret_key() override;
   // string get_public_key() override;
 
@@ -198,8 +215,14 @@ public:
 
   // -------------------- Codec --------------------
 
+  int slot_count() override;
+
   void encode_int(vector<uint64_t> &data, APlaintext &ptxt) override;
   void decode_int(APlaintext &ptxt, vector<uint64_t> &data) override;
+
+  void encode_double(double data, APlaintext &ptxt) override;
+  void encode_double(vector<double> &data, APlaintext &ptxt) override;
+  void decode_double(APlaintext &ptxt, vector<double> &data) override;
 
   // ------------------ Arithmetic ------------------
 

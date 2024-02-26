@@ -70,18 +70,17 @@ public:
    *
    * @param scheme The encryption scheme to be used.
    * @param poly_modulus_degree The degree of the polynomial modulus, which determines the size and performance of the FHE operations.
-   * @param plain_modulus_bit_size The bit size of the plaintext modulus.
+   * @param plain_modulus_bit_size The bit size of the plaintext modulus / CKKS encoder scale.
    * @param plain_modulus The plaintext modulus, which affects the precision of the computations.
    * @param sec_level The security level, which affects the hardness of the cryptographic problem underlying the FHE scheme.
-   * @param qi_sizes (optional) A vector of sizes for each modulus in the modulus chain.
-   * @param qi_mods (optional) A vector of specific moduli for the modulus chain.
+   * @param qi_sizes (optional) A vector of prime bit sizes for each modulus in the modulus chain.
    *
    * @return A string representing the status of generated context.
    */
   virtual string ContextGen(
     scheme scheme, uint64_t poly_modulus_degree,
     uint64_t plain_modulus_bit_size, uint64_t plain_modulus,
-    int sec_level, vector<int> qi_sizes = {}, vector<uint64_t> qi_mods = {}) = 0;
+    int sec_level, vector<int> qi_sizes = {}) = 0;
 
   // virtual vector<uint64_t> get_qi() = 0;
   // virtual uint64_t get_plain_modulus() = 0;
@@ -108,7 +107,7 @@ public:
   /**
    * @brief Reduces the size of a ciphertext.
    *
-   * This is a technique to reduce the size of the ciphertext typically 
+   * This is a technique to reduce the size of the ciphertext typically
    * called when ciphertext.size() > 2. Results in a ciphertext.size() == 2.
    *
    * @param ctxt The ciphertext to be relinearized, inplace.
@@ -116,14 +115,44 @@ public:
   virtual void relinearize(ACiphertext &ctxt) = 0;
 
   /**
+   * @brief Modulus switches a plaintext using a given parameter id.
+  */
+  virtual void mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt) = 0;
+
+  /**
+   * @brief Modulus switches a ciphertext using a given parameter id.
+  */
+  virtual void mod_switch_to(ACiphertext &to, ACiphertext &from) = 0;
+
+  /**
+   * @brief Reduces the noise in a plaintext.
+   *
+   * Modulus switches an NTT transformed plaintext to the next modulus in the modulus chain.
+   *
+   * @param ptxt The plaintext to be mod switched, inplace.
+   */
+  virtual void mod_switch_to_next(APlaintext &ptxt) = 0;
+
+  /**
    * @brief Reduces the noise in a ciphertext.
-   * 
+   *
    * `Modulus switching' is a technique of changing the ciphertext parameters down
    *  in the chain. This is done to reduce the noise in the ciphertext.
-   * 
+   *
    * @param ctxt The ciphertext to be mod switched, inplace.
    */
   virtual void mod_switch_to_next(ACiphertext &ctxt) = 0;
+
+  /**
+   * @brief Adjusts the scale of an encoded ciphertext in the CKKS scheme.
+   *
+   * `Rescaling' is a technique specific to the CKKS scheme that adjusts the scale of a ciphertext to enable
+   * proper decryption and homomorphic operations at a new scale. It effectively divides the ciphertext by the last modulus
+   * in the modulus chain and removes that modulus, thus reducing the scale and the modulus chain length.
+   *
+   * @param ctxt The ciphertext to be rescaled, inplace.
+  */
+  virtual void rescale_to_next(ACiphertext &ctxt) = 0;
 
   // virtual string get_secret_key() = 0;
   // virtual string get_public_key() = 0;
@@ -155,6 +184,11 @@ public:
   // ------------------ Codec ------------------
 
   /**
+   * @brief Returns the number of plaintext slots in an encoded ciphertext.
+  */
+  virtual int slot_count() = 0;
+
+  /**
    * @brief Encodes a vector of integers into a plaintext message.
    *        Used by BGV and BFV schemes.
    *
@@ -170,7 +204,16 @@ public:
    * @param data The vector of floats to be encoded.
    * @param ptxt The plaintext message where the encoded message will be stored.
    */
-  // virtual void encode_float(vector<double> &data, APlainTxt &ptxt) = 0;
+  virtual void encode_double(vector<double> &data, APlaintext &ptxt) = 0;
+
+  /**
+   * @brief Encodes a single double into a plaintext message.
+   *        Used by CKKS scheme.
+   *
+   * @param data The double to be encoded.
+   * @param ptxt The plaintext message where the encoded message will be stored.
+   */
+  virtual void encode_double(double data, APlaintext &ptxt) = 0;
 
   /**
    * @brief Encodes a vector of complex numbers into a plaintext message.
@@ -197,7 +240,7 @@ public:
    * @param ptxt The plaintext message to be decoded.
    * @param data The vector of floats where the decoded message will be stored.
    */
-  // virtual void decode_float(APlainTxt &ptxt, vector<double> &data) = 0;
+  virtual void decode_double(APlaintext &ptxt, vector<double> &data) = 0;
 
   /**
    * @brief Decodes a plaintext message into a vector of complex numbers.
@@ -287,6 +330,8 @@ class ACiphertext{
 public:
   virtual ~ACiphertext() = default;
   virtual size_t size() = 0;
+  virtual double scale() = 0;
+  virtual void set_scale(double scale) = 0;
 };
 
 #endif /* AFHE_H */
