@@ -159,6 +159,7 @@ class Afhe {
   Plaintext encodeDouble(double value) {
     Pointer ptr = _c_encode_double(library, value);
     raiseForStatus();
+    // String cannot be extracted from C object for CKKS
     return Plaintext.fromPointer(backend, ptr, extractStr: false);
   }
 
