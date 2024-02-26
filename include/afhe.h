@@ -107,7 +107,7 @@ public:
   /**
    * @brief Reduces the size of a ciphertext.
    *
-   * This is a technique to reduce the size of the ciphertext typically 
+   * This is a technique to reduce the size of the ciphertext typically
    * called when ciphertext.size() > 2. Results in a ciphertext.size() == 2.
    *
    * @param ctxt The ciphertext to be relinearized, inplace.
@@ -115,14 +115,34 @@ public:
   virtual void relinearize(ACiphertext &ctxt) = 0;
 
   /**
+   * @brief Reduces the noise in a plaintext.
+   *
+   * Modulus switches an NTT transformed plaintext to the next modulus in the modulus chain.
+   *
+   * @param ptxt The plaintext to be mod switched, inplace.
+   */
+  virtual void mod_switch_to_next(APlaintext &ptxt) = 0;
+
+  /**
    * @brief Reduces the noise in a ciphertext.
-   * 
+   *
    * `Modulus switching' is a technique of changing the ciphertext parameters down
    *  in the chain. This is done to reduce the noise in the ciphertext.
-   * 
+   *
    * @param ctxt The ciphertext to be mod switched, inplace.
    */
   virtual void mod_switch_to_next(ACiphertext &ctxt) = 0;
+
+  /**
+   * @brief Adjusts the scale of an encoded ciphertext in the CKKS scheme.
+   *
+   * `Rescaling' is a technique specific to the CKKS scheme that adjusts the scale of a ciphertext to enable
+   * proper decryption and homomorphic operations at a new scale. It effectively divides the ciphertext by the last modulus
+   * in the modulus chain and removes that modulus, thus reducing the scale and the modulus chain length.
+   *
+   * @param ctxt The ciphertext to be rescaled, inplace.
+  */
+  virtual void rescale_to_next(ACiphertext &ctxt) = 0;
 
   // virtual string get_secret_key() = 0;
   // virtual string get_public_key() = 0;
@@ -300,6 +320,8 @@ class ACiphertext{
 public:
   virtual ~ACiphertext() = default;
   virtual size_t size() = 0;
+  virtual double scale() = 0;
+  virtual void set_scale(double scale) = 0;
 };
 
 #endif /* AFHE_H */

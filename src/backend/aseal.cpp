@@ -10,6 +10,7 @@
 */
 
 #include "aseal.h"
+#include "afhe.h"
 
 using namespace std;
 using namespace seal;
@@ -70,7 +71,7 @@ string Aseal::ContextGen(scheme scheme,
     param.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, bit_sizes));
 
     // Set CKKS Encoder scale
-    this->cEncoderScale = pow(2.0, plain_modulus_bit_size);
+    this->cEncoderScale = plain_modulus_bit_size; //pow(2.0, plain_modulus_bit_size);
   }
 
   // Validate parameters by putting them inside a SEALContext
@@ -168,6 +169,30 @@ void Aseal::mod_switch_to_next(ACiphertext &ctxt)
 
   // Mod Switch using casted types
   this->evaluator->mod_switch_to_next_inplace(_to_ciphertext(ctxt));
+}
+
+void Aseal::mod_switch_to_next(APlaintext &ptxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Mod Switch using casted types
+  this->evaluator->mod_switch_to_next_inplace(_to_plaintext(ptxt));
+}
+
+void Aseal::rescale_to_next(ACiphertext &ctxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Rescale using casted types
+  this->evaluator->rescale_to_next_inplace(_to_ciphertext(ctxt));
 }
 
 // string Aseal::get_secret_key()

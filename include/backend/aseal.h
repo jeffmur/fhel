@@ -110,6 +110,12 @@ public:
   size_t size() override {
     return seal::Ciphertext::size();
   }
+  double scale() override {
+    return seal::Ciphertext::scale();
+  }
+  void set_scale(double scale) override {
+    seal::Ciphertext::scale() = scale;
+  }
 };
 
 // DYNAMIC CASTING
@@ -184,7 +190,9 @@ public:
   void KeyGen() override;
   void RelinKeyGen() override;
   void relinearize(ACiphertext &ctxt) override;
+  void mod_switch_to_next(APlaintext &ptxt) override;
   void mod_switch_to_next(ACiphertext &ctxt) override;
+  void rescale_to_next(ACiphertext &ctxt) override;
   // string get_secret_key() override;
   // string get_public_key() override;
 

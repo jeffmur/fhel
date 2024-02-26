@@ -154,7 +154,7 @@ TEST(Add, VectorDouble) {
 
   Aseal* fhe = new Aseal();
 
-  string ctx = fhe->ContextGen(scheme::ckks, 8192, 40, -1, -1, {60, 40, 40, 60});
+  string ctx = fhe->ContextGen(scheme::ckks, 8192, pow(2.0, 40), -1, -1, {60, 40, 40, 60});
 
   // Expect two strings not to be equal.
   EXPECT_STREQ(ctx.c_str(), "success: valid");

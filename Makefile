@@ -49,6 +49,12 @@ ctest:
 	@echo "Testing cpp..."
 	@cd $(AL_INSTALL_DIR); ctest
 
+# Debug Abstract Layer (AFHEL)
+.PHONY: ctest-debug
+ctest-debug:
+	@echo "Debugging cpp..."
+	@cd $(AL_INSTALL_DIR); ./seal_test
+
 # Test Implementation Layer (FHE)
 .PHONY: dtest
 dtest:
