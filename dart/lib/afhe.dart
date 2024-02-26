@@ -155,6 +155,13 @@ class Afhe {
     return uint64ArrayToIntList(ptr, arrayLength);
   }
 
+  /// Encodes a double into a [Plaintext].
+  Plaintext encodeDouble(double value) {
+    Pointer ptr = _c_encode_double(library, value);
+    raiseForStatus();
+    return Plaintext.fromPointer(backend, ptr, extractStr: false);
+  }
+
   /// Encodes a list of doubles into a [Plaintext].
   Plaintext encodeVecDouble(List<double> vec) {
     Pointer ptr = _c_encode_vector_double(library, doubleListToArray(vec), vec.length);

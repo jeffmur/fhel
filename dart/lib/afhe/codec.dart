@@ -30,6 +30,13 @@ Pointer<Int> intListToArray(List<int> list) {
   return pointer;
 }
 
+typedef _EncodeDoubleC = Pointer Function(Pointer library, Double value);
+typedef _EncodeDouble = Pointer Function(Pointer library, double value);
+
+/// Encodes a double into a [Plaintext].
+final _EncodeDouble _c_encode_double = dylib
+    .lookupFunction<_EncodeDoubleC, _EncodeDouble>('encode_double_value');
+
 typedef _EncodeVectorDoubleC = Pointer Function(Pointer library, Pointer<Double> vec, Int size);
 typedef _EncodeVectorDouble = Pointer Function(Pointer library, Pointer<Double> vec, int size);
 

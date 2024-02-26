@@ -111,4 +111,38 @@ void main() {
     }
   });
 
+  test("List<double> Pi * x^2", () {
+    Map ctx = {
+      'polyModDegree': 8192,
+      'encodeScalar': 40,
+      'qSizes': [60, 40, 40, 60]
+    };
+    List<double> x = [1.1, 2.2, 3.3, 4.4];
+    double pi = 3.14159265;
+    int arr_len = x.length;
+
+    final fhe = Seal('ckks');
+    String status = fhe.genContext(ctx);
+    expect(status, 'success: valid');
+    final pt_x = fhe.encodeVecDouble(x);
+
+    fhe.genKeys();
+    fhe.genRelinKeys();
+
+    final ct_x = fhe.encrypt(pt_x);
+    Ciphertext ct_squared = fhe.multiply(ct_x, ct_x);
+    final ct_squared_relin = fhe.relinearize(ct_squared);
+
+    Plaintext pt_pi = fhe.encodeDouble(pi);
+    Ciphertext ct_pi_squared = fhe.multiplyPlain(ct_squared_relin, pt_pi);
+    Plaintext pt_pi_squared = fhe.decrypt(ct_pi_squared);
+
+    List<double> product = [3.801327107, 15.205308426, 34.211943958, 60.821233704];
+    for (int i = 0; i < arr_len; i++) {
+      near(eps: 1e-7, product[i],
+           fhe.decodeVecDouble(pt_pi_squared, arr_len)[i]);
+      near(eps: 1e-7, product[i],
+           fhe.decodeVecDouble(pt_pi_squared, arr_len)[i]);
+    }
+  });
 }

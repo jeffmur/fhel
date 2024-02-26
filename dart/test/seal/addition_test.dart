@@ -74,27 +74,6 @@ void main() {
     }
   });
 
-  // test('Double addition', () {
-  //   Map ctx = {
-  //     'polyModDegree': 8192,
-  //     'encodeScalar': 40,
-  //     'qSizes': [60, 40, 40, 60],
-  //   };
-
-  //   Seal fhe = Seal('ckks');
-  //   fhe.genContext(ctx);
-  //   fhe.genKeys();
-  //   var pt_x = fhe.plain('1.23');
-  //   var ct_x = fhe.encrypt(pt_x);
-
-  //   var pt_y = fhe.plain('2.46');
-  //   var ct_y = fhe.encrypt(pt_y);
-
-  //   var ct_res = fhe.add(ct_x, ct_y);
-  //   var pt_res = fhe.decrypt(ct_res);
-  //   expect(pt_res.text, '3.0');
-  // });
-
   test("List<int> Addition", () {
     for (var sch in schemes) {
       final fhe = Seal(sch);
