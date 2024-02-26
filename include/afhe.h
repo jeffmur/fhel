@@ -115,6 +115,16 @@ public:
   virtual void relinearize(ACiphertext &ctxt) = 0;
 
   /**
+   * @brief Modulus switches a plaintext using a given parameter id.
+  */
+  virtual void mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt) = 0;
+
+  /**
+   * @brief Modulus switches a ciphertext using a given parameter id.
+  */
+  virtual void mod_switch_to(ACiphertext &to, ACiphertext &from) = 0;
+
+  /**
    * @brief Reduces the noise in a plaintext.
    *
    * Modulus switches an NTT transformed plaintext to the next modulus in the modulus chain.

@@ -151,12 +151,12 @@ TEST(CKKS, Basics)
     by a prime. We are down to the last level in the modulus switching chain.
     */
     cout << "Compute, relinearize, and rescale (PI*x)*x^2." << endl;
-    AsealCiphertext pi_x3_encrypted;
-    fhe->multiply(x2_encrypted, x1_encrypted_coeff3, pi_x3_encrypted);
-    fhe->relinearize(pi_x3_encrypted);
-    cout << "    + Scale of PI*x^3 before rescale: " << log2(pi_x3_encrypted.scale()) << " bits" << endl;
-    fhe->rescale_to_next(pi_x3_encrypted);
-    cout << "    + Scale of PI*x^3 after rescale: " << log2(pi_x3_encrypted.scale()) << " bits" << endl;
+    AsealCiphertext x3_encrypted_coeff3;
+    fhe->multiply(x2_encrypted, x1_encrypted_coeff3, x3_encrypted_coeff3);
+    fhe->relinearize(x3_encrypted_coeff3);
+    cout << "    + Scale of PI*x^3 before rescale: " << log2(x3_encrypted_coeff3.scale()) << " bits" << endl;
+    fhe->rescale_to_next(x3_encrypted_coeff3);
+    cout << "    + Scale of PI*x^3 after rescale: " << log2(x3_encrypted_coeff3.scale()) << " bits" << endl;
 
     /*
     Next we compute the degree one term. All this requires is one multiply_plain
@@ -178,14 +178,14 @@ TEST(CKKS, Basics)
     the same, and also that the encryption parameters (parms_id) match. If there
     is a mismatch, Evaluator will throw an exception.
     */
-    // cout << "Parameters used by all three terms are different." << endl;
-    // cout << "    + Modulus chain index for x3_encrypted: "
-    //      << context.get_context_data(x3_encrypted.parms_id())->chain_index() << endl;
-    // cout << "    + Modulus chain index for x1_encrypted: "
-    //      << context.get_context_data(x1_encrypted.parms_id())->chain_index() << endl;
-    // cout << "    + Modulus chain index for plain_coeff0: "
-    //      << context.get_context_data(plain_coeff0.parms_id())->chain_index() << endl;
-    // cout << endl;
+    cout << "Parameters used by all three terms are different." << endl;
+    cout << "    + Modulus chain index for x3_encrypted_coeff3: "
+         << fhe->get_context()->get_context_data(x3_encrypted_coeff3.parms_id())->chain_index() << endl;
+    cout << "    + Modulus chain index for x1_encrypted_coeff1: "
+         << fhe->get_context()->get_context_data(x1_encrypted_coeff1.parms_id())->chain_index() << endl;
+    cout << "    + Modulus chain index for plain_coeff0: "
+         << fhe->get_context()->get_context_data(plain_coeff0.parms_id())->chain_index() << endl;
+    cout << endl;
 
     /*
     Let us carefully consider what the scales are at this point. We denote the
@@ -209,7 +209,7 @@ TEST(CKKS, Basics)
     ios old_fmt(nullptr);
     old_fmt.copyfmt(cout);
     cout << fixed << setprecision(10);
-    cout << "    + Exact scale in PI*x^3: " << pi_x3_encrypted.scale() << endl;
+    cout << "    + Exact scale in PI*x^3: " << x3_encrypted_coeff3.scale() << endl;
     cout << "    + Exact scale in  0.4*x: " << x1_encrypted_coeff1.scale() << endl;
     cout << "    + Exact scale in      1: " << plain_coeff0.scale() << endl;
     cout << endl;
@@ -230,7 +230,7 @@ TEST(CKKS, Basics)
     the scale of PI*x^3 and 0.4*x to 2^40.
     */
     cout << "Normalize scales to 2^40." << endl;
-    pi_x3_encrypted.set_scale(pow(2.0, 40));
+    x3_encrypted_coeff3.set_scale(pow(2.0, 40));
     x1_encrypted_coeff1.set_scale(pow(2.0, 40));
 
     /*
@@ -240,15 +240,15 @@ TEST(CKKS, Basics)
     of the coefficient modulus when it is simply not needed.
     */
     cout << "Normalize encryption parameters to the lowest level." << endl;
-    fhe->mod_switch_to_next(x1_encrypted_coeff1); // TODO: mod_switch_to_level(x1_encrypted_coeff1, pi_x3_encrypted.parms_id())
-    fhe->mod_switch_to_next(plain_coeff0);
+    fhe->mod_switch_to(x1_encrypted_coeff1, x3_encrypted_coeff3);
+    fhe->mod_switch_to(plain_coeff0, x3_encrypted_coeff3);
 
     /*
     All three ciphertexts are now compatible and can be added.
     */
     AsealCiphertext add_ct;
     AsealCiphertext add_one;
-    fhe->add(pi_x3_encrypted, x1_encrypted_coeff1, add_ct);
+    fhe->add(x3_encrypted_coeff3, x1_encrypted_coeff1, add_ct);
     fhe->add(add_ct, plain_coeff0, add_one);
 
     /*
@@ -270,8 +270,8 @@ TEST(CKKS, Basics)
     vector<double> result;
     fhe->decode_double(plain_result, result);
     for (int i = 0; i < true_result.size(); i++) {
-      // Compare up to 7 decimal places.
-      EXPECT_NEAR(true_result[i], result[i], 0.0000001);
+      // Compare up to 5 decimal places, as 6 or more will fail
+      EXPECT_NEAR(true_result[i], result[i], 0.00001);
     }
     /*
     While we did not show any computations on complex numbers in these examples,

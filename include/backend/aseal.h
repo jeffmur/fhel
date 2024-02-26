@@ -183,13 +183,21 @@ public:
    * @return A pointer to the SEAL context object.
    * @throws std::logic_error if the context is not initialized.
   */
-  inline shared_ptr<seal::SEALContext> get_context();
+  inline shared_ptr<seal::SEALContext> get_context() {
+    if (this->context == nullptr)
+    {
+      throw logic_error("Context is not initialized");
+    }
+    return this->context;
+  }
 
   // ------------------ Keys ------------------
 
   void KeyGen() override;
   void RelinKeyGen() override;
   void relinearize(ACiphertext &ctxt) override;
+  void mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt) override;
+  void mod_switch_to(ACiphertext &to, ACiphertext &from) override;
   void mod_switch_to_next(APlaintext &ptxt) override;
   void mod_switch_to_next(ACiphertext &ctxt) override;
   void rescale_to_next(ACiphertext &ctxt) override;

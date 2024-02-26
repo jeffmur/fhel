@@ -51,7 +51,7 @@ ctest:
 
 # Debug Abstract Layer (AFHEL)
 .PHONY: ctest-debug
-ctest-debug:
+ctest-debug: build-cmake
 	@echo "Debugging cpp..."
 	@cd $(AL_INSTALL_DIR); ./seal_test
 

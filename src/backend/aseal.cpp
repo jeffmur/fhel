@@ -101,15 +101,6 @@ string Aseal::ContextGen(scheme scheme,
   }
 }
 
-shared_ptr<SEALContext> inline Aseal::get_context()
-{
-  if (this->context == nullptr)
-  {
-    throw logic_error("Context is not initialized");
-  }
-  return (this->context);
-}
-
 void Aseal::KeyGen()
 {
   // Gather current context, resolves object
@@ -157,6 +148,30 @@ void Aseal::relinearize(ACiphertext &ctxt)
 
   // Relinearize using casted types
   this->evaluator->relinearize_inplace(_to_ciphertext(ctxt), *this->relinKeys);
+}
+
+void Aseal::mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Mod Switch using from Ciphertext parms_id
+  this->evaluator->mod_switch_to_inplace(_to_plaintext(ptxt), _to_ciphertext(ctxt).parms_id());
+}
+
+void Aseal::mod_switch_to(ACiphertext &to, ACiphertext &from)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Mod Switch using from Ciphertext parms_id
+  this->evaluator->mod_switch_to_inplace(_to_ciphertext(to),  _to_ciphertext(from).parms_id());
 }
 
 void Aseal::mod_switch_to_next(ACiphertext &ctxt)
