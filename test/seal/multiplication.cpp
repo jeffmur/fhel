@@ -260,3 +260,60 @@ TEST(Multiply, VectorDouble) {
     EXPECT_NEAR(expect, decode_res_no_relin[i], 0.0000001);
   }
 }
+
+TEST(Multiply, PiXSquared) {
+  // π * x^2
+  Aseal* fhe = new Aseal();
+  string ctx = fhe->ContextGen(scheme::ckks, 8192, 40, -1, -1, {60, 40, 40, 60});
+  // Expect two strings not to be equal.
+  EXPECT_STREQ(ctx.c_str(), "success: valid");
+
+  fhe->KeyGen();
+  fhe->RelinKeyGen();
+
+  AsealPlaintext pi_coeff;
+  double pi = 3.14159265;
+  fhe->encode_double(pi, pi_coeff);
+
+  size_t slot_count = fhe->slot_count();
+
+  /**
+   * Create an input vector (x) with floating point values 0 ... 1.
+  */
+  vector<double> x;
+  x.reserve(slot_count);
+  double curr_point = 0;
+  double step_size = 1.0 / (static_cast<double>(slot_count) - 1);
+  for (size_t i = 0; i < slot_count; i++)
+  {
+      x.push_back(curr_point);
+      curr_point += step_size;
+  }
+  AsealPlaintext pt_x = AsealPlaintext();
+  fhe->encode_double(x, pt_x);
+
+  AsealCiphertext ct_x = AsealCiphertext();
+  AsealCiphertext ct_squared = AsealCiphertext();
+  AsealCiphertext ct_pi_squared = AsealCiphertext();
+
+  // x^2
+  fhe->encrypt(pt_x, ct_x);
+  fhe->multiply(ct_x, ct_x, ct_squared);
+  fhe->relinearize(ct_squared);
+
+  // π * x^2
+  fhe->multiply(ct_squared, pi_coeff, ct_pi_squared);
+
+  // AsealPlaintext decrypt_res = AsealPlaintext();
+  AsealPlaintext decrypt_res = decrypt(fhe, ct_pi_squared);
+  fhe->decrypt(ct_pi_squared, decrypt_res);
+
+  vector<double> decode_res;
+  fhe->decode_double(decrypt_res, decode_res);
+
+  for (int i = 0; i < x.size(); i++) {
+    double expect = pi * x[i] * x[i];
+    // Compare up to 7 decimal places.
+    EXPECT_NEAR(expect, decode_res[i], 0.0000001);
+  }
+}

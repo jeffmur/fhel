@@ -61,6 +61,11 @@ string Aseal::ContextGen(scheme scheme,
       throw invalid_argument("CKKS requires at least one entry in bit_sizes");
     }
 
+    if (plain_modulus_bit_size < 1)
+    {
+      throw invalid_argument("CKKS requires a positive value for plain_modulus_bit_size");
+    }
+
     // Set coefficient modulus
     param.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, bit_sizes));
 
