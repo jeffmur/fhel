@@ -131,7 +131,7 @@ extern "C" {
      * @param qi_sizes_length Length of the array of primes.
      * @return String representing the context.
     */
-    const char* generate_context(Afhe* afhe, scheme_t scheme, int poly_mod_degree, int pt_mod_bit, int pt_mod, int sec_level, const int* qi_sizes, int qi_sizes_length);
+    const char* generate_context(Afhe* afhe, scheme_t scheme, uint64_t poly_mod_degree, uint64_t pt_mod_bit, uint64_t pt_mod, uint64_t sec_level, const uint64_t* qi_sizes, uint64_t qi_sizes_length);
 
     /**
      * @brief Generate keys for the backend library.

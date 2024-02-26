@@ -30,10 +30,12 @@ class Afhe {
   ///
   /// The [Scheme] is used to represent one of the supported fhe schemes.
   Scheme scheme = Scheme();
+
   /// The backend library used for the encryption scheme.
   ///
   /// The [Backend] is used to represent one of the supported fhe backends.
   Backend backend = Backend();
+
   /// A pointer to the memory address of the underlying C++ object.
   Pointer library = nullptr;
 
@@ -55,7 +57,8 @@ class Afhe {
         context['ptModBit'] ?? 0, // Only used when batching
         context['ptMod'] ?? 0, // Not used when batching
         context['secLevel'],
-        nullptr, 0);
+        nullptr,
+        0);
     raiseForStatus();
     return ptr.toDartString();
   }
@@ -85,7 +88,8 @@ class Afhe {
         context['encodeScalar'],
         0, // Plain Modulus is not used
         0, // Security Level is not used
-        intListToArray(primeSizes), primeSizes.length);
+        intListToUint64Array(primeSizes),
+        primeSizes.length);
     raiseForStatus();
     return ptr.toDartString();
   }
@@ -127,6 +131,7 @@ class Afhe {
   Plaintext decrypt(Ciphertext ciphertext) {
     Pointer ptr = _c_decrypt(library, ciphertext.obj);
     raiseForStatus();
+
     /// String cannot be extracted from C object
     if (scheme.name.toLowerCase() == "ckks") {
       return Plaintext.fromPointer(backend, ptr, extractStr: false);
@@ -143,7 +148,8 @@ class Afhe {
 
   /// Encodes a list of integers into a [Plaintext].
   Plaintext encodeVecInt(List<int> vec) {
-    Pointer ptr = _c_encode_vector_int(library, intListToUint64Array(vec), vec.length);
+    Pointer ptr =
+        _c_encode_vector_int(library, intListToUint64Array(vec), vec.length);
     raiseForStatus();
     return Plaintext.fromPointer(backend, ptr);
   }
@@ -165,7 +171,8 @@ class Afhe {
 
   /// Encodes a list of doubles into a [Plaintext].
   Plaintext encodeVecDouble(List<double> vec) {
-    Pointer ptr = _c_encode_vector_double(library, doubleListToArray(vec), vec.length);
+    Pointer ptr =
+        _c_encode_vector_double(library, doubleListToArray(vec), vec.length);
     raiseForStatus();
     // String cannot be extracted from C object for CKKS
     return Plaintext.fromPointer(backend, ptr, extractStr: false);

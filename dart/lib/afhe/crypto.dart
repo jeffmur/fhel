@@ -6,12 +6,12 @@ part of '../afhe.dart';
 typedef _GenContextC = Pointer<Utf8> Function(
     Pointer library,
     Int32 scheme,
-    Int64 poly_mod_degree,
-    Int64 pt_mod_bit,
-    Int64 pt_mod,
-    Int64 sec_level,
-    Pointer<Int> prime_sizes,
-    Int prime_sizes_length);
+    Uint64 poly_mod_degree,
+    Uint64 pt_mod_bit,
+    Uint64 pt_mod,
+    Uint64 sec_level,
+    Pointer<Uint64> prime_sizes,
+    Uint64 prime_sizes_length);
 
 typedef _GenContext = Pointer<Utf8> Function(
   Pointer library,
@@ -20,7 +20,7 @@ typedef _GenContext = Pointer<Utf8> Function(
   int pt_mod_bit,
   int pt_mod,
   int sec_level,
-  Pointer<Int> prime_sizes,
+  Pointer<Uint64> prime_sizes,
   int prime_sizes_length);
 
 final _GenContext _c_gen_context = dylib

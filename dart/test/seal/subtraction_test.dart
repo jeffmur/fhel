@@ -1,10 +1,12 @@
 import 'package:test/test.dart';
 import 'package:fhel/seal.dart' show Seal;
 import 'test_utils.dart';
+import 'dart:math';
 
 const schemes = ['bgv', 'bfv'];
 
-String sub(String scheme, String a, String b, Map<String, int> ctx, {bool encryptSubtrahend = true}) {
+String sub(String scheme, String a, String b, Map<String, int> ctx,
+    {bool encryptSubtrahend = true}) {
   final fhe = Seal(scheme);
   String status = fhe.genContext(ctx);
   expect(status, 'success: valid');
@@ -45,12 +47,12 @@ void main() {
     };
 
     for (var sch in schemes) {
+      expect(120.toRadixString(16),
+          sub(sch, 200.toRadixString(16), 80.toRadixString(16), ctx));
       expect(
-        120.toRadixString(16),
-        sub(sch, 200.toRadixString(16), 80.toRadixString(16), ctx));
-      expect(
-        120.toRadixString(16),
-        sub(sch, 200.toRadixString(16), 80.toRadixString(16), ctx, encryptSubtrahend: false));
+          120.toRadixString(16),
+          sub(sch, 200.toRadixString(16), 80.toRadixString(16), ctx,
+              encryptSubtrahend: false));
     }
 
     // Otherwise, you are forced to increase plaintext modulus,
@@ -64,12 +66,12 @@ void main() {
     // When using hexadecimal, plain modulus can be lower
     ctx['ptMod'] = 4196;
     for (var sch in schemes) {
+      expect(1200.toRadixString(16).toLowerCase(),
+          sub(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx));
       expect(
-        1200.toRadixString(16).toLowerCase(),
-        sub(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx));
-      expect(
-        1200.toRadixString(16).toLowerCase(),
-        sub(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx, encryptSubtrahend: false));
+          1200.toRadixString(16).toLowerCase(),
+          sub(sch, 2000.toRadixString(16), 800.toRadixString(16), ctx,
+              encryptSubtrahend: false));
     }
   });
 
@@ -107,11 +109,11 @@ void main() {
     }
   });
 
-   test("List<double> Subtraction", () {
+  test("List<double> Subtraction", () {
     final fhe = Seal('ckks');
     Map ctx = {
       'polyModDegree': 8192,
-      'encodeScalar': 40,
+      'encodeScalar': pow(2, 40),
       'qSizes': [60, 40, 40, 60]
     };
     fhe.genContext(ctx);
@@ -145,5 +147,4 @@ void main() {
       near(actual_cipher[i], expected[i], eps: 1e-7);
     }
   });
-
 }

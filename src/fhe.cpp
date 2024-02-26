@@ -41,7 +41,7 @@ scheme_t scheme_t_from_string(const char* scheme)
     return scheme_t::no_s;
 }
 
-const char* generate_context(Afhe* afhe, scheme_t scheme_type, int poly_mod_degree, int pt_mod_bit, int pt_mod, int sec_level, const int* qi_sizes, int qi_sizes_length)
+const char* generate_context(Afhe* afhe, scheme_t scheme_type, uint64_t poly_mod_degree, uint64_t pt_mod_bit, uint64_t pt_mod, uint64_t sec_level, const uint64_t* qi_sizes, uint64_t qi_sizes_length)
 {
     try {
         scheme a_scheme = scheme_t_map_scheme.at(scheme_type);

@@ -1,6 +1,7 @@
 import 'package:test/test.dart';
 import 'package:fhel/seal.dart' show Seal;
 import 'test_utils.dart';
+import 'dart:math';
 
 const schemes = ['bgv', 'bfv'];
 
@@ -119,7 +120,7 @@ void main() {
     final fhe = Seal('ckks');
     Map ctx = {
       'polyModDegree': 8192,
-      'encodeScalar': 40,
+      'encodeScalar': pow(2, 40),
       'qSizes': [60, 40, 40, 60]
     };
     fhe.genContext(ctx);

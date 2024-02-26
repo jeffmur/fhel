@@ -2,6 +2,7 @@ import 'package:fhel/afhe.dart';
 import 'package:test/test.dart';
 import 'package:fhel/seal.dart' show Seal;
 import 'test_utils.dart';
+import 'dart:math';
 
 const schemes = ['bgv', 'bfv'];
 
@@ -13,7 +14,8 @@ void modSwitchTest(Seal fhe, Ciphertext ct) {
   expect(beforeSwitch > afterSwitch, true);
 }
 
-Plaintext multiply(Seal fhe, Plaintext pt_x, Plaintext pt_m, {bool encryptMultiplier=true, bool modSwitch=true}) {
+Plaintext multiply(Seal fhe, Plaintext pt_x, Plaintext pt_m,
+    {bool encryptMultiplier = true, bool modSwitch = true}) {
   fhe.genKeys();
   final ct_x = fhe.encrypt(pt_x);
   Ciphertext ct_res;
@@ -25,13 +27,11 @@ Plaintext multiply(Seal fhe, Plaintext pt_x, Plaintext pt_m, {bool encryptMultip
     expect(ct_no_relin.size(), 3);
     ct_res = fhe.relinearize(ct_no_relin);
     expect(ct_res.size(), 2);
-  }
-  else {
+  } else {
     ct_res = fhe.multiplyPlain(ct_x, pt_m);
     expect(ct_res.size(), 2);
   }
-  if (modSwitch)
-  {
+  if (modSwitch) {
     modSwitchTest(fhe, ct_res);
   }
 
@@ -50,12 +50,13 @@ void main() {
       final pt_hex_10 = fhe.plain(10.toRadixString(16));
       String status = fhe.genContext(ctx);
       expect(status, 'success: valid');
+      expect(100.toRadixString(16),
+          multiply(fhe, pt_hex_10, pt_hex_10).text.toLowerCase());
       expect(
-        100.toRadixString(16),
-        multiply(fhe, pt_hex_10, pt_hex_10).text.toLowerCase());
-      expect(
-        100.toRadixString(16),
-        multiply(fhe, pt_hex_10, pt_hex_10, encryptMultiplier: false).text.toLowerCase());
+          100.toRadixString(16),
+          multiply(fhe, pt_hex_10, pt_hex_10, encryptMultiplier: false)
+              .text
+              .toLowerCase());
     }
   });
 
@@ -78,14 +79,17 @@ void main() {
       final pt_m = fhe.encodeVecInt(m);
 
       expect(product, fhe.decodeVecInt(multiply(fhe, pt_x, pt_m), arr_len));
-      expect(product, fhe.decodeVecInt(multiply(fhe, pt_x, pt_m, encryptMultiplier: false), arr_len));
+      expect(
+          product,
+          fhe.decodeVecInt(
+              multiply(fhe, pt_x, pt_m, encryptMultiplier: false), arr_len));
     }
   });
 
   test("List<double> Multiplication", () {
     Map ctx = {
       'polyModDegree': 8192,
-      'encodeScalar': 40,
+      'encodeScalar': pow(2, 40),
       'qSizes': [60, 40, 40, 60]
     };
     List<double> x = [1.1, 2.2, 3.3, 4.4];
@@ -100,13 +104,17 @@ void main() {
     final pt_m = fhe.encodeVecDouble(m);
 
     for (int i = 0; i < arr_len; i++) {
-      near(eps: 1e-7, product[i],
-           fhe.decodeVecDouble(
-              multiply(fhe, pt_x, pt_m, modSwitch: false),
-              arr_len)[i]);
-      near(eps: 1e-7, product[i],
-           fhe.decodeVecDouble(
-              multiply(fhe, pt_x, pt_m, modSwitch: false, encryptMultiplier: false),
+      near(
+          eps: 1e-7,
+          product[i],
+          fhe.decodeVecDouble(
+              multiply(fhe, pt_x, pt_m, modSwitch: false), arr_len)[i]);
+      near(
+          eps: 1e-7,
+          product[i],
+          fhe.decodeVecDouble(
+              multiply(fhe, pt_x, pt_m,
+                  modSwitch: false, encryptMultiplier: false),
               arr_len)[i]);
     }
   });
@@ -114,7 +122,7 @@ void main() {
   test("List<double> Pi * x^2", () {
     Map ctx = {
       'polyModDegree': 8192,
-      'encodeScalar': 40,
+      'encodeScalar': pow(2, 40),
       'qSizes': [60, 40, 40, 60]
     };
     List<double> x = [1.1, 2.2, 3.3, 4.4];
@@ -137,12 +145,21 @@ void main() {
     Ciphertext ct_pi_squared = fhe.multiplyPlain(ct_squared_relin, pt_pi);
     Plaintext pt_pi_squared = fhe.decrypt(ct_pi_squared);
 
-    List<double> product = [3.801327107, 15.205308426, 34.211943958, 60.821233704];
+    List<double> product = [
+      3.801327107,
+      15.205308426,
+      34.211943958,
+      60.821233704
+    ];
     for (int i = 0; i < arr_len; i++) {
-      near(eps: 1e-7, product[i],
-           fhe.decodeVecDouble(pt_pi_squared, arr_len)[i]);
-      near(eps: 1e-7, product[i],
-           fhe.decodeVecDouble(pt_pi_squared, arr_len)[i]);
+      near(
+          eps: 1e-7,
+          product[i],
+          fhe.decodeVecDouble(pt_pi_squared, arr_len)[i]);
+      near(
+          eps: 1e-7,
+          product[i],
+          fhe.decodeVecDouble(pt_pi_squared, arr_len)[i]);
     }
   });
 }
