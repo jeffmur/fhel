@@ -70,6 +70,7 @@ TEST(CKKS, Basics)
     size_t poly_modulus_degree = 8192;
     string ctx = fhe->ContextGen(scheme::ckks, poly_modulus_degree, scale, -1, -1, primes);
     EXPECT_STREQ(ctx.c_str(), "success: valid");
+    print_parameters(fhe->get_context());
 
     fhe->KeyGen();
     fhe->RelinKeyGen();

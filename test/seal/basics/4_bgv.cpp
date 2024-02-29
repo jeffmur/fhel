@@ -27,6 +27,7 @@ TEST(BGV, Basics)
      int security_level = 128;
      string ctx = fhe->ContextGen(scheme::bgv, poly_modulus_degree, plain_modulus_bit_size, 0, security_level);
      EXPECT_STREQ(ctx.c_str(), "success: valid");
+     print_parameters(fhe->get_context());
 
      /*
      Print the parameters that we have chosen.
