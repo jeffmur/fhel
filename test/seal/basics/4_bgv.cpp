@@ -29,13 +29,6 @@ TEST(BGV, Basics)
      EXPECT_STREQ(ctx.c_str(), "success: valid");
      print_parameters(fhe->get_context());
 
-     /*
-     Print the parameters that we have chosen.
-     */
-     print_line(__LINE__);
-     cout << "Set encryption parameters and print" << endl;
-     // print_parameters(fhe->get_context());
-
      fhe->KeyGen();
      fhe->RelinKeyGen();
 
