@@ -55,6 +55,12 @@ ctest-debug: build-cmake
 	@echo "Debugging cpp..."
 	@cd $(AL_INSTALL_DIR); ./seal_test
 
+# SEAL Basics using the Abstraction Layer
+.PHONY: seal-basics
+seal-basics: build-cmake
+	@echo "SEAL basics..."
+	@cd $(AL_INSTALL_DIR); ./seal_basics
+
 # Test Implementation Layer (FHE)
 .PHONY: dtest
 dtest:

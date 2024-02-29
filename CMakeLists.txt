@@ -68,6 +68,7 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
         test/seal/multiplication.cpp
         test/seal/relinearization.cpp
         test/seal/basics/1_bfv.cpp
+        test/seal/basics/4_bgv.cpp
         test/seal/basics/5_ckks.cpp
     )
 
@@ -80,4 +81,20 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
 
     include(GoogleTest)
     gtest_discover_tests(seal_test)
+
+    # SEAL Basics
+    add_executable(
+        seal_basics
+        test/seal/basics/1_bfv.cpp
+        test/seal/basics/4_bgv.cpp
+        test/seal/basics/5_ckks.cpp
+    )
+    include_directories(test/seal/basics)
+    target_link_libraries(
+        seal_basics
+        GTest::gtest_main
+        seal
+        fhel
+    )
+    gtest_discover_tests(seal_basics)
 endif()

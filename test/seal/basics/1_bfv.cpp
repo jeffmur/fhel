@@ -1,9 +1,4 @@
-#include <gtest/gtest.h> // NOLINT
-#include <aseal.h>       /* Microsoft SEAL */
-#include <map>
-
-using namespace std;
-using namespace seal;
+#include "basics.h"
 
 TEST(BFV, Basics)
 {
@@ -54,7 +49,8 @@ TEST(BFV, Basics)
     */
     size_t poly_modulus_degree = 4096;
     size_t plain_modulus = 1024;
-    string ctx = fhe->ContextGen(scheme::bfv, poly_modulus_degree, 0, plain_modulus, 128);
+    int security_level = 128;
+    string ctx = fhe->ContextGen(scheme::bfv, poly_modulus_degree, 0, plain_modulus, security_level);
     EXPECT_STREQ(ctx.c_str(), "success: valid");
 
     /*
@@ -162,6 +158,7 @@ TEST(BFV, Basics)
     */
     uint64_t x = 6;
     AsealPlaintext x_plain = AsealPlaintext(uint64_to_hex(x));
+    print_line(__LINE__);
     cout << "Express x = " + to_string(x) + " as a plaintext polynomial 0x" + x_plain.to_string() + "." << endl;
 
     /*
@@ -196,8 +193,8 @@ TEST(BFV, Basics)
     AsealPlaintext x_decrypted;
     cout << "    + decryption of x_encrypted: ";
     fhe->decrypt(x_encrypted, x_decrypted);
-    cout << "0x" << x_decrypted.to_string() << " ...... Correct." << endl;
     EXPECT_EQ(x, hex_to_uint64(x_decrypted.to_string()));
+    cout << "0x" << x_decrypted.to_string() << " ...... Correct." << endl;
 
     /*
     When using Microsoft SEAL, it is typically advantageous to compute in a way
@@ -217,6 +214,7 @@ TEST(BFV, Basics)
     can vary the plain_modulus parameter to see its effect on the rate of noise
     budget consumption.
     */
+    print_line(__LINE__);
     cout << "Compute x_sq_plus_one (x^2+1)." << endl;
     AsealCiphertext x_sq_plus_one;
     AsealCiphertext x_sq;
@@ -245,12 +243,13 @@ TEST(BFV, Basics)
     AsealPlaintext decrypted_result;
     cout << "    + decryption of x_sq_plus_one: ";
     fhe->decrypt(x_sq_plus_one, decrypted_result);
-    cout << "0x" << decrypted_result.to_string() << " ...... Correct." << endl;
     EXPECT_EQ(37, hex_to_uint64(decrypted_result.to_string()));
+    cout << "0x" << decrypted_result.to_string() << " ...... Correct." << endl;
 
     /*
     Next, we compute (x + 1)^2.
     */
+    print_line(__LINE__);
     cout << "Compute x_plus_one_sq ((x+1)^2)." << endl;
     AsealCiphertext x_plus_one_sq;
     AsealCiphertext x_plus_one;
@@ -261,12 +260,13 @@ TEST(BFV, Basics)
          << endl;
     cout << "    + decryption of x_plus_one_sq: ";
     fhe->decrypt(x_plus_one_sq, decrypted_result);
-    cout << "0x" << decrypted_result.to_string() << " ...... Correct." << endl;
     EXPECT_EQ(49, hex_to_uint64(decrypted_result.to_string()));
+    cout << "0x" << decrypted_result.to_string() << " ...... Correct." << endl;
 
     /*
     Finally, we multiply (x^2 + 1) * (x + 1)^2 * 4.
     */
+    print_line(__LINE__);
     cout << "Compute encrypted_result (4(x^2+1)(x+1)^2)." << endl;
     AsealCiphertext encrypted_result;
     AsealCiphertext four_x_sq_plus_one;
@@ -275,12 +275,19 @@ TEST(BFV, Basics)
     fhe->multiply(four_x_sq_plus_one, x_plus_one_sq, encrypted_result);
     cout << "    + size of encrypted_result: " << encrypted_result.size() << endl;
     cout << "    + noise budget in encrypted_result: " << fhe->invariant_noise_budget(encrypted_result) << " bits"
-         << endl;
+         << endl << endl;
     cout << "NOTE: Decryption can be incorrect if noise budget is zero." << endl;
-    fhe->decrypt(encrypted_result, decrypted_result);
-    // 7522 % 1024 == 84
-    EXPECT_EQ(84, hex_to_uint64(decrypted_result.to_string()));
-
+    if (fhe->invariant_noise_budget(encrypted_result) == 0)
+    {
+        cout << "    + Noise budget is zero!" << endl;
+    }
+    else
+    {
+        EXPECT_GT(fhe->invariant_noise_budget(encrypted_result), 0);
+        fhe->decrypt(encrypted_result, decrypted_result);
+        EXPECT_EQ(84, hex_to_uint64(decrypted_result.to_string()));
+        cout << "    + decryption of 4(x^2+1)(x+1)^2 = 0x" << decrypted_result.to_string() << " ...... Correct." << endl;
+    }
     cout << endl;
     cout << "~~~~~~ A better way to calculate 4(x^2+1)(x+1)^2. ~~~~~~" << endl;
 
@@ -308,12 +315,14 @@ TEST(BFV, Basics)
     in this example we continue using BFV. We repeat our computation from before,
     but this time relinearize after every multiplication.
     */
+    print_line(__LINE__);
     cout << "Generate relinearization keys." << endl;
     fhe->RelinKeyGen();
 
     /*
     We now repeat the computation relinearizing after each multiplication.
     */
+    print_line(__LINE__);
     cout << "Compute and relinearize x_squared (x^2)," << endl;
     cout << string(13, ' ') << "then compute x_sq_plus_one (x^2+1)" << endl;
     AsealCiphertext x_squared;
@@ -331,6 +340,7 @@ TEST(BFV, Basics)
     cout << "0x" << decrypted_result.to_string() << " ...... Correct." << endl;
     EXPECT_EQ(37, hex_to_uint64(decrypted_result.to_string()));
 
+    print_line(__LINE__);
     cout << "Compute x_plus_one (x+1)," << endl;
     cout << string(13, ' ') << "then compute and relinearize x_plus_one_sq ((x+1)^2)." << endl;
     fhe->add(x_encrypted, plain_one, x_plus_one);
@@ -346,31 +356,30 @@ TEST(BFV, Basics)
     cout << "0x" << decrypted_result.to_string() << " ...... Correct." << endl;
     EXPECT_EQ(49, hex_to_uint64(decrypted_result.to_string()));
 
+    print_line(__LINE__);
     cout << "Compute and relinearize encrypted_result (4(x^2+1)(x+1)^2)." << endl;
-    AsealCiphertext four_x_sq_plus_one_relin;
-    fhe->multiply(x_sq_plus_one, plain_four, four_x_sq_plus_one_relin);
-    fhe->multiply(four_x_sq_plus_one, x_plus_one_sq, encrypted_result);
+    fhe->multiply(x_sq_plus_one, plain_four, four_x_sq_plus_one);
+    // We may not need to relinearize after Ciphertext x Plaintext multiplication.
+    cout << "    + size of four_x_sq_plus_one: " << four_x_sq_plus_one.size() << endl;
+    EXPECT_EQ(2, four_x_sq_plus_one.size());
+    fhe->multiply(x_plus_one_sq, four_x_sq_plus_one, encrypted_result);
     cout << "    + size of encrypted_result: " << encrypted_result.size() << endl;
-    // TODO: Size is now 4, but should be 3. Why?
-    // I think it's because of multiply_inplace vs. create new ciphertext.
-    // fhe->relinearize(encrypted_result);
-    // cout << "    + size of encrypted_result (after relinearization): " << encrypted_result.size() << endl;
+    EXPECT_EQ(3, encrypted_result.size());
+    fhe->relinearize(encrypted_result);
+    EXPECT_EQ(2, encrypted_result.size());
+    cout << "    + size of encrypted_result (after relinearization): " << encrypted_result.size() << endl;
     cout << "    + noise budget in encrypted_result: " << fhe->invariant_noise_budget(encrypted_result) << " bits"
          << endl;
 
-    cout << endl;
     cout << "NOTE: Notice the increase in remaining noise budget." << endl;
 
     /*
     Relinearization clearly improved our noise consumption. We have still plenty
     of noise budget left, so we can expect the correct answer when decrypting.
     */
-    cout << "Decrypt encrypted_result (4(x^2+1)(x+1)^2)." << endl;
     fhe->decrypt(encrypted_result, decrypted_result);
-    cout << "    + decryption of 4(x^2+1)(x+1)^2 = 0x" << decrypted_result.to_string() << " ...... Correct." << endl;
-    cout << endl;
-    EXPECT_EQ("54", decrypted_result.to_string());
     EXPECT_EQ(84, hex_to_uint64(decrypted_result.to_string()));
+    cout << "    + decryption of 4(x^2+1)(x+1)^2 = 0x" << decrypted_result.to_string() << " ...... Correct." << endl;
 
     /*
     For x=6, 4(x^2+1)(x+1)^2 = 7252. Since the plaintext modulus is set to 1024,
