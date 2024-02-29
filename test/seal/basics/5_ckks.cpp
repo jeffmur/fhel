@@ -1,9 +1,4 @@
-#include <gtest/gtest.h> // NOLINT
-#include <aseal.h>       /* Microsoft SEAL */
-#include <map>
-
-using namespace std;
-using namespace seal;
+#include "basics.h"
 
 TEST(CKKS, Basics)
 {
@@ -75,6 +70,7 @@ TEST(CKKS, Basics)
     size_t poly_modulus_degree = 8192;
     string ctx = fhe->ContextGen(scheme::ckks, poly_modulus_degree, scale, -1, -1, primes);
     EXPECT_STREQ(ctx.c_str(), "success: valid");
+    print_parameters(fhe->get_context());
 
     fhe->KeyGen();
     fhe->RelinKeyGen();
@@ -91,6 +87,8 @@ TEST(CKKS, Basics)
         input.push_back(curr_point);
         curr_point += step_size;
     }
+    print_vector(input, 5, 7);
+    print_line(__LINE__);
     cout << "Evaluating polynomial PI*x^3 + 0.4x + 1 ..." << endl;
 
     /*
@@ -103,7 +101,6 @@ TEST(CKKS, Basics)
     fhe->encode_double(1.0, plain_coeff0);
 
     AsealPlaintext x_plain;
-    cout << "Encode input vectors." << endl;
     fhe->encode_double(input, x_plain);
     AsealCiphertext x1_encrypted;
     fhe->encrypt(x_plain, x1_encrypted);
@@ -112,6 +109,7 @@ TEST(CKKS, Basics)
     To compute x^3 we first compute x^2 and relinearize. However, the scale has
     now grown to 2^80.
     */
+    print_line(__LINE__);
     AsealCiphertext x2_encrypted;
     cout << "Compute x^2 and relinearize:" << endl;
     fhe->multiply(x1_encrypted, x1_encrypted, x2_encrypted);
@@ -124,6 +122,7 @@ TEST(CKKS, Basics)
     new scale should be close to 2^40. Note, however, that the scale is not equal
     to 2^40: this is because the 40-bit prime is only close to 2^40.
     */
+    print_line(__LINE__);
     cout << "Rescale x^2." << endl;
     fhe->rescale_to_next(x2_encrypted);
     cout << "    + Scale of x^2 after rescale: " << log2(x2_encrypted.scale()) << " bits" << endl;
@@ -136,6 +135,7 @@ TEST(CKKS, Basics)
     first and multiply that with x^2 to obtain PI*x^3. To this end, we compute
     PI*x and rescale it back from scale 2^80 to something close to 2^40.
     */
+    print_line(__LINE__);
     cout << "Compute and rescale PI*x." << endl;
     AsealCiphertext x1_encrypted_coeff3;
     fhe->multiply(x1_encrypted, plain_coeff3, x1_encrypted_coeff3);
@@ -150,6 +150,7 @@ TEST(CKKS, Basics)
     is something close to 2^40, but not exactly 2^40 due to yet another scaling
     by a prime. We are down to the last level in the modulus switching chain.
     */
+    print_line(__LINE__);
     cout << "Compute, relinearize, and rescale (PI*x)*x^2." << endl;
     AsealCiphertext x3_encrypted_coeff3;
     fhe->multiply(x2_encrypted, x1_encrypted_coeff3, x3_encrypted_coeff3);
@@ -162,12 +163,14 @@ TEST(CKKS, Basics)
     Next we compute the degree one term. All this requires is one multiply_plain
     with plain_coeff1. We overwrite x1_encrypted with the result.
     */
+    print_line(__LINE__);
     cout << "Compute and rescale 0.4*x." << endl;
     AsealCiphertext x1_encrypted_coeff1;
     fhe->multiply(x1_encrypted, plain_coeff1, x1_encrypted_coeff1);
     cout << "    + Scale of 0.4*x before rescale: " << log2(x1_encrypted_coeff1.scale()) << " bits" << endl;
     fhe->rescale_to_next(x1_encrypted_coeff1);
-    cout << "    + Scale of 0.4*x after rescale: " << log2(x1_encrypted_coeff1.scale()) << " bits" << endl;
+    cout << "    + Scale of 0.4*x after rescale: " << log2(x1_encrypted_coeff1.scale()) << " bits" << endl
+         << endl;
 
     /*
     Now we would hope to compute the sum of all three terms. However, there is
@@ -178,6 +181,7 @@ TEST(CKKS, Basics)
     the same, and also that the encryption parameters (parms_id) match. If there
     is a mismatch, Evaluator will throw an exception.
     */
+    print_line(__LINE__);
     cout << "Parameters used by all three terms are different." << endl;
     cout << "    + Modulus chain index for x3_encrypted_coeff3: "
          << fhe->get_context()->get_context_data(x3_encrypted_coeff3.parms_id())->chain_index() << endl;
@@ -205,6 +209,7 @@ TEST(CKKS, Basics)
     Although the scales of all three terms are approximately 2^40, their exact
     values are different, hence they cannot be added together.
     */
+    print_line(__LINE__);
     cout << "The exact scales of all three terms are different:" << endl;
     ios old_fmt(nullptr);
     old_fmt.copyfmt(cout);
@@ -269,10 +274,9 @@ TEST(CKKS, Basics)
     fhe->decrypt(add_one, plain_result);
     vector<double> result;
     fhe->decode_double(plain_result, result);
-    for (int i = 0; i < true_result.size(); i++) {
-      // Compare up to 5 decimal places, as 6 or more will fail
-      EXPECT_NEAR(true_result[i], result[i], 0.00001);
-    }
+    print_vector(result, 5, 7);
+    expect_equal_vector(result, true_result, 0.00001);
+    cout << "    + Result of PI*x^3 + 0.4x + 1 ...... Correct." << endl;
     /*
     While we did not show any computations on complex numbers in these examples,
     the CKKSEncoder would allow us to have done that just as easily. Additions
