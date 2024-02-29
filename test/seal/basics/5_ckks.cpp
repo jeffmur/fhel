@@ -86,6 +86,7 @@ TEST(CKKS, Basics)
         input.push_back(curr_point);
         curr_point += step_size;
     }
+    print_vector(input, 5, 7);
     print_line(__LINE__);
     cout << "Evaluating polynomial PI*x^3 + 0.4x + 1 ..." << endl;
 
@@ -99,7 +100,6 @@ TEST(CKKS, Basics)
     fhe->encode_double(1.0, plain_coeff0);
 
     AsealPlaintext x_plain;
-    cout << "Encode input vectors." << endl;
     fhe->encode_double(input, x_plain);
     AsealCiphertext x1_encrypted;
     fhe->encrypt(x_plain, x1_encrypted);
@@ -168,7 +168,8 @@ TEST(CKKS, Basics)
     fhe->multiply(x1_encrypted, plain_coeff1, x1_encrypted_coeff1);
     cout << "    + Scale of 0.4*x before rescale: " << log2(x1_encrypted_coeff1.scale()) << " bits" << endl;
     fhe->rescale_to_next(x1_encrypted_coeff1);
-    cout << "    + Scale of 0.4*x after rescale: " << log2(x1_encrypted_coeff1.scale()) << " bits" << endl;
+    cout << "    + Scale of 0.4*x after rescale: " << log2(x1_encrypted_coeff1.scale()) << " bits" << endl
+         << endl;
 
     /*
     Now we would hope to compute the sum of all three terms. However, there is
@@ -179,7 +180,7 @@ TEST(CKKS, Basics)
     the same, and also that the encryption parameters (parms_id) match. If there
     is a mismatch, Evaluator will throw an exception.
     */
-    cout << endl;
+    print_line(__LINE__);
     cout << "Parameters used by all three terms are different." << endl;
     cout << "    + Modulus chain index for x3_encrypted_coeff3: "
          << fhe->get_context()->get_context_data(x3_encrypted_coeff3.parms_id())->chain_index() << endl;
@@ -207,6 +208,7 @@ TEST(CKKS, Basics)
     Although the scales of all three terms are approximately 2^40, their exact
     values are different, hence they cannot be added together.
     */
+    print_line(__LINE__);
     cout << "The exact scales of all three terms are different:" << endl;
     ios old_fmt(nullptr);
     old_fmt.copyfmt(cout);
@@ -271,6 +273,7 @@ TEST(CKKS, Basics)
     fhe->decrypt(add_one, plain_result);
     vector<double> result;
     fhe->decode_double(plain_result, result);
+    print_vector(result, 5, 7);
     expect_equal_vector(result, true_result, 0.00001);
     cout << "    + Result of PI*x^3 + 0.4x + 1 ...... Correct." << endl;
     /*
