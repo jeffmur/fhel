@@ -139,10 +139,10 @@ public:
   using seal::PublicKey::PublicKey;
   AsealPublicKey(const seal::PublicKey &pk) : seal::PublicKey(pk) {};
   ~AsealPublicKey(){};
-  ACiphertext& data() override {
-    AsealCiphertext* ctxt = new AsealCiphertext(seal::PublicKey::data());
-    return _from_ciphertext(*ctxt);
-  }
+  // ACiphertext& data() override {
+  //   AsealCiphertext* ctxt = new AsealCiphertext(seal::PublicKey::data());
+  //   return _from_ciphertext(*ctxt);
+  // }
 };
 
 // DYNAMIC CASTING
@@ -161,10 +161,10 @@ public:
   using seal::SecretKey::SecretKey;
   AsealSecretKey(const seal::SecretKey &sk) : seal::SecretKey(sk) {};
   ~AsealSecretKey(){};
-  APlaintext& data() override {
-    AsealPlaintext* ctxt = new AsealPlaintext(seal::SecretKey::data());
-    return _from_plaintext(*ctxt);
-  }
+  // APlaintext& data() override {
+  //   AsealPlaintext* ctxt = new AsealPlaintext(seal::SecretKey::data());
+  //   return _from_plaintext(*ctxt);
+  // }
 };
 
 // DYNAMIC CASTING
@@ -176,10 +176,30 @@ inline ASecretKey& _from_secret_key(AsealSecretKey& k){
 };
 
 /**
+ * @brief Abstraction for RelinKey
+*/
+class AsealRelinKey : public ARelinKey, public seal::RelinKeys {
+public:
+  using seal::RelinKeys::RelinKeys;
+  AsealRelinKey(const seal::RelinKeys &rk) : seal::RelinKeys(rk) {};
+  ~AsealRelinKey(){};
+};
+
+// DYNAMIC CASTING
+inline AsealRelinKey& _to_relin_keys(ARelinKey& k){
+  return dynamic_cast<AsealRelinKey&>(k);
+};
+inline ARelinKey& _from_relin_keys(AsealRelinKey& k){
+  return dynamic_cast<ARelinKey&>(k);
+};
+
+
+/**
  * @brief Aseal class represents a concrete implementation of the Afhe class using the Microsoft SEAL library.
  */
 class Aseal : public Afhe {
 private:
+  shared_ptr<seal::EncryptionParameters> params; /**< Pointer to the SEAL parameters object. */
   shared_ptr<seal::SEALContext> context;     /**< Pointer to the SEAL context object. */
   shared_ptr<seal::BatchEncoder> bEncoder;   /**< Pointer to the BatchEncoder object. */
   shared_ptr<seal::CKKSEncoder> cEncoder;    /**< Pointer to the CKKSEncoder object. */
@@ -243,6 +263,8 @@ public:
     return this->context;
   }
 
+  void disable_mod_switch() override;
+
   // ------------------ Keys ------------------
 
   void KeyGen() override;
@@ -255,6 +277,7 @@ public:
   void rescale_to_next(ACiphertext &ctxt) override;
   APublicKey& get_public_key() override;
   ASecretKey& get_secret_key() override;
+  ARelinKey& get_relin_keys() override;
 
   // ------------------ Cryptography ------------------
 

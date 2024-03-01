@@ -165,9 +165,8 @@ TEST(LEVELS, Basics)
     fhe->KeyGen();
     AsealPublicKey& public_key = _to_public_key(fhe->get_public_key());
     AsealSecretKey& secret_key = _to_secret_key(fhe->get_secret_key());
-    // auto secret_key = fhe->get_secret_key();
-    // fhe->RelinKeyGen();
-    // auto relin_keys = fhe->get_relin_keys();
+    fhe->RelinKeyGen();
+    AsealRelinKey& relin_keys = _to_relin_keys(fhe->get_relin_keys());
 
     print_line(__LINE__);
     cout << "Print the parameter IDs of generated elements." << endl;
@@ -183,153 +182,184 @@ TEST(LEVELS, Basics)
         cout << param << " ";
     }
     cout << endl;
-    // cout << "    + relin_keys:  " << relin_keys.parms_id() << endl;
+    cout << "    + relin_keys:  ";
+    for (const auto &param : relin_keys.parms_id())
+    {
+        cout << param << " ";
+    }
+    cout << dec << endl << endl;
 
-    // Encryptor encryptor(context, public_key);
-    // Evaluator evaluator(context);
-    // Decryptor decryptor(context, secret_key);
+    /*
+    In the BFV scheme plaintexts do not carry a parms_id, but ciphertexts do. Note
+    how the freshly encrypted ciphertext is at the highest data level.
+    */
+    AsealPlaintext plain("1x^3 + 2x^2 + 3x^1 + 4");
+    AsealCiphertext encrypted;
+    fhe->encrypt(plain, encrypted);
+    cout << "    + plain:       " << hex;
+    for (const auto &param : plain.parms_id())
+    {
+        cout << param << " ";
+    }
+    cout << " (not set in BFV)" << endl;
+    cout << "    + encrypted:   " << hex;
+    for (const auto &param : encrypted.parms_id())
+    {
+        cout << param << " ";
+    }
+    cout << dec << endl << endl;
 
-    // /*
-    // In the BFV scheme plaintexts do not carry a parms_id, but ciphertexts do. Note
-    // how the freshly encrypted ciphertext is at the highest data level.
-    // */
-    // Plaintext plain("1x^3 + 2x^2 + 3x^1 + 4");
-    // Ciphertext encrypted;
-    // encryptor.encrypt(plain, encrypted);
-    // cout << "    + plain:       " << plain.parms_id() << " (not set in BFV)" << endl;
-    // cout << "    + encrypted:   " << encrypted.parms_id() << endl << endl;
+    /*
+    `Modulus switching' is a technique of changing the ciphertext parameters down
+    in the chain. The function Evaluator::mod_switch_to_next always switches to
+    the next level down the chain, whereas Evaluator::mod_switch_to switches to
+    a parameter set down the chain corresponding to a given parms_id. However, it
+    is impossible to switch up in the chain.
+    */
+    print_line(__LINE__);
+    cout << "Perform modulus switching on encrypted and print." << endl;
+    context_data = context->first_context_data();
+    cout << "---->";
+    while (context_data->next_context_data())
+    {
+        cout << " Level (chain index): " << context_data->chain_index() << endl;
+        cout << "      parms_id of encrypted: " << hex;
+        for (const auto &param : encrypted.parms_id())
+        {
+            cout << param << " ";
+        }
+        cout << endl << dec;
+        cout << "      Noise budget at this level: " << fhe->invariant_noise_budget(encrypted) << " bits" << endl;
+        cout << "\\" << endl;
+        cout << " \\-->";
+        fhe->mod_switch_to_next(encrypted);
+        context_data = context_data->next_context_data();
+    }
+    cout << " Level (chain index): " << context_data->chain_index() << endl;
+    cout << "      parms_id of encrypted: " << hex;
+    for (const auto &param : encrypted.parms_id())
+    {
+        cout << param << " ";
+    }
+    cout << endl << dec;
+    cout << "      Noise budget at this level: " << fhe->invariant_noise_budget(encrypted) << " bits" << endl;
+    cout << "\\" << endl;
+    cout << " \\-->";
+    cout << " End of chain reached" << endl << endl;
 
-    // /*
-    // `Modulus switching' is a technique of changing the ciphertext parameters down
-    // in the chain. The function Evaluator::mod_switch_to_next always switches to
-    // the next level down the chain, whereas Evaluator::mod_switch_to switches to
-    // a parameter set down the chain corresponding to a given parms_id. However, it
-    // is impossible to switch up in the chain.
-    // */
-    // print_line(__LINE__);
-    // cout << "Perform modulus switching on encrypted and print." << endl;
-    // context_data = context.first_context_data();
-    // cout << "---->";
-    // while (context_data->next_context_data())
-    // {
-    //     cout << " Level (chain index): " << context_data->chain_index() << endl;
-    //     cout << "      parms_id of encrypted: " << encrypted.parms_id() << endl;
-    //     cout << "      Noise budget at this level: " << decryptor.invariant_noise_budget(encrypted) << " bits" << endl;
-    //     cout << "\\" << endl;
-    //     cout << " \\-->";
-    //     evaluator.mod_switch_to_next_inplace(encrypted);
-    //     context_data = context_data->next_context_data();
-    // }
-    // cout << " Level (chain index): " << context_data->chain_index() << endl;
-    // cout << "      parms_id of encrypted: " << encrypted.parms_id() << endl;
-    // cout << "      Noise budget at this level: " << decryptor.invariant_noise_budget(encrypted) << " bits" << endl;
-    // cout << "\\" << endl;
-    // cout << " \\-->";
-    // cout << " End of chain reached" << endl << endl;
+    /*
+    At this point it is hard to see any benefit in doing this: we lost a huge
+    amount of noise budget (i.e., computational power) at each switch and seemed
+    to get nothing in return. Decryption still works.
+    */
+    print_line(__LINE__);
+    cout << "Decrypt still works after modulus switching." << endl;
+    fhe->decrypt(encrypted, plain);
+    cout << "    + Decryption of encrypted: " << plain.to_string();
+    cout << " ...... Correct." << endl << endl;
 
-    // /*
-    // At this point it is hard to see any benefit in doing this: we lost a huge
-    // amount of noise budget (i.e., computational power) at each switch and seemed
-    // to get nothing in return. Decryption still works.
-    // */
-    // print_line(__LINE__);
-    // cout << "Decrypt still works after modulus switching." << endl;
-    // decryptor.decrypt(encrypted, plain);
-    // cout << "    + Decryption of encrypted: " << plain.to_string();
-    // cout << " ...... Correct." << endl << endl;
+    /*
+    However, there is a hidden benefit: the size of the ciphertext depends
+    linearly on the number of primes in the coefficient modulus. Thus, if there
+    is no need or intention to perform any further computations on a given
+    ciphertext, we might as well switch it down to the smallest (last) set of
+    parameters in the chain before sending it back to the secret key holder for
+    decryption.
 
-    // /*
-    // However, there is a hidden benefit: the size of the ciphertext depends
-    // linearly on the number of primes in the coefficient modulus. Thus, if there
-    // is no need or intention to perform any further computations on a given
-    // ciphertext, we might as well switch it down to the smallest (last) set of
-    // parameters in the chain before sending it back to the secret key holder for
-    // decryption.
+    Also the lost noise budget is actually not an issue at all, if we do things
+    right, as we will see below.
 
-    // Also the lost noise budget is actually not an issue at all, if we do things
-    // right, as we will see below.
+    First we recreate the original ciphertext and perform some computations.
+    */
+    cout << "Computation is more efficient with modulus switching." << endl;
+    print_line(__LINE__);
+    cout << "Compute the 8th power." << endl;
+    fhe->encrypt(plain, encrypted);
+    cout << "    + Noise budget fresh:                    " << fhe->invariant_noise_budget(encrypted) << " bits"
+         << endl;
+    AsealCiphertext squared;
+    fhe->multiply(encrypted, encrypted, squared);
+    fhe->relinearize(squared);
+    cout << "    + Noise budget of the 2nd power:         " << fhe->invariant_noise_budget(squared) << " bits"
+         << endl;
+    AsealCiphertext fourth_power;
+    fhe->multiply(squared, squared, fourth_power);
+    fhe->relinearize(fourth_power);
+    cout << "    + Noise budget of the 4th power:         " << fhe->invariant_noise_budget(fourth_power) << " bits"
+         << endl;
 
-    // First we recreate the original ciphertext and perform some computations.
-    // */
-    // cout << "Computation is more efficient with modulus switching." << endl;
-    // print_line(__LINE__);
-    // cout << "Compute the 8th power." << endl;
-    // encryptor.encrypt(plain, encrypted);
-    // cout << "    + Noise budget fresh:                   " << decryptor.invariant_noise_budget(encrypted) << " bits"
-    //      << endl;
-    // evaluator.square_inplace(encrypted);
-    // evaluator.relinearize_inplace(encrypted, relin_keys);
-    // cout << "    + Noise budget of the 2nd power:         " << decryptor.invariant_noise_budget(encrypted) << " bits"
-    //      << endl;
-    // evaluator.square_inplace(encrypted);
-    // evaluator.relinearize_inplace(encrypted, relin_keys);
-    // cout << "    + Noise budget of the 4th power:         " << decryptor.invariant_noise_budget(encrypted) << " bits"
-    //      << endl;
+    /*
+    Surprisingly, in this case modulus switching has no effect at all on the
+    noise budget.
+    */
+    fhe->mod_switch_to_next(fourth_power);
+    cout << "    + Noise budget after modulus switching:  " << fhe->invariant_noise_budget(fourth_power) << " bits"
+         << endl;
+    /*
+    This means that there is no harm at all in dropping some of the coefficient
+    modulus after doing enough computations. In some cases one might want to
+    switch to a lower level slightly earlier, actually sacrificing some of the
+    noise budget in the process, to gain computational performance from having
+    smaller parameters. We see from the print-out that the next modulus switch
+    should be done ideally when the noise budget is down to around 25 bits.
+    */
+    AsealCiphertext eighth_power;
+    fhe->multiply(fourth_power, fourth_power, eighth_power);
+    fhe->relinearize(encrypted);
+    cout << "    + Noise budget of the 8th power:         " << fhe->invariant_noise_budget(eighth_power) << " bits"
+         << endl;
+    fhe->mod_switch_to_next(eighth_power);
+    cout << "    + Noise budget after modulus switching:  " << fhe->invariant_noise_budget(eighth_power) << " bits"
+         << endl;
 
-    // /*
-    // Surprisingly, in this case modulus switching has no effect at all on the
-    // noise budget.
-    // */
-    // evaluator.mod_switch_to_next_inplace(encrypted);
-    // cout << "    + Noise budget after modulus switching:  " << decryptor.invariant_noise_budget(encrypted) << " bits"
-    //      << endl;
-    // /*
-    // This means that there is no harm at all in dropping some of the coefficient
-    // modulus after doing enough computations. In some cases one might want to
-    // switch to a lower level slightly earlier, actually sacrificing some of the
-    // noise budget in the process, to gain computational performance from having
-    // smaller parameters. We see from the print-out that the next modulus switch
-    // should be done ideally when the noise budget is down to around 25 bits.
-    // */
-    // evaluator.square_inplace(encrypted);
-    // evaluator.relinearize_inplace(encrypted, relin_keys);
-    // cout << "    + Noise budget of the 8th power:         " << decryptor.invariant_noise_budget(encrypted) << " bits"
-    //      << endl;
-    // evaluator.mod_switch_to_next_inplace(encrypted);
-    // cout << "    + Noise budget after modulus switching:  " << decryptor.invariant_noise_budget(encrypted) << " bits"
-    //      << endl;
+    /*
+    At this point the ciphertext still decrypts correctly, has very small size,
+    and the computation was as efficient as possible. Note that the decryptor
+    can be used to decrypt a ciphertext at any level in the modulus switching
+    chain.
+    */
+    fhe->decrypt(encrypted, plain);
+    cout << "    + Decryption of the 8th power (hexadecimal) ...... Correct." << endl;
+    cout << "    " << plain.to_string() << endl << endl;
 
-    // /*
-    // At this point the ciphertext still decrypts correctly, has very small size,
-    // and the computation was as efficient as possible. Note that the decryptor
-    // can be used to decrypt a ciphertext at any level in the modulus switching
-    // chain.
-    // */
-    // decryptor.decrypt(encrypted, plain);
-    // cout << "    + Decryption of the 8th power (hexadecimal) ...... Correct." << endl;
-    // cout << "    " << plain.to_string() << endl << endl;
+    /*
+    In BFV modulus switching is not necessary and in some cases the user might
+    not want to create the modulus switching chain, except for the highest two
+    levels. This can be done by passing a bool `false' to SEALContext constructor.
+    */
+    print_line(__LINE__);
+    cout << "Disable modulus switching chain." << endl;
+    fhe->disable_mod_switch();
+    context = fhe->get_context();
 
-    // /*
-    // In BFV modulus switching is not necessary and in some cases the user might
-    // not want to create the modulus switching chain, except for the highest two
-    // levels. This can be done by passing a bool `false' to SEALContext constructor.
-    // */
-    // context = SEALContext(parms, false);
-
-    // /*
-    // We can check that indeed the modulus switching chain has been created only
-    // for the highest two levels (key level and highest data level). The following
-    // loop should execute only once.
-    // */
-    // cout << "Optionally disable modulus switching chain expansion." << endl;
-    // print_line(__LINE__);
-    // cout << "Print the modulus switching chain." << endl;
-    // cout << "---->";
-    // for (context_data = context.key_context_data(); context_data; context_data = context_data->next_context_data())
-    // {
-    //     cout << " Level (chain index): " << context_data->chain_index() << endl;
-    //     cout << "      parms_id: " << context_data->parms_id() << endl;
-    //     cout << "      coeff_modulus primes: ";
-    //     cout << hex;
-    //     for (const auto &prime : context_data->parms().coeff_modulus())
-    //     {
-    //         cout << prime.value() << " ";
-    //     }
-    //     cout << dec << endl;
-    //     cout << "\\" << endl;
-    //     cout << " \\-->";
-    // }
-    // cout << " End of chain reached" << endl << endl;
+    /*
+    We can check that indeed the modulus switching chain has been created only
+    for the highest two levels (key level and highest data level). The following
+    loop should execute only once.
+    */
+    cout << "Optionally disable modulus switching chain expansion." << endl;
+    print_line(__LINE__);
+    cout << "Print the modulus switching chain." << endl;
+    cout << "---->";
+    for (context_data = context->key_context_data(); context_data; context_data = context_data->next_context_data())
+    {
+        cout << " Level (chain index): " << context_data->chain_index() << endl;
+        cout << "      parms_id: " << hex;
+        for (const auto &param : context_data->parms_id())
+        {
+            cout << param << " ";
+        }
+        cout << endl;
+        cout << "      coeff_modulus primes: ";
+        for (const auto &prime : context_data->parms().coeff_modulus())
+        {
+            cout << prime.value() << " ";
+        }
+        cout << dec << endl;
+        cout << "\\" << endl;
+        cout << " \\-->";
+    }
+    cout << " End of chain reached" << endl << endl;
 
     /*
     It is very important to understand how this example works since in the BGV

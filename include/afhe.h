@@ -72,7 +72,7 @@ public:
 class APublicKey {
 public:
   virtual ~APublicKey() = default;
-  virtual ACiphertext& data() = 0;
+  // virtual ACiphertext& data() = 0;
   // virtual TODO param_id() = 0;
 };
 
@@ -82,7 +82,14 @@ public:
 class ASecretKey {
 public:
   virtual ~ASecretKey() = default;
-  virtual APlaintext& data() = 0;
+  // virtual APlaintext& data() = 0;
+  // virtual TODO param_id() = 0;
+};
+
+class ARelinKey {
+public:
+  virtual ~ARelinKey() = default;
+  // virtual ACiphertext& data() = 0;
   // virtual TODO param_id() = 0;
 };
 
@@ -123,6 +130,8 @@ public:
     uint64_t plain_modulus_bit_size, uint64_t plain_modulus,
     int sec_level, vector<int> qi_sizes = {}) = 0;
 
+  virtual void disable_mod_switch() = 0;
+
   // virtual vector<uint64_t> get_qi() = 0;
   // virtual uint64_t get_plain_modulus() = 0;
   // virtual size_t get_poly_modulus_degree() = 0;
@@ -149,6 +158,11 @@ public:
    * @brief Returns the secret key.
   */
   virtual ASecretKey& get_secret_key() = 0;
+
+  /**
+   * @brief Returns the relinearization keys.
+  */
+  virtual ARelinKey& get_relin_keys() = 0;
 
   /**
    * @brief Generates a public and private key pair; derived from the private key.
