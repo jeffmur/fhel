@@ -263,6 +263,10 @@ public:
     return this->context;
   }
 
+  /**
+   * @brief Replaces the existing SEALContext with a new one,
+   * with the same parameters, however disables mod switching.
+  */
   void disable_mod_switch() override;
 
   // ------------------ Keys ------------------

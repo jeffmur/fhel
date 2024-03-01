@@ -130,6 +130,9 @@ public:
     uint64_t plain_modulus_bit_size, uint64_t plain_modulus,
     int sec_level, vector<int> qi_sizes = {}) = 0;
 
+  /**
+   * @brief Disables the modulus switching chain
+  */
   virtual void disable_mod_switch() = 0;
 
   // virtual vector<uint64_t> get_qi() = 0;
