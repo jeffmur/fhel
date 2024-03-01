@@ -45,6 +45,47 @@ enum scheme : int
   bgv = 3,  /* Brakerski-Gentry-Vaikuntanathan */
 };
 
+// ------------------ Abstractions ------------------
+/**
+ * @brief Abstraction for Plaintexts.
+ */
+class APlaintext {
+public:
+  virtual ~APlaintext() = default;
+  virtual string to_string() = 0;
+};
+
+/**
+ * @brief Abstraction for Ciphertexts.
+ */
+class ACiphertext{
+public:
+  virtual ~ACiphertext() = default;
+  virtual size_t size() = 0;
+  virtual double scale() = 0;
+  virtual void set_scale(double scale) = 0;
+};
+
+/**
+ * @brief Abstraction for public keys.
+*/
+class APublicKey {
+public:
+  virtual ~APublicKey() = default;
+  virtual ACiphertext& data() = 0;
+  // virtual TODO param_id() = 0;
+};
+
+/**
+ * @brief Abstraction for secret keys.
+*/
+class ASecretKey {
+public:
+  virtual ~ASecretKey() = default;
+  virtual APlaintext& data() = 0;
+  // virtual TODO param_id() = 0;
+};
+
 /**
  * @class Afhe
  * @brief The Afhe class represents a Fully Homomorphic Encryption (FHE) scheme.
@@ -98,6 +139,16 @@ public:
    * @brief Generates a public and private key pair.
   */
   virtual void KeyGen() = 0;
+
+  /**
+   * @brief Returns the public key.
+  */
+  virtual APublicKey& get_public_key() = 0;
+
+  /**
+   * @brief Returns the secret key.
+  */
+  virtual ASecretKey& get_secret_key() = 0;
 
   /**
    * @brief Generates a public and private key pair; derived from the private key.
@@ -312,26 +363,6 @@ public:
    * This function performs the multiplication operation on a ciphertext and a plaintext and stores the result in a ciphertext.
   */
   virtual void multiply(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) = 0;
-};
-
-/**
- * @brief Abstraction for Plaintexts.
- */
-class APlaintext {
-public:
-  virtual ~APlaintext() = default;
-  virtual string to_string() = 0;
-};
-
-/**
- * @brief Abstraction for Ciphertexts.
- */
-class ACiphertext{
-public:
-  virtual ~ACiphertext() = default;
-  virtual size_t size() = 0;
-  virtual double scale() = 0;
-  virtual void set_scale(double scale) = 0;
 };
 
 #endif /* AFHE_H */

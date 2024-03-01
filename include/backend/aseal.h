@@ -90,6 +90,7 @@ class AsealPlaintext : public APlaintext, public seal::Plaintext {
 public:
   // Inherit constructors
   using seal::Plaintext::Plaintext;
+  AsealPlaintext(const seal::Plaintext &ptxt) : seal::Plaintext(ptxt) {};
   string to_string() override {
     return seal::Plaintext::to_string();
   }
@@ -99,6 +100,9 @@ public:
 inline AsealPlaintext& _to_plaintext(APlaintext& p){
   return dynamic_cast<AsealPlaintext&>(p);
 };
+inline APlaintext& _from_plaintext(AsealPlaintext& p){
+  return dynamic_cast<APlaintext&>(p);
+};
 
 /**
  * @brief Abstraction for Ciphertext
@@ -106,6 +110,7 @@ inline AsealPlaintext& _to_plaintext(APlaintext& p){
 class AsealCiphertext : public ACiphertext, public seal::Ciphertext {
 public:
   using seal::Ciphertext::Ciphertext;
+  AsealCiphertext(const seal::Ciphertext &ctxt) : seal::Ciphertext(ctxt) {};
   ~AsealCiphertext(){};
   size_t size() override {
     return seal::Ciphertext::size();
@@ -121,6 +126,53 @@ public:
 // DYNAMIC CASTING
 inline AsealCiphertext& _to_ciphertext(ACiphertext& c){
   return dynamic_cast<AsealCiphertext&>(c);
+};
+inline ACiphertext& _from_ciphertext(AsealCiphertext& c){
+  return dynamic_cast<ACiphertext&>(c);
+};
+
+/**
+ * @brief Abstraction for PublicKey
+*/
+class AsealPublicKey : public APublicKey, public seal::PublicKey {
+public:
+  using seal::PublicKey::PublicKey;
+  AsealPublicKey(const seal::PublicKey &pk) : seal::PublicKey(pk) {};
+  ~AsealPublicKey(){};
+  ACiphertext& data() override {
+    AsealCiphertext* ctxt = new AsealCiphertext(seal::PublicKey::data());
+    return _from_ciphertext(*ctxt);
+  }
+};
+
+// DYNAMIC CASTING
+inline AsealPublicKey& _to_public_key(APublicKey& k){
+  return dynamic_cast<AsealPublicKey&>(k);
+};
+inline APublicKey& _from_public_key(AsealPublicKey& k){
+  return dynamic_cast<APublicKey&>(k);
+};
+
+/**
+ * @brief Abstraction for SecretKey
+*/
+class AsealSecretKey : public ASecretKey, public seal::SecretKey {
+public:
+  using seal::SecretKey::SecretKey;
+  AsealSecretKey(const seal::SecretKey &sk) : seal::SecretKey(sk) {};
+  ~AsealSecretKey(){};
+  APlaintext& data() override {
+    AsealPlaintext* ctxt = new AsealPlaintext(seal::SecretKey::data());
+    return _from_plaintext(*ctxt);
+  }
+};
+
+// DYNAMIC CASTING
+inline AsealSecretKey& _to_secret_key(ASecretKey& k){
+  return dynamic_cast<AsealSecretKey&>(k);
+};
+inline ASecretKey& _from_secret_key(AsealSecretKey& k){
+  return dynamic_cast<ASecretKey&>(k);
 };
 
 /**
@@ -201,11 +253,8 @@ public:
   void mod_switch_to_next(APlaintext &ptxt) override;
   void mod_switch_to_next(ACiphertext &ctxt) override;
   void rescale_to_next(ACiphertext &ctxt) override;
-  // string get_secret_key() override;
-  // string get_public_key() override;
-
-  void setPublicKey(seal::PublicKey &pubKey) { this->publicKey = make_shared<seal::PublicKey>(pubKey); }
-  void setSecretKey(seal::SecretKey &secKey) { this->secretKey = make_shared<seal::SecretKey>(secKey); }
+  APublicKey& get_public_key() override;
+  ASecretKey& get_secret_key() override;
 
   // ------------------ Cryptography ------------------
 

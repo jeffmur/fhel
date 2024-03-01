@@ -122,6 +122,18 @@ void Aseal::KeyGen()
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
 }
 
+APublicKey& Aseal::get_public_key()
+{
+  AsealPublicKey* publicKey = new AsealPublicKey(*this->publicKey);
+  return _from_public_key(*publicKey);
+}
+
+ASecretKey& Aseal::get_secret_key()
+{
+  AsealSecretKey* secretKey = new AsealSecretKey(*this->secretKey);
+  return _from_secret_key(*secretKey);
+}
+
 void Aseal::RelinKeyGen()
 {
   // Gather current context, resolves object
