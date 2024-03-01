@@ -338,8 +338,6 @@ TEST(LEVELS, Basics)
     loop should execute only once.
     */
     cout << "Optionally disable modulus switching chain expansion." << endl;
-    print_line(__LINE__);
-    cout << "Print the modulus switching chain." << endl;
     cout << "---->";
     for (context_data = context->key_context_data(); context_data; context_data = context_data->next_context_data())
     {

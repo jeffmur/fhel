@@ -86,10 +86,10 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
     # SEAL Basics
     add_executable(
         seal_basics
-        # test/seal/basics/1_bfv.cpp
+        test/seal/basics/1_bfv.cpp
         test/seal/basics/3_levels.cpp
-        # test/seal/basics/4_bgv.cpp
-        # test/seal/basics/5_ckks.cpp
+        test/seal/basics/4_bgv.cpp
+        test/seal/basics/5_ckks.cpp
     )
     include_directories(test/seal/basics)
     target_link_libraries(
