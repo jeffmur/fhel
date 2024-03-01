@@ -1,6 +1,6 @@
 #include "basics.h"
 
-TEST(BGV, Basics)
+TEST(Basics, BGV)
 {
      /*
      As an example, we evaluate the degree 8 polynomial

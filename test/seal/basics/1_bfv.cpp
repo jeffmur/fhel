@@ -1,6 +1,6 @@
 #include "basics.h"
 
-TEST(BFV, Basics)
+TEST(Basics, BFV)
 {
     /*
     In this example, we demonstrate performing simple computations (a polynomial

@@ -1,6 +1,6 @@
 #include "basics.h"
 
-TEST(LEVELS, Basics)
+TEST(Basics, Levels)
 {
     /*
     In this examples we describe the concept of `levels' in BFV and CKKS and the
@@ -256,6 +256,7 @@ TEST(LEVELS, Basics)
     cout << "Decrypt still works after modulus switching." << endl;
     fhe->decrypt(encrypted, plain);
     cout << "    + Decryption of encrypted: " << plain.to_string();
+    EXPECT_STREQ(plain.to_string().c_str(), "1x^3 + 2x^2 + 3x^1 + 4");
     cout << " ...... Correct." << endl << endl;
 
     /*
@@ -318,10 +319,11 @@ TEST(LEVELS, Basics)
     can be used to decrypt a ciphertext at any level in the modulus switching
     chain.
     */
-    fhe->decrypt(encrypted, plain);
-    cout << "    + Decryption of the 8th power (hexadecimal) ...... Correct." << endl;
-    cout << "    " << plain.to_string() << endl << endl;
-
+    fhe->decrypt(eighth_power, plain);
+    cout << "    + Decryption of the 8th power (hexadecimal)" << endl;
+    cout << "    " << plain.to_string();
+    EXPECT_STREQ(plain.to_string().c_str(), "1x^24 + 10x^23 + 88x^22 + 330x^21 + EFCx^20 + 3A30x^19 + C0B8x^18 + 22BB0x^17 + 58666x^16 + C88D0x^15 + 9C377x^14 + F4C0Ex^13 + E8B38x^12 + 5EE89x^11 + F8BFFx^10 + 30304x^9 + 5B9D4x^8 + 12653x^7 + 4DFB5x^6 + 879F8x^5 + 825FBx^4 + F1FFEx^3 + 3FFFFx^2 + 60000x^1 + 10000");
+    cout << " ...... Correct." << endl << endl;
     /*
     In BFV modulus switching is not necessary and in some cases the user might
     not want to create the modulus switching chain, except for the highest two

@@ -1,6 +1,6 @@
 #include "basics.h"
 
-TEST(CKKS, Basics)
+TEST(Basics, CKKS)
 {
     /*
     In this example we demonstrate evaluating a polynomial function
