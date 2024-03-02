@@ -67,6 +67,7 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
         test/seal/subtraction.cpp
         test/seal/multiplication.cpp
         test/seal/relinearization.cpp
+        test/seal/exchange.cpp
         test/seal/basics/1_bfv.cpp
         test/seal/basics/3_levels.cpp
         test/seal/basics/4_bgv.cpp

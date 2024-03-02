@@ -139,6 +139,9 @@ public:
   using seal::PublicKey::PublicKey;
   AsealPublicKey(const seal::PublicKey &pk) : seal::PublicKey(pk) {};
   ~AsealPublicKey(){};
+  seal::PublicKey to_seal() {
+    return seal::PublicKey();
+  }
   // ACiphertext& data() override {
   //   AsealCiphertext* ctxt = new AsealCiphertext(seal::PublicKey::data());
   //   return _from_ciphertext(*ctxt);
@@ -161,6 +164,9 @@ public:
   using seal::SecretKey::SecretKey;
   AsealSecretKey(const seal::SecretKey &sk) : seal::SecretKey(sk) {};
   ~AsealSecretKey(){};
+  seal::SecretKey to_seal() {
+    return seal::SecretKey();
+  }
   // APlaintext& data() override {
   //   AsealPlaintext* ctxt = new AsealPlaintext(seal::SecretKey::data());
   //   return _from_plaintext(*ctxt);
@@ -251,6 +257,13 @@ public:
     uint64_t plain_modulus_bit_size = 0, uint64_t plain_modulus = 0,
     int sec_level = 128, vector<int> qi_sizes = {}) override;
 
+  string ContextGen(string params);
+
+  void set_encoders();
+
+  string save_parameters() override;
+  void load_parameters(string &params) override;
+
   /**
    * @return A pointer to the SEAL context object.
    * @throws std::logic_error if the context is not initialized.
@@ -270,7 +283,7 @@ public:
   void disable_mod_switch() override;
 
   // ------------------ Keys ------------------
-
+  void KeyGen(ASecretKey &sec);
   void KeyGen() override;
   void RelinKeyGen() override;
   void relinearize(ACiphertext &ctxt) override;

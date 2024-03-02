@@ -131,19 +131,19 @@ public:
     int sec_level, vector<int> qi_sizes = {}) = 0;
 
   /**
+   * @brief Returns the parameters, used for re-generating the context.
+  */
+  virtual string save_parameters() = 0;
+
+  /**
+   * @brief Loads the parameters, used for re-generating the context.
+  */
+  virtual void load_parameters(string &params) = 0;
+
+  /**
    * @brief Disables the modulus switching chain
   */
   virtual void disable_mod_switch() = 0;
-
-  // virtual vector<uint64_t> get_qi() = 0;
-  // virtual uint64_t get_plain_modulus() = 0;
-  // virtual size_t get_poly_modulus_degree() = 0;
-  // virtual scheme_t get_scheme() = 0;
-
-  // ------------------ Sizes ------------------
-  // virtual size_t sizeof_context(std::string &compr_mode) = 0;
-  // virtual size_t sizeof_plaintext(std::string &compr_mode, APlainTxt &pt) = 0;
-  // virtual size_t sizeof_ciphertext(std::string &compr_mode, ACipherTxt &ct) = 0;
 
   // ------------------ Cryptography ------------------
 
@@ -221,9 +221,6 @@ public:
    * @param ctxt The ciphertext to be rescaled, inplace.
   */
   virtual void rescale_to_next(ACiphertext &ctxt) = 0;
-
-  // virtual string get_secret_key() = 0;
-  // virtual string get_public_key() = 0;
 
   /**
    * @brief Encrypts a plaintext message into a ciphertext.

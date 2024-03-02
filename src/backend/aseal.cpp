@@ -80,15 +80,11 @@ string Aseal::ContextGen(scheme scheme,
   // Initialize Encoder object
   if(this->context->parameters_set() && plain_modulus_bit_size > 0)
   {
-    if (scheme == scheme::bfv || scheme == scheme::bgv)
-    {
-      this->bEncoder = make_shared<BatchEncoder>(*this->context);
-    }
-    else if (scheme == scheme::ckks)
-    {
-      this->cEncoder = make_shared<CKKSEncoder>(*this->context);
-    }
+    set_encoders();
   }
+  params->set_random_generator(
+    seal::UniformRandomGeneratorFactory::DefaultFactory()
+  );
 
   // Return info about parameter validity.
   //    - 'success: valid' if everything went well
@@ -99,6 +95,82 @@ string Aseal::ContextGen(scheme scheme,
   catch (invalid_argument &e) {
     return string("invalid_argument: ") + e.what();
   }
+}
+
+string Aseal::ContextGen(string parms)
+{
+  // Initialize parameters with scheme
+  this->params = make_shared<EncryptionParameters>();
+
+  // Load parameters from string
+  istringstream ss(parms);
+  this->params->load(ss);
+
+  // Validate parameters by putting them inside a SEALContext
+  this->context = make_shared<SEALContext>(*this->params, true);
+
+  // Initialize Encoder object
+  // if(this->context->parameters_set())
+  // {
+  //   set_encoders();
+  // }
+
+  // Return info about parameter validity.
+  //    - 'success: valid' if everything went well
+  //    - Error name and message from list in seal/context/context.cpp otherwise
+  return string(this->context->parameter_error_name())  + ": " +
+                this->context->parameter_error_message();
+}
+
+void Aseal::set_encoders()
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+  const auto &context_data = context->key_context_data();
+  const auto &scheme = context_data->parms().scheme();
+
+  if (scheme == scheme_type::bfv || scheme == scheme_type::bgv)
+  {
+    // Initialize BatchEncoder object
+    this->bEncoder = make_shared<BatchEncoder>(seal_context);
+  }
+  else if (scheme == scheme_type::ckks)
+  {
+    // Initialize CKKSEncoder object
+    this->cEncoder = make_shared<CKKSEncoder>(seal_context);
+  }
+  else {
+    throw logic_error("Scheme is not set");
+  }
+}
+
+string Aseal::save_parameters()
+{
+  // Share as a string
+  ostringstream ss;
+
+  if (this->params == nullptr)
+  {
+    throw logic_error("Parameters are not initialized");
+  }
+
+  // Save parameters to stringstream
+  this->params->save(ss);
+
+  // Return stringstream as string
+  return ss.str();
+}
+
+void Aseal::load_parameters(string &params)
+{
+  // Initialize parameters with scheme
+  this->params = make_shared<EncryptionParameters>();
+
+  // Load parameters from string
+  istringstream ss(params);
+  this->params->load(ss);
+
+  // this->context = make_shared<SEALContext>(*this->params, true);
 }
 
 void Aseal::disable_mod_switch()
@@ -114,6 +186,27 @@ void Aseal::KeyGen()
 
   // Initialize KeyGen object
   this->keyGenObj = make_shared<KeyGenerator>(seal_context);
+
+  // Initialize empty PublicKey object
+  this->publicKey = make_shared<PublicKey>();
+
+  // Derive Key Pair
+  keyGenObj->create_public_key(*this->publicKey);
+
+  // Assign Secret Key
+  this->secretKey = make_shared<SecretKey>(keyGenObj->secret_key());
+
+  // Refresh Encryptor, Evaluator, and Decryptor objects
+  this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
+}
+
+void Aseal::KeyGen(ASecretKey &sec)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *(this->get_context());
+
+  // Initialize KeyGen object
+  this->keyGenObj = make_shared<KeyGenerator>(seal_context, _to_secret_key(sec));
 
   // Initialize empty PublicKey object
   this->publicKey = make_shared<PublicKey>();
