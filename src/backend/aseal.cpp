@@ -25,7 +25,7 @@ string Aseal::ContextGen(scheme scheme,
                          vector<int> bit_sizes)
 { try {
   // Initialize parameters with scheme
-  EncryptionParameters param(scheme_map_to_seal.at(scheme));
+  this->params = make_shared<EncryptionParameters>(scheme_map_to_seal.at(scheme));
 
   /*
    * BGV encodes plaintext with “least significant bits”
@@ -34,10 +34,10 @@ string Aseal::ContextGen(scheme scheme,
   if (scheme == scheme::bfv || scheme == scheme::bgv)
   {
     // Set polynomial modulus degree
-    param.set_poly_modulus_degree(poly_modulus_degree);
+    this->params->set_poly_modulus_degree(poly_modulus_degree);
 
     // Set coefficient modulus
-    param.set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
+    this->params->set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
 
     /**
      * When plain_modulus_bit_size is set, batching is enabled, plain_modulus is not used
@@ -45,17 +45,17 @@ string Aseal::ContextGen(scheme scheme,
     */
     if (plain_modulus_bit_size > 0)
     {
-      param.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, plain_modulus_bit_size));
+      this->params->set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, plain_modulus_bit_size));
     }
     else
     {
-      param.set_plain_modulus(plain_modulus);
+      this->params->set_plain_modulus(plain_modulus);
     }
   }
   else if (scheme == scheme::ckks)
   {
     // Set polynomial modulus degree
-    param.set_poly_modulus_degree(poly_modulus_degree);
+    this->params->set_poly_modulus_degree(poly_modulus_degree);
 
     if (bit_sizes.size() == 0)
     {
@@ -68,14 +68,14 @@ string Aseal::ContextGen(scheme scheme,
     }
 
     // Set coefficient modulus
-    param.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, bit_sizes));
+    this->params->set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, bit_sizes));
 
     // Set CKKS Encoder scale
     this->cEncoderScale = plain_modulus_bit_size; //pow(2.0, plain_modulus_bit_size);
   }
 
   // Validate parameters by putting them inside a SEALContext
-  this->context = make_shared<SEALContext>(param, true, sec_map[sec_level]);
+  this->context = make_shared<SEALContext>(*this->params, true, sec_map[sec_level]);
 
   // Initialize Encoder object
   if(this->context->parameters_set() && plain_modulus_bit_size > 0)
@@ -101,6 +101,12 @@ string Aseal::ContextGen(scheme scheme,
   }
 }
 
+void Aseal::disable_mod_switch()
+{
+  // Update existing context with same parameters
+  this->context = make_shared<SEALContext>(*this->params, false);
+}
+
 void Aseal::KeyGen()
 {
   // Gather current context, resolves object
@@ -120,6 +126,23 @@ void Aseal::KeyGen()
 
   // Refresh Encryptor, Evaluator, and Decryptor objects
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
+}
+
+APublicKey& Aseal::get_public_key()
+{
+  AsealPublicKey* publicKey = new AsealPublicKey(*this->publicKey);
+  return _from_public_key(*publicKey);
+}
+
+ASecretKey& Aseal::get_secret_key()
+{
+  AsealSecretKey* secretKey = new AsealSecretKey(*this->secretKey);
+  return _from_secret_key(*secretKey);
+}
+
+ARelinKey& Aseal::get_relin_keys(){
+  AsealRelinKey* relinKeys = new AsealRelinKey(*this->relinKeys);
+  return _from_relin_keys(*relinKeys);
 }
 
 void Aseal::RelinKeyGen()
