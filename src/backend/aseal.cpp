@@ -82,9 +82,6 @@ string Aseal::ContextGen(scheme scheme,
   {
     set_encoders();
   }
-  params->set_random_generator(
-    seal::UniformRandomGeneratorFactory::DefaultFactory()
-  );
 
   // Return info about parameter validity.
   //    - 'success: valid' if everything went well
@@ -110,10 +107,10 @@ string Aseal::ContextGen(string parms)
   this->context = make_shared<SEALContext>(*this->params, true);
 
   // Initialize Encoder object
-  // if(this->context->parameters_set())
-  // {
-  //   set_encoders();
-  // }
+  if(this->context->parameters_set())
+  {
+    set_encoders(true);
+  }
 
   // Return info about parameter validity.
   //    - 'success: valid' if everything went well
@@ -122,17 +119,25 @@ string Aseal::ContextGen(string parms)
                 this->context->parameter_error_message();
 }
 
-void Aseal::set_encoders()
+void Aseal::set_encoders(bool ignore_exception)
 {
-  // Gather current context, resolves object
+  // Gather current context and scheme.
   auto &seal_context = *(this->get_context());
   const auto &context_data = context->key_context_data();
   const auto &scheme = context_data->parms().scheme();
 
   if (scheme == scheme_type::bfv || scheme == scheme_type::bgv)
   {
-    // Initialize BatchEncoder object
-    this->bEncoder = make_shared<BatchEncoder>(seal_context);
+    try {
+      // Initialize BatchEncoder object
+      this->bEncoder = make_shared<BatchEncoder>(seal_context);
+    }
+    // Skip assignment, as parameters are not setup for batching
+    catch (invalid_argument &e) {
+      if (!ignore_exception) {
+        throw e;
+      }
+    }
   }
   else if (scheme == scheme_type::ckks)
   {
@@ -140,7 +145,9 @@ void Aseal::set_encoders()
     this->cEncoder = make_shared<CKKSEncoder>(seal_context);
   }
   else {
-    throw logic_error("Scheme is not set");
+    if (!ignore_exception) {
+        throw logic_error("Scheme is not set");;
+      }
   }
 }
 
@@ -151,7 +158,7 @@ string Aseal::save_parameters()
 
   if (this->params == nullptr)
   {
-    throw logic_error("Parameters are not initialized");
+    throw logic_error("Parameters are not set, cannot save them.");
   }
 
   // Save parameters to stringstream
@@ -169,8 +176,6 @@ void Aseal::load_parameters(string &params)
   // Load parameters from string
   istringstream ss(params);
   this->params->load(ss);
-
-  // this->context = make_shared<SEALContext>(*this->params, true);
 }
 
 void Aseal::disable_mod_switch()

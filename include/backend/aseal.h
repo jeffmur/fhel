@@ -205,11 +205,11 @@ inline ARelinKey& _from_relin_keys(AsealRelinKey& k){
  */
 class Aseal : public Afhe {
 private:
-  shared_ptr<seal::EncryptionParameters> params; /**< Pointer to the SEAL parameters object. */
-  shared_ptr<seal::SEALContext> context;     /**< Pointer to the SEAL context object. */
-  shared_ptr<seal::BatchEncoder> bEncoder;   /**< Pointer to the BatchEncoder object. */
-  shared_ptr<seal::CKKSEncoder> cEncoder;    /**< Pointer to the CKKSEncoder object. */
-  double cEncoderScale;                      /**< Scale for CKKSEncoder. */
+  shared_ptr<seal::EncryptionParameters> params; /** Pointer to the SEAL parameters object. */
+  shared_ptr<seal::SEALContext> context;     /** Pointer to the SEAL context object. */
+  shared_ptr<seal::BatchEncoder> bEncoder;   /** Pointer to the BatchEncoder object. */
+  shared_ptr<seal::CKKSEncoder> cEncoder;    /** Pointer to the CKKSEncoder object. */
+  double cEncoderScale;                      /** Scale for CKKSEncoder. */
   shared_ptr<seal::KeyGenerator> keyGenObj;  /** Key generator.*/
   shared_ptr<seal::SecretKey> secretKey;     /** Secret key.*/
   shared_ptr<seal::PublicKey> publicKey;     /** Public key.*/
@@ -259,9 +259,23 @@ public:
 
   string ContextGen(string params);
 
-  void set_encoders();
+  /**
+   * @brief Assign Encoders used for encoding and decoding.
+   * @param ignore_exception If true, ignore exceptions.
+   * 
+   * We may want to ignore exceptions if we are setting the encoders without
+   * access to the original parameters.
+  */
+  void set_encoders(bool ignore_exception=false);
 
+  /**
+   * @brief Represent SEALContext parameters as a string.
+  */
   string save_parameters() override;
+
+  /**
+   * @brief Load SEALContext parameters from a string.
+  */
   void load_parameters(string &params) override;
 
   /**
