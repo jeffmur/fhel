@@ -70,6 +70,15 @@ static map<int, seal::sec_level_type> sec_map {
 };
 
 /**
+ * @brief Serialization Compression Modes
+*/
+static map<string,seal::compr_mode_type> compression_mode_map {
+    {"none", seal::compr_mode_type::none},
+    {"zlib", seal::compr_mode_type::zlib},
+    {"zstd", seal::compr_mode_type::zstd},
+};
+
+/**
  * @brief Convert uint_64 to hexademical string.
 */
 inline string uint64_to_hex(uint64_t value) {
@@ -257,7 +266,7 @@ public:
     uint64_t plain_modulus_bit_size = 0, uint64_t plain_modulus = 0,
     int sec_level = 128, vector<int> qi_sizes = {}) override;
 
-  string ContextGen(string params);
+  string ContextGen(string params) override;
 
   /**
    * @brief Assign Encoders used for encoding and decoding.
@@ -271,12 +280,15 @@ public:
   /**
    * @brief Represent SEALContext parameters as a string.
   */
-  string save_parameters() override;
+  string save_parameters(string compression_mode="none") override;
+  int save_parameters_size(string compression_mode="none") override;
+  void save_parameters_inplace(byte* buffer, int size, string compression_mode="none");
+  void load_parameters_inplace(const byte* buffer, int size);
 
   /**
    * @brief Load SEALContext parameters from a string.
   */
-  void load_parameters(string &params) override;
+  // void load_parameters(string &params) override;
 
   /**
    * @return A pointer to the SEAL context object.

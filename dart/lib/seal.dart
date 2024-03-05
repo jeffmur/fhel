@@ -11,6 +11,8 @@ class Seal extends Afhe {
   /// Instanciates SEAL [Backend] with [Scheme]
   Seal(String scheme) : super('seal', scheme);
 
+  Seal.noScheme() : super.noScheme('seal');
+
   /// Generate a [Plaintext] object from a string.
   Plaintext plain(String value) => Plaintext.withValue(backend, value);
 

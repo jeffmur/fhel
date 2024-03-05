@@ -1,5 +1,12 @@
 #include "fhe.h"
 
+// Important: Must copy string to char* to avoid memory leak
+const char* to_char(string str) {
+    char *cpy = new char[str.size()+1] ;
+    strcpy(cpy, str.c_str());
+    return cpy;
+}
+
 const char* check_for_error() {
     ErrorTranslator& et = ErrorTranslator::getInstance();
     // cout << "check_for_error: " << et.get_error() << endl;
@@ -47,12 +54,60 @@ const char* generate_context(Afhe* afhe, scheme_t scheme_type, uint64_t poly_mod
         scheme a_scheme = scheme_t_map_scheme.at(scheme_type);
         vector<int> qi_sizes_vec(qi_sizes, qi_sizes + qi_sizes_length);
         string ctx = afhe->ContextGen(a_scheme, poly_mod_degree, pt_mod_bit, pt_mod, sec_level, qi_sizes_vec);
-        // !Important: Must copy string to char* to avoid memory leak
-        char *cpy = new char[ctx.size()+1] ;
-        strcpy(cpy, ctx.c_str());
-        return cpy;
+        return to_char(ctx);
     }
     catch (exception &e) { return set_error(e); }
+}
+
+const char* generate_context_from_str(Afhe* afhe, const char* params, int size)
+{
+    try {
+        // Convert params to string
+        string params_str(params, size);
+        cout << "gen_context_from_param: " << params_str << endl;
+        string ctx = afhe->ContextGen(params_str);
+        return to_char(ctx);
+    }
+    catch (exception &e) { return set_error(e); }
+}
+
+const char* save_parameters(Afhe* afhe)
+{
+    try {
+        string params = afhe->save_parameters();
+        return to_char(params);
+    }
+    catch (exception &e) { return set_error(e); }
+}
+
+int save_parameters_size(Afhe* afhe)
+{
+    try {
+        int p_size = afhe->save_parameters_size();
+        cout << "fhe_save_parameters_size: " << p_size << endl;
+        return p_size;
+    }
+    catch (exception &e) { set_error(e); return -1; }
+
+}
+
+byte* save_parameters_bytes(Afhe* afhe)
+{
+    try {
+        vector<byte> byte_buffer(static_cast<size_t>(afhe->save_parameters_size()));
+        cout << "save_parameters_bytes: " << byte_buffer.size() << endl;
+        afhe->save_parameters_inplace(reinterpret_cast<byte *>(byte_buffer.data()), byte_buffer.size());
+        return byte_buffer.data();
+    }
+    catch (exception &e) { set_error(e); return nullptr; }
+}
+
+void load_parameters_bytes(Afhe* afhe, const byte* params, int size)
+{
+    try {
+       afhe->load_parameters_inplace(params, size);
+    }
+    catch (exception &e) { set_error(e); }
 }
 
 void generate_keys(Afhe* afhe)
@@ -101,10 +156,7 @@ APlaintext* init_plaintext_value(backend_t backend, const char* value) {
 }
 
 const char* get_plaintext_value(APlaintext* plaintext) {
-    string ptx = plaintext->to_string();
-    char *cpy = new char[ptx.size()+1] ;
-    strcpy(cpy, ptx.c_str());
-    return cpy;
+    return to_char(plaintext->to_string());
 }
 
 

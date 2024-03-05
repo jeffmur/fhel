@@ -11,6 +11,7 @@
 
 #include "aseal.h"
 #include "afhe.h"
+#include <bitset>
 
 using namespace std;
 using namespace seal;
@@ -96,12 +97,21 @@ string Aseal::ContextGen(scheme scheme,
 
 string Aseal::ContextGen(string parms)
 {
+  cout << "ContextGen: " << parms << endl;
+
   // Initialize parameters with scheme
   this->params = make_shared<EncryptionParameters>();
 
   // Load parameters from string
   istringstream ss(parms);
+
+  cout << "Load (before) " << ss.str() << endl;
+  cout << "param_size: " << parms.length() << endl;
+  // cout << "this->params: " << this->params << endl;
+
   this->params->load(ss);
+
+  cout << "Loaded! " << ss.str() << endl;
 
   // Validate parameters by putting them inside a SEALContext
   this->context = make_shared<SEALContext>(*this->params, true);
@@ -151,9 +161,37 @@ void Aseal::set_encoders(bool ignore_exception)
   }
 }
 
-string Aseal::save_parameters()
+void Aseal::save_parameters_inplace(byte *out, int size, string compr_mode)
 {
-  // Share as a string
+  // Initialize params
+  this->params = make_shared<EncryptionParameters>();
+
+  // Write to memory
+  this->params->save(out, size, compression_mode_map.at(compr_mode));
+
+  // Validate parameters by putting them inside a SEALContext
+  this->context = make_shared<SEALContext>(*this->params, true);
+}
+
+void Aseal::load_parameters_inplace(const byte *in, int size)
+{
+  // Initialize params
+  this->params = make_shared<EncryptionParameters>();
+
+  cout << "load_parameters_inplace: " << in << endl;
+
+  // Load from memory
+  this->params->load(in, size);
+
+  cout << "Success!" << endl;
+
+  // Validate parameters by putting them inside a SEALContext
+  this->context = make_shared<SEALContext>(*this->params, true);
+}
+
+string Aseal::save_parameters(string compr_mode)
+{
+  // Share as a binary string
   ostringstream ss;
 
   if (this->params == nullptr)
@@ -162,20 +200,25 @@ string Aseal::save_parameters()
   }
 
   // Save parameters to stringstream
-  this->params->save(ss);
+  this->params->save(ss, compression_mode_map.at(compr_mode));
 
-  // Return stringstream as string
+  cout << endl << "save_parameters: " << ss.str() << endl;
+  int size = save_parameters_size(compr_mode);
+  cout << "save_parameters_size: " << ss.str().length() << " vs actual: " << size << endl;
+  cout << "compression_mode: " << compr_mode << endl;
+
   return ss.str();
 }
 
-void Aseal::load_parameters(string &params)
+int Aseal::save_parameters_size(string compr_mode)
 {
-  // Initialize parameters with scheme
-  this->params = make_shared<EncryptionParameters>();
+  if (this->params == nullptr)
+  {
+    throw logic_error("Parameters are not set, cannot save them.");
+  }
 
-  // Load parameters from string
-  istringstream ss(params);
-  this->params->load(ss);
+  // Save parameters to stringstream
+  return this->params->save_size(compression_mode_map.at(compr_mode));
 }
 
 void Aseal::disable_mod_switch()

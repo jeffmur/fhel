@@ -134,6 +134,29 @@ extern "C" {
     const char* generate_context(Afhe* afhe, scheme_t scheme, uint64_t poly_mod_degree, uint64_t pt_mod_bit, uint64_t pt_mod, uint64_t sec_level, const uint64_t* qi_sizes, uint64_t qi_sizes_length);
 
     /**
+     * @brief Generate a context for the backend library from parameters.
+     * @param afhe Pointer to the backend library.
+     * @param params String representing the parameters.
+     * @return String representing the context.
+    */
+    const char* generate_context_from_str(Afhe* afhe, const char* params, int size);
+
+    /**
+     * @brief Save the parameters for the backend library.
+     * @param afhe Pointer to the backend library.
+     * @return String representing the parameters.
+    */
+    const char* save_parameters(Afhe* afhe);
+
+    /**
+     * @brief Save the size of the parameters for the backend library.
+    */
+    int save_parameters_size(Afhe* afhe);
+
+    byte* save_parameters_bytes(Afhe* afhe);
+    void load_parameters_bytes(Afhe* afhe, const byte* data, int size);
+
+    /**
      * @brief Generate keys for the backend library.
      * @param afhe Pointer to the backend library.
     */

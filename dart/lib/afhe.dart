@@ -20,6 +20,7 @@ part 'afhe/operation.dart';
 part 'afhe/crypto.dart';
 part 'afhe/codec.dart';
 part 'afhe/errors.dart';
+part 'afhe/serial.dart';
 
 /// Abstract Fully Homomorphic Encryption
 ///
@@ -38,6 +39,12 @@ class Afhe {
 
   /// A pointer to the memory address of the underlying C++ object.
   Pointer library = nullptr;
+
+  Afhe.noScheme(String backendName) {
+    backend = Backend.set(backendName);
+    library = _c_init_backend(backend.value);
+    scheme = Scheme();
+  }
 
   /// Default Constructor initializes [Backend] with [Scheme].
   ///
@@ -103,6 +110,39 @@ class Afhe {
       "bgv" => _contextBGV(context),
       "ckks" => _contextCKKS(context),
       _ => "error: Invalid Scheme"
+    };
+  }
+
+  /// Loads the encryption context from a string.
+  /// Used for generating a shared session.
+  String genContextFromParameters(Map parameters) {
+    // _c_load_params_bytes(library, parameters['header'], parameters['size']);
+    print(parameters['header']);
+    final ptr = _c_gen_context_from_str(library, parameters['header'], parameters['size']);
+    raiseForStatus();
+    return ptr.toDartString();
+  }
+
+  /// Returns the string representation of FHE parameters.
+  /// Used for generating a shared session.
+  Map saveParameters() {
+    final params = _c_save_params(library);
+    final param_size = _c_save_params_size(library);
+    parseHeader(params, param_size);
+    raiseForStatus();
+    return {
+      "header": params,
+      "size": param_size,
+    };
+  }
+
+  Map saveParametersBytes() {
+    final params = _c_save_params_bytes(library);
+    final param_size = _c_save_params_size(library);
+    raiseForStatus();
+    return {
+      "header": params,
+      "size": param_size,
     };
   }
 

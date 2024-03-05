@@ -131,14 +131,33 @@ public:
     int sec_level, vector<int> qi_sizes = {}) = 0;
 
   /**
+   * @brief Generates a context for the Fully Homomorphic Encryption (FHE) scheme from a set of parameters.
+   * 
+   * The context contains all the public parameters needed for the encryption and decryption processes.
+   * 
+   * @param params A string representing the parameters used to generate the context.
+   * 
+   * @return A string representing the status of generated context.
+  */
+  virtual string ContextGen(string params) = 0;
+
+  /**
    * @brief Returns the parameters, used for re-generating the context.
   */
-  virtual string save_parameters() = 0;
+  virtual string save_parameters(string compression_mode="none") = 0;
+
+  /**
+   * @brief Returns the size of the parameters, used for re-generating the context.
+  */
+  virtual int save_parameters_size(string compression_mode="none") = 0;
+
+  virtual void save_parameters_inplace(byte* out, int size, string compression_mode="none") = 0;
+  virtual void load_parameters_inplace(const byte* in, int size) = 0;
 
   /**
    * @brief Loads the parameters, used for re-generating the context.
   */
-  virtual void load_parameters(string &params) = 0;
+  // virtual void load_parameters(string &params) = 0;
 
   /**
    * @brief Disables the modulus switching chain
