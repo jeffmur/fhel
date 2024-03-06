@@ -32,21 +32,6 @@ using namespace std;
 class Aseal;
 class AsealPoly;
 
-/**
- * @brief Compression Modes used when compiling SEAL.
- */
-static map<string, seal::compr_mode_type> compr_mode_map {
-    {"none", seal::compr_mode_type::none},
-#ifdef SEAL_USE_ZLIB
-    // Use ZLIB compression
-    {"zlib", seal::compr_mode_type::zlib},
-#endif
-#ifdef SEAL_USE_ZSTD
-    // Use Zstandard compression
-    {"zstd", seal::compr_mode_type::zstd},
-#endif
-};
-
 // ------------------ Parameters ------------------
 
 /**
@@ -74,8 +59,12 @@ static map<int, seal::sec_level_type> sec_map {
 */
 static map<string,seal::compr_mode_type> compression_mode_map {
     {"none", seal::compr_mode_type::none},
+#ifdef SEAL_USE_ZLIB
     {"zlib", seal::compr_mode_type::zlib},
+#endif
+#ifdef SEAL_USE_ZSTD
     {"zstd", seal::compr_mode_type::zstd},
+#endif
 };
 
 /**
@@ -282,8 +271,8 @@ public:
   */
   string save_parameters(string compression_mode="none") override;
   int save_parameters_size(string compression_mode="none") override;
-  void save_parameters_inplace(byte* buffer, int size, string compression_mode="none");
-  void load_parameters_inplace(const byte* buffer, int size);
+  void save_parameters_inplace(byte* buffer, int size, string compression_mode="none") override;
+  void load_parameters_inplace(const byte* buffer, int size) override;
 
   /**
    * @brief Load SEALContext parameters from a string.
