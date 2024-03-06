@@ -186,6 +186,16 @@ public:
   virtual ASecretKey& get_secret_key() = 0;
 
   /**
+   * @brief Saves the secret key.
+  */
+  virtual string save_secret_key() = 0;
+
+  /**
+   * @brief Loads the secret key.
+  */
+  virtual ASecretKey& load_secret_key(string secret_key) = 0;
+
+  /**
    * @brief Returns the relinearization keys.
   */
   virtual ARelinKey& get_relin_keys() = 0;

@@ -245,17 +245,17 @@ void Aseal::KeyGen(ASecretKey &sec)
   // Gather current context, resolves object
   auto &seal_context = *(this->get_context());
 
+  // Copy Secret Key
+  this->secretKey = make_shared<SecretKey>(_to_secret_key(sec));
+
   // Initialize KeyGen object
-  this->keyGenObj = make_shared<KeyGenerator>(seal_context, _to_secret_key(sec));
+  this->keyGenObj = make_shared<KeyGenerator>(seal_context, *this->secretKey);
 
   // Initialize empty PublicKey object
   this->publicKey = make_shared<PublicKey>();
 
   // Derive Key Pair
   keyGenObj->create_public_key(*this->publicKey);
-
-  // Assign Secret Key
-  this->secretKey = make_shared<SecretKey>(keyGenObj->secret_key());
 
   // Refresh Encryptor, Evaluator, and Decryptor objects
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
@@ -270,6 +270,41 @@ APublicKey& Aseal::get_public_key()
 ASecretKey& Aseal::get_secret_key()
 {
   AsealSecretKey* secretKey = new AsealSecretKey(*this->secretKey);
+  return _from_secret_key(*secretKey);
+}
+
+string Aseal::save_secret_key()
+{
+  // Share as a binary string
+  ostringstream ss;
+
+  if (this->secretKey == nullptr)
+  {
+    throw logic_error("Secret Key is not set, cannot save it.");
+  }
+
+  // Save secret key to stringstream
+  this->secretKey->save(ss, seal::compr_mode_type::none);
+
+  return ss.str();
+}
+
+ASecretKey& Aseal::load_secret_key(string sec_key)
+{
+  // Initialize a SecretKey object
+  SecretKey *sealKey = new SecretKey();
+
+  if (this->context == nullptr)
+  {
+    throw logic_error("Context is not set, cannot load secret key.");
+  }
+
+  // Load secret key from string
+  istringstream ss(sec_key);
+  sealKey->load(*this->context, ss);
+
+  AsealSecretKey* secretKey = new AsealSecretKey(*sealKey);
+
   return _from_secret_key(*secretKey);
 }
 

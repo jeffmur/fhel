@@ -58,13 +58,15 @@ TEST(Exchange, Parameters)
     EXPECT_STREQ(g_ctxt.c_str(), "success: valid");
 }
 
-TEST(Exchange, SecretKey) 
+TEST(Exchange, Ciphertext) 
 {
     Aseal* host = new Aseal();
     string h_ctx = host->ContextGen(scheme::bfv, 1024, 0, 1024);
     EXPECT_STREQ(h_ctx.c_str(), "success: valid");
 
+    // Save the secret key
     host->KeyGen();
+    string h_sec_key = host->save_secret_key();
     AsealPlaintext four("4");
     AsealCiphertext ctxt_four;
     host->encrypt(four, ctxt_four);
@@ -75,12 +77,14 @@ TEST(Exchange, SecretKey)
 
     // Initialize the guest
     // Note: the parameters are not passed to the guest
+    // But guest parameters should match the host
     Aseal* guest = new Aseal();
     string g_ctxt = guest->ContextGen(scheme::bfv, 1024, 0, 1024);
     EXPECT_STREQ(g_ctxt.c_str(), "success: valid");
 
     // Load the secret key from the host
-    guest->KeyGen(host->get_secret_key());
+    // You wouldn't do this in practice, but for testing purposes
+    guest->KeyGen(guest->load_secret_key(h_sec_key));
 
     AsealCiphertext ctxt_four_guest;
     ctxt_four_guest.load(*guest->get_context(), cipher_out);
@@ -89,5 +93,3 @@ TEST(Exchange, SecretKey)
     guest->decrypt(ctxt_four_guest, four_guest);
     EXPECT_EQ(four_guest.to_string(), "4");
 }
-
-// TEST(Exchange, SessionKey)

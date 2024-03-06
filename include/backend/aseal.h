@@ -137,9 +137,9 @@ public:
   using seal::PublicKey::PublicKey;
   AsealPublicKey(const seal::PublicKey &pk) : seal::PublicKey(pk) {};
   ~AsealPublicKey(){};
-  seal::PublicKey to_seal() {
-    return seal::PublicKey();
-  }
+  // seal::PublicKey& to_seal() {
+  //   return *this;
+  // }
   // ACiphertext& data() override {
   //   AsealCiphertext* ctxt = new AsealCiphertext(seal::PublicKey::data());
   //   return _from_ciphertext(*ctxt);
@@ -148,10 +148,10 @@ public:
 
 // DYNAMIC CASTING
 inline AsealPublicKey& _to_public_key(APublicKey& k){
-  return dynamic_cast<AsealPublicKey&>(k);
+  return static_cast<AsealPublicKey&>(k);
 };
 inline APublicKey& _from_public_key(AsealPublicKey& k){
-  return dynamic_cast<APublicKey&>(k);
+  return static_cast<APublicKey&>(k);
 };
 
 /**
@@ -162,9 +162,9 @@ public:
   using seal::SecretKey::SecretKey;
   AsealSecretKey(const seal::SecretKey &sk) : seal::SecretKey(sk) {};
   ~AsealSecretKey(){};
-  seal::SecretKey to_seal() {
-    return seal::SecretKey();
-  }
+  // seal::SecretKey to_seal() {
+  //   return static_cast<seal::SecretKey&>(*this);
+  // }
   // APlaintext& data() override {
   //   AsealPlaintext* ctxt = new AsealPlaintext(seal::SecretKey::data());
   //   return _from_plaintext(*ctxt);
@@ -173,10 +173,10 @@ public:
 
 // DYNAMIC CASTING
 inline AsealSecretKey& _to_secret_key(ASecretKey& k){
-  return dynamic_cast<AsealSecretKey&>(k);
+  return static_cast<AsealSecretKey&>(k);
 };
 inline ASecretKey& _from_secret_key(AsealSecretKey& k){
-  return dynamic_cast<ASecretKey&>(k);
+  return static_cast<ASecretKey&>(k);
 };
 
 /**
@@ -313,8 +313,8 @@ public:
   void disable_mod_switch() override;
 
   // ------------------ Keys ------------------
-  void KeyGen(ASecretKey &sec);
   void KeyGen() override;
+  void KeyGen(ASecretKey &sec);
   void RelinKeyGen() override;
   void relinearize(ACiphertext &ctxt) override;
   void mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt) override;
@@ -324,6 +324,8 @@ public:
   void rescale_to_next(ACiphertext &ctxt) override;
   APublicKey& get_public_key() override;
   ASecretKey& get_secret_key() override;
+  string save_secret_key() override;
+  ASecretKey& load_secret_key(string sk) override;
   ARelinKey& get_relin_keys() override;
 
   // ------------------ Cryptography ------------------
