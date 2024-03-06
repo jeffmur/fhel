@@ -92,6 +92,7 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
         # test/seal/basics/3_levels.cpp
         # test/seal/basics/4_bgv.cpp
         # test/seal/basics/5_ckks.cpp
+        test/seal/exchange.cpp
         test/seal/basics/7_serialization.cpp
     )
     include_directories(test/seal/basics)

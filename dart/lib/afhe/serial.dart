@@ -28,13 +28,12 @@ final class SEALHeader extends Struct {
   external Array<Uint8> dataSize;
 }
 
-SEALHeader parseHeader(Pointer<Uint8> raw, int length) {
-  final Pointer<Uint8> ptr = calloc<Uint8>(length);
-  final buffer = ptr.asTypedList(length);
-  for (var i = 0; i < length; i++) {
-    buffer[i] = raw[i];
-  }
-  final header = ptr.cast<SEALHeader>().ref;
+/// Check SEAL Magic Number
+/// 
+/// The SEAL Magic Number is a 2-byte sequence of 0xA15E.
+SEALHeader sealMagicNumber(Pointer<Uint8> raw, int length) {
+  // Cast raw pointer to SEALHeader
+  final header = raw.cast<SEALHeader>().ref;
   // Check SEAL Magic Number, A1 (161) 5E (94)
   if (header.sealMagic[0] != 94 || header.sealMagic[1] != 161) {
     throw Exception('Invalid SEAL Magic Number');

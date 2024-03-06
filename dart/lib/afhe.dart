@@ -117,7 +117,6 @@ class Afhe {
   /// Used for generating a shared session.
   String genContextFromParameters(Map parameters) {
     // _c_load_params_bytes(library, parameters['header'], parameters['size']);
-    print(parameters['header']);
     final ptr = _c_gen_context_from_str(library, parameters['header'], parameters['size']);
     raiseForStatus();
     return ptr.toDartString();
@@ -128,18 +127,8 @@ class Afhe {
   Map saveParameters() {
     final params = _c_save_params(library);
     final param_size = _c_save_params_size(library);
-    parseHeader(params, param_size);
     raiseForStatus();
-    return {
-      "header": params,
-      "size": param_size,
-    };
-  }
-
-  Map saveParametersBytes() {
-    final params = _c_save_params_bytes(library);
-    final param_size = _c_save_params_size(library);
-    raiseForStatus();
+    sealMagicNumber(params, param_size);
     return {
       "header": params,
       "size": param_size,

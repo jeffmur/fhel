@@ -2,6 +2,23 @@
 #include <aseal.h>       /* Microsoft SEAL */
 #include <map>
 #include <cstdint>
+#include <fhe.h>
+
+TEST(Exchange, NullTerminated)
+{
+    Aseal* host = new Aseal();
+    const char* ctx = generate_context(host, scheme_t::bfv_s, 1024, 0, 1024, 128, nullptr, 0);
+    EXPECT_STREQ(ctx, "success: valid");
+
+    // Contain null-terminated characters, we should validate that this works
+    // Before trying to decode in Dart
+    const char* parm = save_parameters(host);
+    int p_size = save_parameters_size(host);
+
+    Aseal* guest = new Aseal();
+    const char* g_ctx = generate_context_from_str(guest, parm, p_size);
+    EXPECT_STREQ(g_ctx, "success: valid");
+}
 
 TEST(Exchange, Parameters) 
 {

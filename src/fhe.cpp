@@ -1,9 +1,15 @@
 #include "fhe.h"
 
 // Important: Must copy string to char* to avoid memory leak
-const char* to_char(string str) {
-    char *cpy = new char[str.size()+1] ;
-    strcpy(cpy, str.c_str());
+// Optional ignores null-terminated strings
+const char* to_char(string str, bool ignore_null_terminated=false) {
+    int size = str.size();
+    char *cpy = new char[size+1];
+    // Convert string to char array
+    // Regardless of null-terminated chars
+    if (ignore_null_terminated) { str.copy(cpy, size); }
+    // Up-to null-terminated char
+    else { strcpy(cpy, str.c_str()); }
     return cpy;
 }
 
@@ -64,7 +70,6 @@ const char* generate_context_from_str(Afhe* afhe, const char* params, int size)
     try {
         // Convert params to string
         string params_str(params, size);
-        cout << "gen_context_from_param: " << params_str << endl;
         string ctx = afhe->ContextGen(params_str);
         return to_char(ctx);
     }
@@ -75,16 +80,15 @@ const char* save_parameters(Afhe* afhe)
 {
     try {
         string params = afhe->save_parameters();
-        return to_char(params);
+        return to_char(params, true);
     }
-    catch (exception &e) { return set_error(e); }
+    catch (exception &e) { set_error(e); return nullptr; }
 }
 
 int save_parameters_size(Afhe* afhe)
 {
     try {
         int p_size = afhe->save_parameters_size();
-        cout << "fhe_save_parameters_size: " << p_size << endl;
         return p_size;
     }
     catch (exception &e) { set_error(e); return -1; }
@@ -95,7 +99,6 @@ byte* save_parameters_bytes(Afhe* afhe)
 {
     try {
         vector<byte> byte_buffer(static_cast<size_t>(afhe->save_parameters_size()));
-        cout << "save_parameters_bytes: " << byte_buffer.size() << endl;
         afhe->save_parameters_inplace(reinterpret_cast<byte *>(byte_buffer.data()), byte_buffer.size());
         return byte_buffer.data();
     }

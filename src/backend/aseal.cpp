@@ -97,21 +97,13 @@ string Aseal::ContextGen(scheme scheme,
 
 string Aseal::ContextGen(string parms)
 {
-  cout << "ContextGen: " << parms << endl;
-
   // Initialize parameters with scheme
   this->params = make_shared<EncryptionParameters>();
 
   // Load parameters from string
   istringstream ss(parms);
 
-  cout << "Load (before) " << ss.str() << endl;
-  cout << "param_size: " << parms.length() << endl;
-  // cout << "this->params: " << this->params << endl;
-
   this->params->load(ss);
-
-  cout << "Loaded! " << ss.str() << endl;
 
   // Validate parameters by putting them inside a SEALContext
   this->context = make_shared<SEALContext>(*this->params, true);
@@ -200,12 +192,12 @@ string Aseal::save_parameters(string compr_mode)
   }
 
   // Save parameters to stringstream
+  int size = save_parameters_size(compr_mode);
   this->params->save(ss, compression_mode_map.at(compr_mode));
 
-  cout << endl << "save_parameters: " << ss.str() << endl;
-  int size = save_parameters_size(compr_mode);
-  cout << "save_parameters_size: " << ss.str().length() << " vs actual: " << size << endl;
-  cout << "compression_mode: " << compr_mode << endl;
+  // cout << endl << "save_parameters: " << ss.str() << endl;
+  // cout << "save_parameters_size: " << size << " vs str length: " << ss.str().length() << endl;
+  // cout << "compression_mode: " << compr_mode << endl;
 
   return ss.str();
 }
