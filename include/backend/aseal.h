@@ -267,17 +267,32 @@ public:
   void set_encoders(bool ignore_exception=false);
 
   /**
-   * @brief Represent SEALContext parameters as a string.
+   * @brief Represent SEALContext parameters as a serialized string.
+   * @param compression_mode The compression mode to use.
+   * Note: String may contain null-terminating characters.
   */
   string save_parameters(string compression_mode="none") override;
-  int save_parameters_size(string compression_mode="none") override;
-  void save_parameters_inplace(byte* buffer, int size, string compression_mode="none") override;
-  void load_parameters_inplace(const byte* buffer, int size) override;
 
   /**
-   * @brief Load SEALContext parameters from a string.
+   * @brief Calculate the size of the serialized SEALContext parameters.
+   * @param compression_mode The compression mode to use.
   */
-  // void load_parameters(string &params) override;
+  int save_parameters_size(string compression_mode="none") override;
+
+  /**
+   * @brief Load SEALContext parameters from a serialized byte array.
+   * @param buffer The byte array containing the serialized parameters.
+   * @param size The size of the byte array.
+   * @param compression_mode The compression mode used.
+  */
+  void save_parameters_inplace(byte* buffer, int size, string compression_mode="none") override;
+
+  /**
+   * @brief Load SEALContext parameters from a serialized byte array.
+   * @param buffer The byte array containing the serialized parameters.
+   * @param size The size of the byte array.
+  */
+  void load_parameters_inplace(const byte* buffer, int size) override;
 
   /**
    * @return A pointer to the SEAL context object.

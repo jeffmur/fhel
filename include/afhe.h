@@ -151,13 +151,17 @@ public:
   */
   virtual int save_parameters_size(string compression_mode="none") = 0;
 
+  /**
+   * @brief Saves the parameters, used for re-generating the context.
+   * Exposes lower level interface for saving parameters.
+  */
   virtual void save_parameters_inplace(byte* out, int size, string compression_mode="none") = 0;
-  virtual void load_parameters_inplace(const byte* in, int size) = 0;
-
+  
   /**
    * @brief Loads the parameters, used for re-generating the context.
+   * Exposure lower level interface for loading parameters.
   */
-  // virtual void load_parameters(string &params) = 0;
+  virtual void load_parameters_inplace(const byte* in, int size) = 0;
 
   /**
    * @brief Disables the modulus switching chain
