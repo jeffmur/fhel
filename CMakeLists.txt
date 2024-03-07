@@ -68,11 +68,11 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
         test/seal/multiplication.cpp
         test/seal/relinearization.cpp
         test/seal/exchange.cpp
-        # test/seal/basics/1_bfv.cpp
-        # test/seal/basics/3_levels.cpp
-        # test/seal/basics/4_bgv.cpp
-        # test/seal/basics/5_ckks.cpp
-        # test/seal/basics/7_serialization.cpp
+        test/seal/basics/1_bfv.cpp
+        test/seal/basics/3_levels.cpp
+        test/seal/basics/4_bgv.cpp
+        test/seal/basics/5_ckks.cpp
+        test/seal/basics/7_serialization.cpp
     )
 
     target_link_libraries(
