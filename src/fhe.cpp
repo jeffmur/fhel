@@ -178,6 +178,25 @@ int get_ciphertext_size(ACiphertext* ciphertext) {
     return ciphertext->size();
 }
 
+const char* save_ciphertext(ACiphertext* ciphertext) {
+    return to_char(ciphertext->save(), true);
+}
+
+int save_ciphertext_size(ACiphertext* ciphertext) {
+    return ciphertext->save_size();
+}
+
+ACiphertext* load_ciphertext(Afhe* fhe, const char* data, int size) {
+    backend_t lib = backend_map_backend_t[fhe->backend_lib];
+    ACiphertext* ctxt = init_ciphertext(lib);
+    try {
+        string data_str(data, size);
+        ctxt->load(fhe, data_str);
+    }
+    catch (exception &e) { set_error(e); }
+    return ctxt;
+}
+
 ACiphertext* encrypt(Afhe* afhe, APlaintext* ptxt) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
     ACiphertext* ctxt = init_ciphertext(lib);

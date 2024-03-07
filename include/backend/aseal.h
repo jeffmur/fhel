@@ -141,6 +141,9 @@ public:
     seal::Ciphertext::save(stream, compression_mode_map.at(compression_mode));
     return stream.str();
   }
+  int save_size(string compression_mode="none") override {
+    return seal::Ciphertext::save_size(compression_mode_map.at(compression_mode));
+  }
   void load(Afhe* fhe, string data) override {
     istringstream stream(data);
     seal::Ciphertext::load(_to_context(fhe->get_context()), stream);

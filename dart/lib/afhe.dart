@@ -128,7 +128,6 @@ class Afhe {
     final params = _c_save_params(library);
     final param_size = _c_save_params_size(library);
     raiseForStatus();
-    sealMagicNumber(params, param_size);
     return {
       "header": params,
       "size": param_size,
@@ -175,10 +174,20 @@ class Afhe {
     return n;
   }
 
+  /// Loads a [Ciphertext] from a non-human-readable format.
+  /// Useful for loading from disk or receiving over the network.
+  /// The [size] is the length of the data.
+  /// The [data] is a pointer to the memory address of the data.
+  ///
+  Ciphertext loadCiphertext(Pointer<Uint8> data, int size) {
+    Pointer ptr = _c_load_ciphertext(library, data, size);
+    raiseForStatus();
+    return Ciphertext.fromPointer(backend, ptr);
+  }
+
   /// Encodes a list of integers into a [Plaintext].
   Plaintext encodeVecInt(List<int> vec) {
-    Pointer ptr =
-        _c_encode_vector_int(library, intListToUint64Array(vec), vec.length);
+    Pointer ptr = _c_encode_vector_int(library, intListToUint64Array(vec), vec.length);
     raiseForStatus();
     return Plaintext.fromPointer(backend, ptr);
   }

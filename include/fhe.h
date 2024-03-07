@@ -153,9 +153,6 @@ extern "C" {
     */
     int save_parameters_size(Afhe* afhe);
 
-    byte* save_parameters_bytes(Afhe* afhe);
-    void load_parameters_bytes(Afhe* afhe, const byte* data, int size);
-
     /**
      * @brief Generate keys for the backend library.
      * @param afhe Pointer to the backend library.
@@ -210,6 +207,29 @@ extern "C" {
      * @return Size of the ciphertext.
      */
     int get_ciphertext_size(ACiphertext* ciphertext);
+
+    /**
+     * @brief Convert the ciphertext to a string.
+     * @param ciphertext Pointer to the ciphertext.
+     * @return String representing the ciphertext.
+    */
+    const char* save_ciphertext(ACiphertext* ciphertext);
+
+    /**
+     * @brief Save the size of the ciphertext.
+     * @param ciphertext Pointer to the ciphertext.
+     * @return Size of the serialized ciphertext payload.
+    */
+    int save_ciphertext_size(ACiphertext* ciphertext);
+
+    /**
+     * @brief Load a ciphertext from a string.
+     * @param afhe Pointer to the backend library.
+     * @param data String representing the ciphertext.
+     * @param size Size of the ciphertext.
+     * @return Pointer to the loaded ciphertext.
+    */
+    ACiphertext* load_ciphertext(Afhe* afhe, const char* data, int size);
 
     /**
      * @brief Encrypt a plaintext.

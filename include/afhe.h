@@ -96,6 +96,11 @@ public:
   virtual string save(string compression_mode="none") = 0;
 
   /**
+   * @brief Calucate the save size of the ciphertext.
+  */
+  virtual int save_size(string compression_mode="none") = 0;
+
+  /**
    * @brief Loads the ciphertext.
    * @param fhe The backend library to be used to validate the ciphertext.
    * @param ctxt The ciphertext to be loaded.
