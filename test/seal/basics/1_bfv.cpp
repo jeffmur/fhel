@@ -52,7 +52,7 @@ TEST(Basics, BFV)
     int security_level = 128;
     string ctx = fhe->ContextGen(scheme::bfv, poly_modulus_degree, 0, plain_modulus, security_level);
     EXPECT_STREQ(ctx.c_str(), "success: valid");
-    print_parameters(fhe->get_context());
+    // print_parameters(fhe->get_context());
 
     /*
     Next we set the [ciphertext] `coefficient modulus' (coeff_modulus). This

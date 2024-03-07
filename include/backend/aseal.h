@@ -82,6 +82,23 @@ inline uint64_t hex_to_uint64(string value) {
 }
 
 /**
+ * @brief Abstraction for Context
+*/
+class AsealContext : public AContext, public seal::SEALContext {
+public:
+  using seal::SEALContext::SEALContext;
+  AsealContext(const seal::SEALContext &context) : seal::SEALContext(context) {};
+  ~AsealContext(){};
+};
+
+inline AsealContext& _to_context(AContext& c){
+  return static_cast<AsealContext&>(c);
+};
+inline AContext& _from_context(AsealContext& c){
+  return static_cast<AContext&>(c);
+};
+
+/**
  * @brief Abstraction for Plaintext
  */
 class AsealPlaintext : public APlaintext, public seal::Plaintext {
@@ -118,6 +135,15 @@ public:
   }
   void set_scale(double scale) override {
     seal::Ciphertext::scale() = scale;
+  }
+  string save(string compression_mode="none") override {
+    ostringstream stream;
+    seal::Ciphertext::save(stream, compression_mode_map.at(compression_mode));
+    return stream.str();
+  }
+  void load(Afhe* fhe, string data) override {
+    istringstream stream(data);
+    seal::Ciphertext::load(_to_context(fhe->get_context()), stream);
   }
 };
 
@@ -257,6 +283,14 @@ public:
 
   string ContextGen(string params) override;
 
+  AContext& get_context() {
+    if (this->context == nullptr)
+    {
+      throw logic_error("Context is not initialized");
+    }
+    return _from_context(static_cast<AsealContext&>(*this->context));
+  }
+
   /**
    * @brief Assign Encoders used for encoding and decoding.
    * @param ignore_exception If true, ignore exceptions.
@@ -293,18 +327,6 @@ public:
    * @param size The size of the byte array.
   */
   void load_parameters_inplace(const byte* buffer, int size) override;
-
-  /**
-   * @return A pointer to the SEAL context object.
-   * @throws std::logic_error if the context is not initialized.
-  */
-  inline shared_ptr<seal::SEALContext> get_context() {
-    if (this->context == nullptr)
-    {
-      throw logic_error("Context is not initialized");
-    }
-    return this->context;
-  }
 
   /**
    * @brief Replaces the existing SEALContext with a new one,

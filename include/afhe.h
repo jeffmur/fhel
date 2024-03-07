@@ -47,11 +47,24 @@ enum scheme : int
 
 // ------------------ Abstractions ------------------
 /**
+ * @brief Abstraction for FHE Context
+*/
+class AContext {
+public:
+  virtual ~AContext() = default;
+  // virtual TODO param_id() = 0;
+};
+
+/**
  * @brief Abstraction for Plaintexts.
  */
 class APlaintext {
 public:
   virtual ~APlaintext() = default;
+
+  /**
+   * @brief Returns a string representation of the plaintext.
+  */
   virtual string to_string() = 0;
 };
 
@@ -61,9 +74,33 @@ public:
 class ACiphertext{
 public:
   virtual ~ACiphertext() = default;
+
+  /**
+   * @brief Returns the size of the ciphertext.
+  */
   virtual size_t size() = 0;
+
+  /**
+   * @brief Returns the scale of the ciphertext.
+  */
   virtual double scale() = 0;
+
+  /**
+   * @brief Sets the scale of the ciphertext.
+  */
   virtual void set_scale(double scale) = 0;
+
+  /**
+   * @brief Saves the ciphertext.
+  */
+  virtual string save(string compression_mode="none") = 0;
+
+  /**
+   * @brief Loads the ciphertext.
+   * @param fhe The backend library to be used to validate the ciphertext.
+   * @param ctxt The ciphertext to be loaded.
+  */
+  virtual void load(Afhe* fhe, string ctxt) = 0;
 };
 
 /**
@@ -140,6 +177,11 @@ public:
    * @return A string representing the status of generated context.
   */
   virtual string ContextGen(string params) = 0;
+
+  /**
+   * @brief Returns the context.
+   */
+  virtual AContext& get_context() = 0;
 
   /**
    * @brief Returns the parameters, used for re-generating the context.

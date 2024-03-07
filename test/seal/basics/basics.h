@@ -15,44 +15,44 @@ inline void print_line(int line_number)
 /**
  * @brief Print the parameters in a SEALContext
 */
-inline void print_parameters(const shared_ptr<seal::SEALContext> &context)
-{
-    const auto &context_data = context->key_context_data();
+// inline void print_parameters(const AsealContext &context)
+// {
+//     const auto &context_data = context->key_context_data();
 
-    string scheme_name;
-    switch (context_data->parms().scheme())
-    {
-    case seal::scheme_type::bfv:
-        scheme_name = "BFV";
-        break;
-    case seal::scheme_type::ckks:
-        scheme_name = "CKKS";
-        break;
-    case seal::scheme_type::bgv:
-        scheme_name = "BGV";
-        break;
-    default:
-        throw invalid_argument("Unsupported scheme");
-    }
-    cout << "/" << endl;
-    cout << "| Encryption parameters:" << endl;
-    cout << "|   scheme: " << scheme_name << endl;
-    cout << "|   poly_modulus_degree: " << context_data->parms().poly_modulus_degree() << endl;
+//     string scheme_name;
+//     switch (context_data->parms().scheme())
+//     {
+//     case seal::scheme_type::bfv:
+//         scheme_name = "BFV";
+//         break;
+//     case seal::scheme_type::ckks:
+//         scheme_name = "CKKS";
+//         break;
+//     case seal::scheme_type::bgv:
+//         scheme_name = "BGV";
+//         break;
+//     default:
+//         throw invalid_argument("Unsupported scheme");
+//     }
+//     cout << "/" << endl;
+//     cout << "| Encryption parameters:" << endl;
+//     cout << "|   scheme: " << scheme_name << endl;
+//     cout << "|   poly_modulus_degree: " << context_data->parms().poly_modulus_degree() << endl;
 
-    auto &coeff_modulus = context_data->parms().coeff_modulus();
-    cout << "|   coeff_modulus size: " << coeff_modulus.size() << " (";
-    for (size_t i = 0; i < coeff_modulus.size() - 1; i++)
-    {
-        cout << coeff_modulus[i].bit_count() << " + ";
-    }
-    cout << coeff_modulus.back().bit_count() << ") bits" << endl;
+//     auto &coeff_modulus = context_data->parms().coeff_modulus();
+//     cout << "|   coeff_modulus size: " << coeff_modulus.size() << " (";
+//     for (size_t i = 0; i < coeff_modulus.size() - 1; i++)
+//     {
+//         cout << coeff_modulus[i].bit_count() << " + ";
+//     }
+//     cout << coeff_modulus.back().bit_count() << ") bits" << endl;
 
-    if (context_data->parms().scheme() == seal::scheme_type::bfv)
-    {
-        cout << "|   plain_modulus: " << context_data->parms().plain_modulus().value() << endl;
-    }
-    cout << "\\" << endl;
-}
+//     if (context_data->parms().scheme() == seal::scheme_type::bfv)
+//     {
+//         cout << "|   plain_modulus: " << context_data->parms().plain_modulus().value() << endl;
+//     }
+//     cout << "\\" << endl;
+// }
 
 /**
  * @brief Assert that two vectors are equal

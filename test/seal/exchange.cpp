@@ -72,8 +72,7 @@ TEST(Exchange, Ciphertext)
     host->encrypt(four, ctxt_four);
 
     // Save the ciphertext
-    stringstream cipher_out;
-    ctxt_four.save(cipher_out, seal::compr_mode_type::none);
+    string cipher_out = ctxt_four.save("none");
 
     // Initialize the guest
     // Note: the parameters are not passed to the guest
@@ -87,7 +86,7 @@ TEST(Exchange, Ciphertext)
     guest->KeyGen(guest->load_secret_key(h_sec_key));
 
     AsealCiphertext ctxt_four_guest;
-    ctxt_four_guest.load(*guest->get_context(), cipher_out);
+    ctxt_four_guest.load(guest, cipher_out);
 
     AsealPlaintext four_guest;
     guest->decrypt(ctxt_four_guest, four_guest);
