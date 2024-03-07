@@ -218,7 +218,7 @@ void Aseal::disable_mod_switch()
 void Aseal::KeyGen()
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->context);
+  auto &seal_context = *_this_context();
 
   // Initialize KeyGen object
   this->keyGenObj = make_shared<KeyGenerator>(seal_context);

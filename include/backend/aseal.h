@@ -283,12 +283,16 @@ public:
 
   string ContextGen(string params) override;
 
-  AContext& get_context() {
+  inline shared_ptr<seal::SEALContext> _this_context() {
     if (this->context == nullptr)
     {
       throw logic_error("Context is not initialized");
     }
-    return _from_context(static_cast<AsealContext&>(*this->context));
+    return this->context;
+  }
+
+  AContext& get_context() {
+    return _from_context(static_cast<AsealContext&>(*_this_context()));
   }
 
   /**
