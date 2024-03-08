@@ -32,21 +32,6 @@ using namespace std;
 class Aseal;
 class AsealPoly;
 
-/**
- * @brief Compression Modes used when compiling SEAL.
- */
-static map<string, seal::compr_mode_type> compr_mode_map {
-    {"none", seal::compr_mode_type::none},
-#ifdef SEAL_USE_ZLIB
-    // Use ZLIB compression
-    {"zlib", seal::compr_mode_type::zlib},
-#endif
-#ifdef SEAL_USE_ZSTD
-    // Use Zstandard compression
-    {"zstd", seal::compr_mode_type::zstd},
-#endif
-};
-
 // ------------------ Parameters ------------------
 
 /**
@@ -70,6 +55,19 @@ static map<int, seal::sec_level_type> sec_map {
 };
 
 /**
+ * @brief Serialization Compression Modes
+*/
+static map<string,seal::compr_mode_type> compression_mode_map {
+    {"none", seal::compr_mode_type::none},
+#ifdef SEAL_USE_ZLIB
+    {"zlib", seal::compr_mode_type::zlib},
+#endif
+#ifdef SEAL_USE_ZSTD
+    {"zstd", seal::compr_mode_type::zstd},
+#endif
+};
+
+/**
  * @brief Convert uint_64 to hexademical string.
 */
 inline string uint64_to_hex(uint64_t value) {
@@ -82,6 +80,23 @@ inline string uint64_to_hex(uint64_t value) {
 inline uint64_t hex_to_uint64(string value) {
   return stoi(value, 0, 16);
 }
+
+/**
+ * @brief Abstraction for Context
+*/
+class AsealContext : public AContext, public seal::SEALContext {
+public:
+  using seal::SEALContext::SEALContext;
+  AsealContext(const seal::SEALContext &context) : seal::SEALContext(context) {};
+  ~AsealContext(){};
+};
+
+inline AsealContext& _to_context(AContext& c){
+  return static_cast<AsealContext&>(c);
+};
+inline AContext& _from_context(AsealContext& c){
+  return static_cast<AContext&>(c);
+};
 
 /**
  * @brief Abstraction for Plaintext
@@ -121,6 +136,18 @@ public:
   void set_scale(double scale) override {
     seal::Ciphertext::scale() = scale;
   }
+  string save(string compression_mode="none") override {
+    ostringstream stream;
+    seal::Ciphertext::save(stream, compression_mode_map.at(compression_mode));
+    return stream.str();
+  }
+  int save_size(string compression_mode="none") override {
+    return seal::Ciphertext::save_size(compression_mode_map.at(compression_mode));
+  }
+  void load(Afhe* fhe, string data) override {
+    istringstream stream(data);
+    seal::Ciphertext::load(_to_context(fhe->get_context()), stream);
+  }
 };
 
 // DYNAMIC CASTING
@@ -139,6 +166,9 @@ public:
   using seal::PublicKey::PublicKey;
   AsealPublicKey(const seal::PublicKey &pk) : seal::PublicKey(pk) {};
   ~AsealPublicKey(){};
+  // seal::PublicKey& to_seal() {
+  //   return *this;
+  // }
   // ACiphertext& data() override {
   //   AsealCiphertext* ctxt = new AsealCiphertext(seal::PublicKey::data());
   //   return _from_ciphertext(*ctxt);
@@ -147,10 +177,10 @@ public:
 
 // DYNAMIC CASTING
 inline AsealPublicKey& _to_public_key(APublicKey& k){
-  return dynamic_cast<AsealPublicKey&>(k);
+  return static_cast<AsealPublicKey&>(k);
 };
 inline APublicKey& _from_public_key(AsealPublicKey& k){
-  return dynamic_cast<APublicKey&>(k);
+  return static_cast<APublicKey&>(k);
 };
 
 /**
@@ -161,6 +191,9 @@ public:
   using seal::SecretKey::SecretKey;
   AsealSecretKey(const seal::SecretKey &sk) : seal::SecretKey(sk) {};
   ~AsealSecretKey(){};
+  // seal::SecretKey to_seal() {
+  //   return static_cast<seal::SecretKey&>(*this);
+  // }
   // APlaintext& data() override {
   //   AsealPlaintext* ctxt = new AsealPlaintext(seal::SecretKey::data());
   //   return _from_plaintext(*ctxt);
@@ -169,10 +202,10 @@ public:
 
 // DYNAMIC CASTING
 inline AsealSecretKey& _to_secret_key(ASecretKey& k){
-  return dynamic_cast<AsealSecretKey&>(k);
+  return static_cast<AsealSecretKey&>(k);
 };
 inline ASecretKey& _from_secret_key(AsealSecretKey& k){
-  return dynamic_cast<ASecretKey&>(k);
+  return static_cast<ASecretKey&>(k);
 };
 
 /**
@@ -199,11 +232,11 @@ inline ARelinKey& _from_relin_keys(AsealRelinKey& k){
  */
 class Aseal : public Afhe {
 private:
-  shared_ptr<seal::EncryptionParameters> params; /**< Pointer to the SEAL parameters object. */
-  shared_ptr<seal::SEALContext> context;     /**< Pointer to the SEAL context object. */
-  shared_ptr<seal::BatchEncoder> bEncoder;   /**< Pointer to the BatchEncoder object. */
-  shared_ptr<seal::CKKSEncoder> cEncoder;    /**< Pointer to the CKKSEncoder object. */
-  double cEncoderScale;                      /**< Scale for CKKSEncoder. */
+  shared_ptr<seal::EncryptionParameters> params; /** Pointer to the SEAL parameters object. */
+  shared_ptr<seal::SEALContext> context;     /** Pointer to the SEAL context object. */
+  shared_ptr<seal::BatchEncoder> bEncoder;   /** Pointer to the BatchEncoder object. */
+  shared_ptr<seal::CKKSEncoder> cEncoder;    /** Pointer to the CKKSEncoder object. */
+  double cEncoderScale;                      /** Scale for CKKSEncoder. */
   shared_ptr<seal::KeyGenerator> keyGenObj;  /** Key generator.*/
   shared_ptr<seal::SecretKey> secretKey;     /** Secret key.*/
   shared_ptr<seal::PublicKey> publicKey;     /** Public key.*/
@@ -251,17 +284,56 @@ public:
     uint64_t plain_modulus_bit_size = 0, uint64_t plain_modulus = 0,
     int sec_level = 128, vector<int> qi_sizes = {}) override;
 
-  /**
-   * @return A pointer to the SEAL context object.
-   * @throws std::logic_error if the context is not initialized.
-  */
-  inline shared_ptr<seal::SEALContext> get_context() {
+  string ContextGen(string params) override;
+
+  inline shared_ptr<seal::SEALContext> _this_context() {
     if (this->context == nullptr)
     {
       throw logic_error("Context is not initialized");
     }
     return this->context;
   }
+
+  AContext& get_context() {
+    return _from_context(static_cast<AsealContext&>(*_this_context()));
+  }
+
+  /**
+   * @brief Assign Encoders used for encoding and decoding.
+   * @param ignore_exception If true, ignore exceptions.
+   * 
+   * We may want to ignore exceptions if we are setting the encoders without
+   * access to the original parameters.
+  */
+  void set_encoders(bool ignore_exception=false);
+
+  /**
+   * @brief Represent SEALContext parameters as a serialized string.
+   * @param compression_mode The compression mode to use.
+   * Note: String may contain null-terminating characters.
+  */
+  string save_parameters(string compression_mode="none") override;
+
+  /**
+   * @brief Calculate the size of the serialized SEALContext parameters.
+   * @param compression_mode The compression mode to use.
+  */
+  int save_parameters_size(string compression_mode="none") override;
+
+  /**
+   * @brief Load SEALContext parameters from a serialized byte array.
+   * @param buffer The byte array containing the serialized parameters.
+   * @param size The size of the byte array.
+   * @param compression_mode The compression mode used.
+  */
+  void save_parameters_inplace(byte* buffer, int size, string compression_mode="none") override;
+
+  /**
+   * @brief Load SEALContext parameters from a serialized byte array.
+   * @param buffer The byte array containing the serialized parameters.
+   * @param size The size of the byte array.
+  */
+  void load_parameters_inplace(const byte* buffer, int size) override;
 
   /**
    * @brief Replaces the existing SEALContext with a new one,
@@ -270,8 +342,8 @@ public:
   void disable_mod_switch() override;
 
   // ------------------ Keys ------------------
-
   void KeyGen() override;
+  void KeyGen(ASecretKey &sec);
   void RelinKeyGen() override;
   void relinearize(ACiphertext &ctxt) override;
   void mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt) override;
@@ -281,6 +353,8 @@ public:
   void rescale_to_next(ACiphertext &ctxt) override;
   APublicKey& get_public_key() override;
   ASecretKey& get_secret_key() override;
+  string save_secret_key() override;
+  ASecretKey& load_secret_key(string sk) override;
   ARelinKey& get_relin_keys() override;
 
   // ------------------ Cryptography ------------------

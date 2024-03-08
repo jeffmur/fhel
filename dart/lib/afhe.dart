@@ -20,6 +20,7 @@ part 'afhe/operation.dart';
 part 'afhe/crypto.dart';
 part 'afhe/codec.dart';
 part 'afhe/errors.dart';
+part 'afhe/serial.dart';
 
 /// Abstract Fully Homomorphic Encryption
 ///
@@ -46,6 +47,15 @@ class Afhe {
     backend = Backend.set(backendName);
     scheme = Scheme.set(schemeName);
     library = _c_init_backend(backend.value);
+  }
+
+  /// Initializes the [Backend] without a [Scheme].
+  /// 
+  /// Typically used for loading parameters from a shared session.
+  Afhe.noScheme(String backendName) {
+    backend = Backend.set(backendName);
+    library = _c_init_backend(backend.value);
+    scheme = Scheme();
   }
 
   /// Generates a context for the Brakerski-Fan-Vercauteren (BFV) scheme.
@@ -106,6 +116,30 @@ class Afhe {
     };
   }
 
+  /// Loads the encryption context from a string.
+  ///
+  /// Used for generating a shared session.
+  String genContextFromParameters(Map parameters) {
+    final ptr = _c_gen_context_from_str(library, parameters['header'], parameters['size']);
+    raiseForStatus();
+    return ptr.toDartString();
+  }
+
+  /// Returns the string representation of FHE parameters.
+  /// 
+  /// Useful for saving to disk or sending over the network.
+  /// The `header` is the string representation of the parameters.
+  /// The `size` is the length of the string.
+  Map saveParameters() {
+    final params = _c_save_params(library);
+    final paramSize = _c_save_params_size(library);
+    raiseForStatus();
+    return {
+      "header": params,
+      "size": paramSize,
+    };
+  }
+
   /// Generates the public and secret keys for the encryption and decryption.
   void genKeys() {
     _c_gen_keys(library);
@@ -146,10 +180,20 @@ class Afhe {
     return n;
   }
 
+  /// Loads a [Ciphertext] from a non-human-readable format.
+  /// 
+  /// Useful for loading from disk or receiving over the network.
+  /// The [size] is the length of the data.
+  /// The [data] is a pointer to the memory address of the data.
+  Ciphertext loadCiphertext(Pointer<Uint8> data, int size) {
+    Pointer ptr = _c_load_ciphertext(library, data, size);
+    raiseForStatus();
+    return Ciphertext.fromPointer(backend, ptr);
+  }
+
   /// Encodes a list of integers into a [Plaintext].
   Plaintext encodeVecInt(List<int> vec) {
-    Pointer ptr =
-        _c_encode_vector_int(library, intListToUint64Array(vec), vec.length);
+    Pointer ptr = _c_encode_vector_int(library, intListToUint64Array(vec), vec.length);
     raiseForStatus();
     return Plaintext.fromPointer(backend, ptr);
   }

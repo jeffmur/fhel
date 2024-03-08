@@ -27,7 +27,7 @@ TEST(Basics, BGV)
      int security_level = 128;
      string ctx = fhe->ContextGen(scheme::bgv, poly_modulus_degree, plain_modulus_bit_size, 0, security_level);
      EXPECT_STREQ(ctx.c_str(), "success: valid");
-     print_parameters(fhe->get_context());
+     print_parameters(_to_context(fhe->get_context()));
 
      fhe->KeyGen();
      fhe->RelinKeyGen();

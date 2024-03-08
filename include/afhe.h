@@ -47,11 +47,24 @@ enum scheme : int
 
 // ------------------ Abstractions ------------------
 /**
+ * @brief Abstraction for FHE Context
+*/
+class AContext {
+public:
+  virtual ~AContext() = default;
+  // virtual TODO param_id() = 0;
+};
+
+/**
  * @brief Abstraction for Plaintexts.
  */
 class APlaintext {
 public:
   virtual ~APlaintext() = default;
+
+  /**
+   * @brief Returns a string representation of the plaintext.
+  */
   virtual string to_string() = 0;
 };
 
@@ -61,9 +74,38 @@ public:
 class ACiphertext{
 public:
   virtual ~ACiphertext() = default;
+
+  /**
+   * @brief Returns the size of the ciphertext.
+  */
   virtual size_t size() = 0;
+
+  /**
+   * @brief Returns the scale of the ciphertext.
+  */
   virtual double scale() = 0;
+
+  /**
+   * @brief Sets the scale of the ciphertext.
+  */
   virtual void set_scale(double scale) = 0;
+
+  /**
+   * @brief Saves the ciphertext.
+  */
+  virtual string save(string compression_mode="none") = 0;
+
+  /**
+   * @brief Calucate the save size of the ciphertext.
+  */
+  virtual int save_size(string compression_mode="none") = 0;
+
+  /**
+   * @brief Loads the ciphertext.
+   * @param fhe The backend library to be used to validate the ciphertext.
+   * @param ctxt The ciphertext to be loaded.
+  */
+  virtual void load(Afhe* fhe, string ctxt) = 0;
 };
 
 /**
@@ -131,19 +173,47 @@ public:
     int sec_level, vector<int> qi_sizes = {}) = 0;
 
   /**
+   * @brief Generates a context for the Fully Homomorphic Encryption (FHE) scheme from a set of parameters.
+   * 
+   * The context contains all the public parameters needed for the encryption and decryption processes.
+   * 
+   * @param params A string representing the parameters used to generate the context.
+   * 
+   * @return A string representing the status of generated context.
+  */
+  virtual string ContextGen(string params) = 0;
+
+  /**
+   * @brief Returns the context.
+   */
+  virtual AContext& get_context() = 0;
+
+  /**
+   * @brief Returns the parameters, used for re-generating the context.
+  */
+  virtual string save_parameters(string compression_mode="none") = 0;
+
+  /**
+   * @brief Returns the size of the parameters, used for re-generating the context.
+  */
+  virtual int save_parameters_size(string compression_mode="none") = 0;
+
+  /**
+   * @brief Saves the parameters, used for re-generating the context.
+   * Exposes lower level interface for saving parameters.
+  */
+  virtual void save_parameters_inplace(byte* out, int size, string compression_mode="none") = 0;
+  
+  /**
+   * @brief Loads the parameters, used for re-generating the context.
+   * Exposure lower level interface for loading parameters.
+  */
+  virtual void load_parameters_inplace(const byte* in, int size) = 0;
+
+  /**
    * @brief Disables the modulus switching chain
   */
   virtual void disable_mod_switch() = 0;
-
-  // virtual vector<uint64_t> get_qi() = 0;
-  // virtual uint64_t get_plain_modulus() = 0;
-  // virtual size_t get_poly_modulus_degree() = 0;
-  // virtual scheme_t get_scheme() = 0;
-
-  // ------------------ Sizes ------------------
-  // virtual size_t sizeof_context(std::string &compr_mode) = 0;
-  // virtual size_t sizeof_plaintext(std::string &compr_mode, APlainTxt &pt) = 0;
-  // virtual size_t sizeof_ciphertext(std::string &compr_mode, ACipherTxt &ct) = 0;
 
   // ------------------ Cryptography ------------------
 
@@ -161,6 +231,16 @@ public:
    * @brief Returns the secret key.
   */
   virtual ASecretKey& get_secret_key() = 0;
+
+  /**
+   * @brief Saves the secret key.
+  */
+  virtual string save_secret_key() = 0;
+
+  /**
+   * @brief Loads the secret key.
+  */
+  virtual ASecretKey& load_secret_key(string secret_key) = 0;
 
   /**
    * @brief Returns the relinearization keys.
@@ -221,9 +301,6 @@ public:
    * @param ctxt The ciphertext to be rescaled, inplace.
   */
   virtual void rescale_to_next(ACiphertext &ctxt) = 0;
-
-  // virtual string get_secret_key() = 0;
-  // virtual string get_public_key() = 0;
 
   /**
    * @brief Encrypts a plaintext message into a ciphertext.

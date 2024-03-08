@@ -11,6 +11,7 @@
 
 #include "aseal.h"
 #include "afhe.h"
+#include <bitset>
 
 using namespace std;
 using namespace seal;
@@ -80,14 +81,7 @@ string Aseal::ContextGen(scheme scheme,
   // Initialize Encoder object
   if(this->context->parameters_set() && plain_modulus_bit_size > 0)
   {
-    if (scheme == scheme::bfv || scheme == scheme::bgv)
-    {
-      this->bEncoder = make_shared<BatchEncoder>(*this->context);
-    }
-    else if (scheme == scheme::ckks)
-    {
-      this->cEncoder = make_shared<CKKSEncoder>(*this->context);
-    }
+    set_encoders();
   }
 
   // Return info about parameter validity.
@@ -101,6 +95,120 @@ string Aseal::ContextGen(scheme scheme,
   }
 }
 
+string Aseal::ContextGen(string parms)
+{
+  // Initialize parameters with scheme
+  this->params = make_shared<EncryptionParameters>();
+
+  // Load parameters from string
+  istringstream ss(parms);
+
+  this->params->load(ss);
+
+  // Validate parameters by putting them inside a SEALContext
+  this->context = make_shared<SEALContext>(*this->params, true);
+
+  // Initialize Encoder object
+  if(this->context->parameters_set())
+  {
+    set_encoders(true);
+  }
+
+  // Return info about parameter validity.
+  //    - 'success: valid' if everything went well
+  //    - Error name and message from list in seal/context/context.cpp otherwise
+  return string(this->context->parameter_error_name())  + ": " +
+                this->context->parameter_error_message();
+}
+
+void Aseal::set_encoders(bool ignore_exception)
+{
+  // Gather current context and scheme.
+  auto &seal_context = *_this_context();
+  const auto &context_data = context->key_context_data();
+  const auto &scheme = context_data->parms().scheme();
+
+  if (scheme == scheme_type::bfv || scheme == scheme_type::bgv)
+  {
+    try {
+      // Initialize BatchEncoder object
+      this->bEncoder = make_shared<BatchEncoder>(seal_context);
+    }
+    // Skip assignment, as parameters are not setup for batching
+    catch (invalid_argument &e) {
+      if (!ignore_exception) {
+        throw e;
+      }
+    }
+  }
+  else if (scheme == scheme_type::ckks)
+  {
+    // Initialize CKKSEncoder object
+    this->cEncoder = make_shared<CKKSEncoder>(seal_context);
+  }
+  else {
+    if (!ignore_exception) {
+        throw logic_error("Scheme is not set");;
+      }
+  }
+}
+
+void Aseal::save_parameters_inplace(byte *out, int size, string compr_mode)
+{
+  // Initialize params
+  this->params = make_shared<EncryptionParameters>();
+
+  // Write to memory
+  this->params->save(out, size, compression_mode_map.at(compr_mode));
+
+  // Validate parameters by putting them inside a SEALContext
+  this->context = make_shared<SEALContext>(*this->params, true);
+}
+
+void Aseal::load_parameters_inplace(const byte *in, int size)
+{
+  // Initialize params
+  this->params = make_shared<EncryptionParameters>();
+
+  // Load from memory
+  this->params->load(in, size);
+
+  // Validate parameters by putting them inside a SEALContext
+  this->context = make_shared<SEALContext>(*this->params, true);
+}
+
+string Aseal::save_parameters(string compr_mode)
+{
+  // Share as a binary string
+  ostringstream ss;
+
+  if (this->params == nullptr)
+  {
+    throw logic_error("Parameters are not set, cannot save them.");
+  }
+
+  // Save parameters to stringstream
+  int size = save_parameters_size(compr_mode);
+  this->params->save(ss, compression_mode_map.at(compr_mode));
+
+  // cout << endl << "save_parameters: " << ss.str() << endl;
+  // cout << "save_parameters_size: " << size << " vs str length: " << ss.str().length() << endl;
+  // cout << "compression_mode: " << compr_mode << endl;
+
+  return ss.str();
+}
+
+int Aseal::save_parameters_size(string compr_mode)
+{
+  if (this->params == nullptr)
+  {
+    throw logic_error("Parameters are not set, cannot save them.");
+  }
+
+  // Save parameters to stringstream
+  return this->params->save_size(compression_mode_map.at(compr_mode));
+}
+
 void Aseal::disable_mod_switch()
 {
   // Update existing context with same parameters
@@ -110,7 +218,7 @@ void Aseal::disable_mod_switch()
 void Aseal::KeyGen()
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize KeyGen object
   this->keyGenObj = make_shared<KeyGenerator>(seal_context);
@@ -128,6 +236,27 @@ void Aseal::KeyGen()
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
 }
 
+void Aseal::KeyGen(ASecretKey &sec)
+{
+  // Gather current context, resolves object
+  auto &seal_context = *_this_context();
+
+  // Copy Secret Key
+  this->secretKey = make_shared<SecretKey>(_to_secret_key(sec));
+
+  // Initialize KeyGen object
+  this->keyGenObj = make_shared<KeyGenerator>(seal_context, *this->secretKey);
+
+  // Initialize empty PublicKey object
+  this->publicKey = make_shared<PublicKey>();
+
+  // Derive Key Pair
+  keyGenObj->create_public_key(*this->publicKey);
+
+  // Refresh Encryptor, Evaluator, and Decryptor objects
+  this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
+}
+
 APublicKey& Aseal::get_public_key()
 {
   AsealPublicKey* publicKey = new AsealPublicKey(*this->publicKey);
@@ -140,6 +269,41 @@ ASecretKey& Aseal::get_secret_key()
   return _from_secret_key(*secretKey);
 }
 
+string Aseal::save_secret_key()
+{
+  // Share as a binary string
+  ostringstream ss;
+
+  if (this->secretKey == nullptr)
+  {
+    throw logic_error("Secret Key is not set, cannot save it.");
+  }
+
+  // Save secret key to stringstream
+  this->secretKey->save(ss, seal::compr_mode_type::none);
+
+  return ss.str();
+}
+
+ASecretKey& Aseal::load_secret_key(string sec_key)
+{
+  // Initialize a SecretKey object
+  SecretKey *sealKey = new SecretKey();
+
+  if (this->context == nullptr)
+  {
+    throw logic_error("Context is not set, cannot load secret key.");
+  }
+
+  // Load secret key from string
+  istringstream ss(sec_key);
+  sealKey->load(*this->context, ss);
+
+  AsealSecretKey* secretKey = new AsealSecretKey(*sealKey);
+
+  return _from_secret_key(*secretKey);
+}
+
 ARelinKey& Aseal::get_relin_keys(){
   AsealRelinKey* relinKeys = new AsealRelinKey(*this->relinKeys);
   return _from_relin_keys(*relinKeys);
@@ -148,7 +312,7 @@ ARelinKey& Aseal::get_relin_keys(){
 void Aseal::RelinKeyGen()
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize KeyGen object
   if (this->keyGenObj == nullptr)
@@ -164,7 +328,7 @@ void Aseal::RelinKeyGen()
 void Aseal::relinearize(ACiphertext &ctxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -176,7 +340,7 @@ void Aseal::relinearize(ACiphertext &ctxt)
 void Aseal::mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -188,7 +352,7 @@ void Aseal::mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt)
 void Aseal::mod_switch_to(ACiphertext &to, ACiphertext &from)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -200,7 +364,7 @@ void Aseal::mod_switch_to(ACiphertext &to, ACiphertext &from)
 void Aseal::mod_switch_to_next(ACiphertext &ctxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -212,7 +376,7 @@ void Aseal::mod_switch_to_next(ACiphertext &ctxt)
 void Aseal::mod_switch_to_next(APlaintext &ptxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -224,7 +388,7 @@ void Aseal::mod_switch_to_next(APlaintext &ptxt)
 void Aseal::rescale_to_next(ACiphertext &ctxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -246,7 +410,7 @@ void Aseal::rescale_to_next(ACiphertext &ctxt)
 void Aseal::encrypt(APlaintext &ptxt, ACiphertext &ctxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Encryptor object
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
@@ -258,7 +422,7 @@ void Aseal::encrypt(APlaintext &ptxt, ACiphertext &ctxt)
 void Aseal::decrypt(ACiphertext &ctxt, APlaintext &ptxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Decryptor object
   this->decryptor = make_shared<Decryptor>(seal_context, *this->secretKey);
@@ -270,7 +434,7 @@ void Aseal::decrypt(ACiphertext &ctxt, APlaintext &ptxt)
 int Aseal::invariant_noise_budget(ACiphertext &ctxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Decryptor object
   this->decryptor = make_shared<Decryptor>(seal_context, *this->secretKey);
@@ -281,7 +445,7 @@ int Aseal::invariant_noise_budget(ACiphertext &ctxt)
 int Aseal::slot_count()
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   if (this->bEncoder != nullptr) {
     return this->bEncoder->slot_count();
@@ -295,7 +459,7 @@ int Aseal::slot_count()
 void Aseal::encode_int(vector<uint64_t> &data, APlaintext &ptxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Encoder object
   // this->bEncoder = make_shared<BatchEncoder>(seal_context);
@@ -307,7 +471,7 @@ void Aseal::encode_int(vector<uint64_t> &data, APlaintext &ptxt)
 void Aseal::decode_int(APlaintext &ptxt, vector<uint64_t> &data)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Encoder object
   // this->bEncoder = make_shared<BatchEncoder>(seal_context);
@@ -319,7 +483,7 @@ void Aseal::decode_int(APlaintext &ptxt, vector<uint64_t> &data)
 void Aseal::encode_double(vector<double> &data, APlaintext &ptxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Encode using casted types
   this->cEncoder->encode(data, this->cEncoderScale, _to_plaintext(ptxt));
@@ -328,7 +492,7 @@ void Aseal::encode_double(vector<double> &data, APlaintext &ptxt)
 void Aseal::encode_double(double data, APlaintext &ptxt)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Encode using casted types
   this->cEncoder->encode(data, this->cEncoderScale, _to_plaintext(ptxt));
@@ -337,7 +501,7 @@ void Aseal::encode_double(double data, APlaintext &ptxt)
 void Aseal::decode_double(APlaintext &ptxt, vector<double> &data)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Encoder object
   // this->cEncoder = make_shared<CKKSEncoder>(seal_context);
@@ -349,7 +513,7 @@ void Aseal::decode_double(APlaintext &ptxt, vector<double> &data)
 void Aseal::add(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -361,7 +525,7 @@ void Aseal::add(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res)
 void Aseal::add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -373,7 +537,7 @@ void Aseal::add(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res)
 void Aseal::subtract(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -385,7 +549,7 @@ void Aseal::subtract(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res)
 void Aseal::subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -397,7 +561,7 @@ void Aseal::subtract(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_r
 void Aseal::multiply(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);
@@ -409,7 +573,7 @@ void Aseal::multiply(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_r
 void Aseal::multiply(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res)
 {
   // Gather current context, resolves object
-  auto &seal_context = *(this->get_context());
+  auto &seal_context = *_this_context();
 
   // Initialize Evaluator object
   this->evaluator = make_shared<Evaluator>(seal_context);

@@ -134,6 +134,26 @@ extern "C" {
     const char* generate_context(Afhe* afhe, scheme_t scheme, uint64_t poly_mod_degree, uint64_t pt_mod_bit, uint64_t pt_mod, uint64_t sec_level, const uint64_t* qi_sizes, uint64_t qi_sizes_length);
 
     /**
+     * @brief Generate a context for the backend library from parameters.
+     * @param afhe Pointer to the backend library.
+     * @param params String representing the parameters.
+     * @return String representing the context.
+    */
+    const char* generate_context_from_str(Afhe* afhe, const char* params, int size);
+
+    /**
+     * @brief Save the parameters for the backend library.
+     * @param afhe Pointer to the backend library.
+     * @return String representing the parameters.
+    */
+    const char* save_parameters(Afhe* afhe);
+
+    /**
+     * @brief Save the size of the parameters for the backend library.
+    */
+    int save_parameters_size(Afhe* afhe);
+
+    /**
      * @brief Generate keys for the backend library.
      * @param afhe Pointer to the backend library.
     */
@@ -187,6 +207,29 @@ extern "C" {
      * @return Size of the ciphertext.
      */
     int get_ciphertext_size(ACiphertext* ciphertext);
+
+    /**
+     * @brief Convert the ciphertext to a string.
+     * @param ciphertext Pointer to the ciphertext.
+     * @return String representing the ciphertext.
+    */
+    const char* save_ciphertext(ACiphertext* ciphertext);
+
+    /**
+     * @brief Save the size of the ciphertext.
+     * @param ciphertext Pointer to the ciphertext.
+     * @return Size of the serialized ciphertext payload.
+    */
+    int save_ciphertext_size(ACiphertext* ciphertext);
+
+    /**
+     * @brief Load a ciphertext from a string.
+     * @param afhe Pointer to the backend library.
+     * @param data String representing the ciphertext.
+     * @param size Size of the ciphertext.
+     * @return Pointer to the loaded ciphertext.
+    */
+    ACiphertext* load_ciphertext(Afhe* afhe, const char* data, int size);
 
     /**
      * @brief Encrypt a plaintext.

@@ -78,7 +78,7 @@ TEST(Basics, Levels)
     Aseal* fhe = new Aseal();
     string ctx = fhe->ContextGen(scheme::bfv, poly_modulus_degree, poly_modulus_bit_size, 0, security_level);
     EXPECT_STREQ(ctx.c_str(), "success: valid");
-    auto context = fhe->get_context();
+    AsealContext context = _to_context(fhe->get_context());
     print_parameters(context);
 
     /*
@@ -97,7 +97,7 @@ TEST(Basics, Levels)
     /*
     First print the key level parameter information.
     */
-    auto context_data = context->key_context_data();
+    auto context_data = context.key_context_data();
 
     cout << "----> Level (chain index): " << context_data->chain_index();
     cout << " ...... key_context_data()" << endl;
@@ -120,15 +120,15 @@ TEST(Basics, Levels)
     /*
     Next iterate over the remaining (data) levels.
     */
-    context_data = context->first_context_data();
+    context_data = context.first_context_data();
     while (context_data)
     {
         cout << " Level (chain index): " << context_data->chain_index();
-        if (context_data->parms_id() == context->first_parms_id())
+        if (context_data->parms_id() == context.first_parms_id())
         {
             cout << " ...... first_context_data()" << endl;
         }
-        else if (context_data->parms_id() == context->last_parms_id())
+        else if (context_data->parms_id() == context.last_parms_id())
         {
             cout << " ...... last_context_data()" << endl;
         }
@@ -218,7 +218,7 @@ TEST(Basics, Levels)
     */
     print_line(__LINE__);
     cout << "Perform modulus switching on encrypted and print." << endl;
-    context_data = context->first_context_data();
+    context_data = context.first_context_data();
     cout << "---->";
     while (context_data->next_context_data())
     {
@@ -332,7 +332,7 @@ TEST(Basics, Levels)
     print_line(__LINE__);
     cout << "Disable modulus switching chain." << endl;
     fhe->disable_mod_switch();
-    context = fhe->get_context();
+    context = _to_context(fhe->get_context());
 
     /*
     We can check that indeed the modulus switching chain has been created only
@@ -341,7 +341,7 @@ TEST(Basics, Levels)
     */
     cout << "Optionally disable modulus switching chain expansion." << endl;
     cout << "---->";
-    for (context_data = context->key_context_data(); context_data; context_data = context_data->next_context_data())
+    for (context_data = context.key_context_data(); context_data; context_data = context_data->next_context_data())
     {
         cout << " Level (chain index): " << context_data->chain_index() << endl;
         cout << "      parms_id: " << hex;

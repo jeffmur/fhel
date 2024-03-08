@@ -24,12 +24,12 @@ Plaintext multiply(Seal fhe, Plaintext pt_x, Plaintext pt_m,
     fhe.genRelinKeys();
     final ct_m = fhe.encrypt(pt_m);
     Ciphertext ct_no_relin = fhe.multiply(ct_x, ct_m);
-    expect(ct_no_relin.size(), 3);
+    expect(ct_no_relin.size, 3);
     ct_res = fhe.relinearize(ct_no_relin);
-    expect(ct_res.size(), 2);
+    expect(ct_res.size, 2);
   } else {
     ct_res = fhe.multiplyPlain(ct_x, pt_m);
-    expect(ct_res.size(), 2);
+    expect(ct_res.size, 2);
   }
   if (modSwitch) {
     modSwitchTest(fhe, ct_res);

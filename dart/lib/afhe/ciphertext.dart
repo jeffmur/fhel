@@ -15,6 +15,27 @@ final _GetCiphertextSize _c_get_ciphertext_size = dylib
     .lookup<NativeFunction<_GetCiphertextSizeC>>('get_ciphertext_size')
     .asFunction();
 
+typedef _SaveCiphertextC = Pointer<Uint8> Function(Pointer ciphertext);
+typedef _SaveCiphertext = Pointer<Uint8> Function(Pointer ciphertext);
+
+final _SaveCiphertext _c_save_ciphertext = dylib
+    .lookup<NativeFunction<_SaveCiphertextC>>('save_ciphertext')
+    .asFunction();
+
+typedef _SaveCipherSizeC = Int32 Function(Pointer ciphertext);
+typedef _SaveCipherSize = int Function(Pointer ciphertext);
+
+final _SaveCipherSize _c_get_ciphertext_save_size = dylib
+    .lookup<NativeFunction<_SaveCipherSizeC>>('save_ciphertext_size')
+    .asFunction();
+
+typedef _LoadCiphertextC = Pointer Function(Pointer library, Pointer<Uint8> data, Int size);
+typedef _LoadCiphertext = Pointer Function(Pointer library, Pointer<Uint8> data, int size);
+
+final _LoadCiphertext _c_load_ciphertext = dylib
+    .lookup<NativeFunction<_LoadCiphertextC>>('load_ciphertext')
+    .asFunction();
+
 
 /// Represents an underlying C ciphertext object.
 ///
@@ -37,10 +58,15 @@ class Ciphertext {
   /// Initializes a ciphertext using the provided [Backend] and [Pointer].
   Ciphertext.fromPointer(this.backend, this.obj);
 
-  /// Returns the size of the ciphertext.
-  int size() {
-    return _c_get_ciphertext_size(obj);
-  }
+  /// Returns the number of bytes of the ciphertext.
+  int get size => _c_get_ciphertext_size(obj);
+
+  /// Calculates the number of bytes of the serialized ciphertext.
+  int get save_size => _c_get_ciphertext_save_size(obj);
+
+  /// Saves the [Ciphertext] to a non-human-readable format.
+  /// Useful for saving to disk or sending over the network.
+  Pointer<Uint8> save() => _c_save_ciphertext(obj);
 }
 
 // --- noise budget ---

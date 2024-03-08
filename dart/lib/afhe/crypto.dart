@@ -3,6 +3,30 @@ part of '../afhe.dart';
 
 // --- encryption parameters ---
 
+typedef _SaveParamsC = Pointer<Uint8> Function(Pointer library);
+typedef _SaveParams = Pointer<Uint8> Function(Pointer library);
+final _SaveParams _c_save_params = dylib
+    .lookup<NativeFunction<_SaveParamsC>>('save_parameters').asFunction();
+
+typedef _SaveParamsSizeC = Int32 Function(Pointer library);
+typedef _SaveParamsSize = int Function(Pointer library);
+final _SaveParamsSize _c_save_params_size = dylib
+    .lookup<NativeFunction<_SaveParamsSizeC>>('save_parameters_size')
+    .asFunction();
+
+typedef _SaveParamsBytesC = Pointer<Uint8> Function(Pointer library);
+typedef _SaveParamsBytes = Pointer<Uint8> Function(Pointer library);
+final _SaveParamsBytes _c_save_params_bytes = dylib
+    .lookup<NativeFunction<_SaveParamsBytesC>>('save_parameters_bytes')
+    .asFunction();
+
+typedef _LoadParamsC = Void Function(Pointer library, Pointer<Uint8> params, Int size);
+typedef _LoadParams = void Function(Pointer library, Pointer<Uint8> params, int size);
+final _LoadParams _c_load_params_bytes = dylib
+    .lookup<NativeFunction<_LoadParamsC>>('load_parameters_bytes').asFunction();
+
+// --- context ---
+
 typedef _GenContextC = Pointer<Utf8> Function(
     Pointer library,
     Int32 scheme,
@@ -25,6 +49,16 @@ typedef _GenContext = Pointer<Utf8> Function(
 
 final _GenContext _c_gen_context = dylib
     .lookup<NativeFunction<_GenContextC>>('generate_context').asFunction();
+
+typedef _GenContextFromStrC = Pointer<Utf8> Function(
+    Pointer library, Pointer<Uint8> context_str, Int context_size);
+
+typedef _GenContextFromStr = Pointer<Utf8> Function(
+    Pointer library, Pointer<Uint8> context_str, int context_size);
+
+final _GenContextFromStr _c_gen_context_from_str = dylib
+    .lookup<NativeFunction<_GenContextFromStrC>>('generate_context_from_str')
+    .asFunction();
 
 // --- encryption keys ---
 

@@ -70,7 +70,7 @@ TEST(Basics, CKKS)
     size_t poly_modulus_degree = 8192;
     string ctx = fhe->ContextGen(scheme::ckks, poly_modulus_degree, scale, -1, -1, primes);
     EXPECT_STREQ(ctx.c_str(), "success: valid");
-    print_parameters(fhe->get_context());
+    print_parameters(_to_context(fhe->get_context()));
 
     fhe->KeyGen();
     fhe->RelinKeyGen();
@@ -181,14 +181,15 @@ TEST(Basics, CKKS)
     the same, and also that the encryption parameters (parms_id) match. If there
     is a mismatch, Evaluator will throw an exception.
     */
+    auto sealContext = _to_context(fhe->get_context());
     print_line(__LINE__);
     cout << "Parameters used by all three terms are different." << endl;
     cout << "    + Modulus chain index for x3_encrypted_coeff3: "
-         << fhe->get_context()->get_context_data(x3_encrypted_coeff3.parms_id())->chain_index() << endl;
+         << sealContext.get_context_data(x3_encrypted_coeff3.parms_id())->chain_index() << endl;
     cout << "    + Modulus chain index for x1_encrypted_coeff1: "
-         << fhe->get_context()->get_context_data(x1_encrypted_coeff1.parms_id())->chain_index() << endl;
+         << sealContext.get_context_data(x1_encrypted_coeff1.parms_id())->chain_index() << endl;
     cout << "    + Modulus chain index for plain_coeff0: "
-         << fhe->get_context()->get_context_data(plain_coeff0.parms_id())->chain_index() << endl;
+         << sealContext.get_context_data(plain_coeff0.parms_id())->chain_index() << endl;
     cout << endl;
 
     /*

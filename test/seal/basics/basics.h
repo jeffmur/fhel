@@ -15,9 +15,9 @@ inline void print_line(int line_number)
 /**
  * @brief Print the parameters in a SEALContext
 */
-inline void print_parameters(const shared_ptr<seal::SEALContext> &context)
+inline void print_parameters(const seal::SEALContext &context)
 {
-    const auto &context_data = context->key_context_data();
+    const auto &context_data = context.key_context_data();
 
     string scheme_name;
     switch (context_data->parms().scheme())
