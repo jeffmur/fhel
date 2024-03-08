@@ -464,6 +464,16 @@ public:
    * This function performs the squaring operation on a ciphertext and stores the result in another ciphertext.
   */
   virtual void square(ACiphertext &ctxt, ACiphertext &ctxt_res) = 0;
+
+  /**
+   * @brief Raises a ciphertext to a power and stores the result in another ciphertext.
+   * 
+   * Applies relinearization after each multiplication step.
+   * @param ctxt The ciphertext to be raised to a power.
+   * @param power The power to raise the ciphertext to.
+   * @param ctxt_res The ciphertext where the result will be stored.
+  */
+  virtual void power(ACiphertext &ctxt, int power, ACiphertext &ctxt_res) = 0;
 };
 
 #endif /* AFHE_H */
