@@ -23,3 +23,8 @@ final _MultiplyC _c_multiply_plain = dylib.lookup<NativeFunction<_MultiplyC>>('m
 
 typedef _SquareC = Pointer Function(Pointer library, Pointer a);
 final _SquareC _c_square = dylib.lookup<NativeFunction<_SquareC>>('square').asFunction();
+
+// --- power ---
+typedef _PowerC = Pointer Function(Pointer library, Pointer a, Int power);
+typedef _Power = Pointer Function(Pointer library, Pointer a, int power);
+final _Power _c_power = dylib.lookup<NativeFunction<_PowerC>>('power').asFunction();

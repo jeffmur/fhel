@@ -298,4 +298,15 @@ class Afhe {
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }
+
+  /// Raises the [Ciphertext] to a [power].
+  /// 
+  /// Only supported for BFV/BGV [Scheme].
+  /// The [power] must be a positive integer.
+  /// Applies relinearization after each multiplication step.
+  Ciphertext power(Ciphertext a, int power) {
+    Pointer ptr = _c_power(library, a.obj, power);
+    raiseForStatus();
+    return Ciphertext.fromPointer(backend, ptr);
+  }
 }
