@@ -45,7 +45,7 @@ docs:
 
 # Publish dart package
 .PHONY: publish
-publish: build-cmake
+publish:
 	@cd $(DART_SRC); $(MAKE) publish
 
 # Test Abstract Layer (AFHEL)
@@ -93,3 +93,9 @@ apk-ci: export ANDROID_SDK_ROOT ?= /tmp/android-sdk-linux
 apk-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
 	$(MAKE) apk
+
+# Publish dart package from github workflows
+.PHONY: publish-ci
+publish-ci: build-cmake
+	@git config --global --add safe.directory /tmp/flutter
+	@cd $(DART_SRC); $(MAKE) publish

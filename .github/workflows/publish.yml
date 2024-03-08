@@ -21,4 +21,4 @@ jobs:
         with:
           submodules: 'true'
       - uses: dart-lang/setup-dart@v1
-      - run: make publish
+      - run: make publish-ci
