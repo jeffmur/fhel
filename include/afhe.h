@@ -446,6 +446,9 @@ public:
 
   /**
    * @brief Multiplies two ciphertexts and stores the result in another ciphertext.
+   * @param ctxt1 The first ciphertext to be multiplied.
+   * @param ctxt2 The second ciphertext to multiply by.
+   * @param ctxt_res The ciphertext where the result will be stored.
    *
    * This function performs the multiplication operation on two ciphertexts and stores the result in a third ciphertext.
   */
@@ -453,6 +456,9 @@ public:
 
   /**
    * @brief Multiplies a ciphertext by a plaintext and stores the result in another ciphertext.
+   * @param ctxt The ciphertext to be multiplied.
+   * @param ptxt The plaintext to multiply by.
+   * @param ctxt_res The ciphertext where the result will be stored.
    *
    * This function performs the multiplication operation on a ciphertext and a plaintext and stores the result in a ciphertext.
   */
@@ -460,6 +466,8 @@ public:
 
   /**
    * @brief Squares a ciphertext and stores the result in another ciphertext.
+   * @param ctxt The ciphertext to be squared.
+   * @param ctxt_res The ciphertext where the result will be stored.
    *
    * This function performs the squaring operation on a ciphertext and stores the result in another ciphertext.
   */

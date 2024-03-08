@@ -52,13 +52,14 @@ void main() {
       final pt_hex_10 = fhe.plain(10.toRadixString(16));
       String status = fhe.genContext(ctx);
       expect(status, 'success: valid');
-      expect(100.toRadixString(16),
-          multiply(fhe, pt_hex_10, pt_hex_10).text.toLowerCase());
       expect(
-          100.toRadixString(16),
+          multiply(fhe, pt_hex_10, pt_hex_10).text.toLowerCase(),
+          100.toRadixString(16));
+      expect(
           multiply(fhe, pt_hex_10, pt_hex_10, encryptMultiplier: false)
               .text
-              .toLowerCase());
+              .toLowerCase(),
+          100.toRadixString(16),);
     }
   });
 
@@ -82,9 +83,9 @@ void main() {
 
       expect(product, fhe.decodeVecInt(multiply(fhe, pt_x, pt_m), arr_len));
       expect(
-          product,
           fhe.decodeVecInt(
-              multiply(fhe, pt_x, pt_m, encryptMultiplier: false), arr_len));
+              multiply(fhe, pt_x, pt_m, encryptMultiplier: false), arr_len),
+              product);
     }
   });
 
@@ -108,16 +109,16 @@ void main() {
     for (int i = 0; i < arr_len; i++) {
       near(
           eps: 1e-7,
-          product[i],
           fhe.decodeVecDouble(
-              multiply(fhe, pt_x, pt_m, modSwitch: false), arr_len)[i]);
+              multiply(fhe, pt_x, pt_m, modSwitch: false), arr_len)[i],
+              product[i]);
       near(
           eps: 1e-7,
-          product[i],
           fhe.decodeVecDouble(
               multiply(fhe, pt_x, pt_m,
                   modSwitch: false, encryptMultiplier: false),
-              arr_len)[i]);
+              arr_len)[i],
+          product[i]);
     }
   });
 
@@ -156,12 +157,8 @@ void main() {
     for (int i = 0; i < arr_len; i++) {
       near(
           eps: 1e-7,
-          product[i],
-          fhe.decodeVecDouble(pt_pi_squared, arr_len)[i]);
-      near(
-          eps: 1e-7,
-          product[i],
-          fhe.decodeVecDouble(pt_pi_squared, arr_len)[i]);
+          fhe.decodeVecDouble(pt_pi_squared, arr_len)[i],
+          product[i]);
     }
   });
 }
