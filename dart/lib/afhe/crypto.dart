@@ -1,5 +1,6 @@
 /// This file contains the FFI bindings for encryption and decryption methods.
 part of '../afhe.dart';
+// ignore_for_file: non_constant_identifier_names
 
 // --- encryption parameters ---
 
@@ -13,17 +14,6 @@ typedef _SaveParamsSize = int Function(Pointer library);
 final _SaveParamsSize _c_save_params_size = dylib
     .lookup<NativeFunction<_SaveParamsSizeC>>('save_parameters_size')
     .asFunction();
-
-typedef _SaveParamsBytesC = Pointer<Uint8> Function(Pointer library);
-typedef _SaveParamsBytes = Pointer<Uint8> Function(Pointer library);
-final _SaveParamsBytes _c_save_params_bytes = dylib
-    .lookup<NativeFunction<_SaveParamsBytesC>>('save_parameters_bytes')
-    .asFunction();
-
-typedef _LoadParamsC = Void Function(Pointer library, Pointer<Uint8> params, Int size);
-typedef _LoadParams = void Function(Pointer library, Pointer<Uint8> params, int size);
-final _LoadParams _c_load_params_bytes = dylib
-    .lookup<NativeFunction<_LoadParamsC>>('load_parameters_bytes').asFunction();
 
 // --- context ---
 

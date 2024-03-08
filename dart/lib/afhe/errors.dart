@@ -1,5 +1,6 @@
 /// This file contains the FFI bindings for handling C errors and throwing Dart exceptions.
 part of '../afhe.dart';
+// ignore_for_file: non_constant_identifier_names
 
 typedef _ErrorC = Pointer<Utf8> Function();
 

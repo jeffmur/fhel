@@ -1,7 +1,11 @@
+// ignore_for_file: non_constant_identifier_names
+
+import 'package:fhel/afhe.dart';
 import 'package:test/test.dart';
 import 'package:fhel/seal.dart' show Seal;
 import 'test_utils.dart';
 import 'dart:math';
+
 
 const schemes = ['bgv', 'bfv'];
 
@@ -15,7 +19,7 @@ String add(String scheme, String a, String b, Map<String, int> ctx, {bool encryp
   final pt_add = fhe.plain(b);
 
   // Optionally, addend can be plaintext
-  var ct_res;
+  Ciphertext ct_res;
   if (encryptAddend) {
     final ct_add = fhe.encrypt(pt_add);
     ct_res = fhe.add(ct_x, ct_add);

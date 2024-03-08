@@ -1,5 +1,6 @@
 /// This file contains the FFI bindinds for operations on the plaintext and ciphertext objects.
 part of '../afhe.dart';
+// ignore_for_file: non_constant_identifier_names
 
 // --- add ---
 

@@ -1,5 +1,6 @@
 /// This file contains the `Ciphertext` class and its associated FFI bindings.
 part of '../afhe.dart';
+// ignore_for_file: non_constant_identifier_names
 
 typedef _InitPlaintextC = Pointer Function(BackendType backend);
 typedef _InitPlaintext = Pointer Function(int backend);
