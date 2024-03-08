@@ -1,10 +1,10 @@
-import 'dart:js_util';
 import 'dart:math';
 
 import 'package:test/test.dart';
 import 'package:fhel/seal.dart' show Seal;
 import 'package:fhel/afhe.dart' show Plaintext, Ciphertext;
 import 'dart:ffi' show Pointer, Uint8;
+import 'test_utils.dart' show near;
 
 void main() {
   group("Parameters", () {
@@ -120,6 +120,68 @@ void main() {
 
       final dec_vec_h = host.decrypt(ct_vec_g_1);
       expect([2, 3, 4, 5, 6], equals(host.decodeVecInt(dec_vec_h, 5)));
+    }
+
+    final host = Seal('ckks');
+    Map<String, dynamic> ckks = {
+      'polyModDegree': 8192,
+      'encodeScalar': pow(2, 60),
+      'qSizes': [60, 40, 40, 60]
+    };
+    String h_ctx = host.genContext(ckks);
+    expect(h_ctx, 'success: valid');
+    host.genKeys();
+
+    // Encrypt + Save a double
+    double addend = 1.2345;
+    double pi = 3.14159;
+    double pi_res = addend + pi;
+    Plaintext pt_pi = host.encodeDouble(pi);
+    Ciphertext ct_pi = host.encrypt(pt_pi);
+
+    // Save the ciphertext
+    int ct_pi_size = ct_pi.save_size();
+    Pointer<Uint8> host_ct_pi = ct_pi.save();
+
+    // Encrypt + Save a double vector
+    List<double> vec = [1.0, 2.0, 3.0, 4.0, 5.0];
+    List<double> vec_res = [for (var element in vec) element + addend];
+    Plaintext pt_vec = host.encodeVecDouble(vec);
+    Ciphertext ct_vec = host.encrypt(pt_vec);
+
+    // Save the ciphertext
+    int ct_vec_size = ct_vec.save_size();
+    Pointer<Uint8> host_vec_pi = ct_vec.save();
+
+    // Initialize guest
+    final guest = Seal('ckks');
+    String g_ctx = guest.genContext(ckks);
+    expect(g_ctx, 'success: valid');
+    guest.genKeys();
+
+    // Load the ciphertexts from host
+    final ct_pi_g = guest.loadCiphertext(host_ct_pi, ct_pi_size);
+    final ct_vec_g = guest.loadCiphertext(host_vec_pi, ct_vec_size);
+
+    // Guest adds 1.2345 to each ciphertext
+    final ct_pi_g_1 = guest.addPlain(ct_pi_g, guest.encodeDouble(addend));
+    final ct_vec_g_1 = guest.addPlain(ct_vec_g, guest.encodeVecDouble(List.filled(5, addend)));
+
+    // Guest should not be able to decrypt the ciphertexts
+    final dec_pi = guest.decrypt(ct_pi_g_1);
+    expect(pi_res, isNot(equals(dec_pi.text)));
+
+    final dec_vec = guest.decrypt(ct_vec_g_1);
+    expect(vec_res, isNot(equals(guest.decodeVecDouble(dec_vec, 5))));
+
+    // Host should be able to decrypt the loaded, modified, ciphertexts
+    final dec_pi_h = host.decrypt(ct_pi_g_1);
+    // near(dec_pi_h.value, pi_res, eps: 1e-4); // TODO: Decode double?
+
+    final dec_vec_h = host.decrypt(ct_vec_g_1);
+    final dec_vec_h_d = host.decodeVecDouble(dec_vec_h, 5);
+    for (var i = 0; i < vec_res.length; i++) {
+      near(vec_res[i], dec_vec_h_d[i]);
     }
   });
 }
