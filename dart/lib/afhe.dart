@@ -40,12 +40,6 @@ class Afhe {
   /// A pointer to the memory address of the underlying C++ object.
   Pointer library = nullptr;
 
-  Afhe.noScheme(String backendName) {
-    backend = Backend.set(backendName);
-    library = _c_init_backend(backend.value);
-    scheme = Scheme();
-  }
-
   /// Default Constructor initializes [Backend] with [Scheme].
   ///
   /// The [library] stores the memory address of the underlying C++ object.
@@ -53,6 +47,15 @@ class Afhe {
     backend = Backend.set(backendName);
     scheme = Scheme.set(schemeName);
     library = _c_init_backend(backend.value);
+  }
+
+  /// Initializes the [Backend] without a [Scheme].
+  /// 
+  /// Typically used for loading parameters from a shared session.
+  Afhe.noScheme(String backendName) {
+    backend = Backend.set(backendName);
+    library = _c_init_backend(backend.value);
+    scheme = Scheme();
   }
 
   /// Generates a context for the Brakerski-Fan-Vercauteren (BFV) scheme.
@@ -114,23 +117,26 @@ class Afhe {
   }
 
   /// Loads the encryption context from a string.
+  ///
   /// Used for generating a shared session.
   String genContextFromParameters(Map parameters) {
-    // _c_load_params_bytes(library, parameters['header'], parameters['size']);
     final ptr = _c_gen_context_from_str(library, parameters['header'], parameters['size']);
     raiseForStatus();
     return ptr.toDartString();
   }
 
   /// Returns the string representation of FHE parameters.
-  /// Used for generating a shared session.
+  /// 
+  /// Useful for saving to disk or sending over the network.
+  /// The `header` is the string representation of the parameters.
+  /// The `size` is the length of the string.
   Map saveParameters() {
     final params = _c_save_params(library);
-    final param_size = _c_save_params_size(library);
+    final paramSize = _c_save_params_size(library);
     raiseForStatus();
     return {
       "header": params,
-      "size": param_size,
+      "size": paramSize,
     };
   }
 
@@ -175,10 +181,10 @@ class Afhe {
   }
 
   /// Loads a [Ciphertext] from a non-human-readable format.
+  /// 
   /// Useful for loading from disk or receiving over the network.
   /// The [size] is the length of the data.
   /// The [data] is a pointer to the memory address of the data.
-  ///
   Ciphertext loadCiphertext(Pointer<Uint8> data, int size) {
     Pointer ptr = _c_load_ciphertext(library, data, size);
     raiseForStatus();
