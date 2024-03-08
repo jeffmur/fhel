@@ -457,6 +457,13 @@ public:
    * This function performs the multiplication operation on a ciphertext and a plaintext and stores the result in a ciphertext.
   */
   virtual void multiply(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) = 0;
+
+  /**
+   * @brief Squares a ciphertext and stores the result in another ciphertext.
+   *
+   * This function performs the squaring operation on a ciphertext and stores the result in another ciphertext.
+  */
+  virtual void square(ACiphertext &ctxt, ACiphertext &ctxt_res) = 0;
 };
 
 #endif /* AFHE_H */
