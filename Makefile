@@ -43,6 +43,11 @@ build: trust-project build-cmake
 docs:
 	@cd $(DART_SRC); $(MAKE) docs
 
+# Publish dart package
+.PHONY: publish
+publish: build-cmake
+	@cd $(DART_SRC); $(MAKE) publish-dry
+
 # Test Abstract Layer (AFHEL)
 .PHONY: ctest
 ctest:

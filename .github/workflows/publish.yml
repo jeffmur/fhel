@@ -1,0 +1,23 @@
+name: Publish 🚀
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*' # tag pattern on pub.dev: 'v{{version}}'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/jeffmur/fhel:builder
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    environment:
+        name: pub.dev
+        url: https://pub.dev/packages/fhel
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+      - uses: dart-lang/setup-dart@v1
+      - run: make publish
