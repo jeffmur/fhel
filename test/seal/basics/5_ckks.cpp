@@ -112,7 +112,7 @@ TEST(Basics, CKKS)
     print_line(__LINE__);
     AsealCiphertext x2_encrypted;
     cout << "Compute x^2 and relinearize:" << endl;
-    fhe->multiply(x1_encrypted, x1_encrypted, x2_encrypted);
+    fhe->square(x1_encrypted, x2_encrypted);
     fhe->relinearize(x2_encrypted);
     cout << "    + Scale of x^2 before rescale: " << log2(x2_encrypted.scale()) << " bits" << endl;
 

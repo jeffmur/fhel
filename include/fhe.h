@@ -324,6 +324,14 @@ extern "C" {
     ACiphertext* multiply_plain(Afhe* afhe, ACiphertext* ciphertext, APlaintext* plaintext);
 
     /**
+     * @brief Square a ciphertext.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext Pointer to the ciphertext.
+     * @return Pointer to the resulting ciphertext.
+    */
+    ACiphertext* square(Afhe* afhe, ACiphertext* ciphertext);
+
+    /**
      * @brief Encode a vector of integers into a plaintext.
      * @param afhe Pointer to the backend library.
      * @param data Vector of integers to encode.
