@@ -593,3 +593,24 @@ void Aseal::square(ACiphertext &ctxt, ACiphertext &ctxt_res)
   // Square using casted types
   this->evaluator->square(_to_ciphertext(ctxt), _to_ciphertext(ctxt_res));
 }
+
+void Aseal::power(ACiphertext &ctxt, int power, ACiphertext &ctxt_res)
+{
+  if (power < 0)
+  {
+    throw invalid_argument("Power must be a positive integer");
+  }
+  if (this->relinKeys == nullptr)
+  {
+    throw logic_error("RelinKeys must be set to perform power operation");
+  }
+
+  // Gather current context, resolves object
+  auto &seal_context = *_this_context();
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Power using casted types
+  this->evaluator->exponentiate(_to_ciphertext(ctxt), power, *this->relinKeys, _to_ciphertext(ctxt_res));
+}

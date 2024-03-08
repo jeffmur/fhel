@@ -296,6 +296,13 @@ TEST(Multiply, PiXSquared) {
   AsealCiphertext ct_squared = AsealCiphertext();
   AsealCiphertext ct_pi_squared = AsealCiphertext();
 
+  // power() cannot be used with SEAL CKKS.
+  try {
+    fhe->power(ct_x, 2, ct_squared);
+  } catch (const logic_error& e) {
+    EXPECT_STREQ(e.what(), "encrypted is not valid for encryption parameters");
+  }
+
   // x^2
   fhe->encrypt(pt_x, ct_x);
   fhe->square(ct_x, ct_squared);

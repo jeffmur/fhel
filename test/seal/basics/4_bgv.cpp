@@ -104,6 +104,9 @@ TEST(Basics, BGV)
      fhe->relinearize(x_4th);
      cout << "    + size of x_4th (after relinearization): " << x_4th.size() << endl;
      cout << "    + noise budget in x_4th: " << fhe->invariant_noise_budget(x_4th) << " bits" << endl;
+     fhe->power(x_encrypted, 4, x_4th);
+     cout << "    + size of x_4th (after power): " << x_4th.size() << endl;
+     cout << "    + noise budget in x_4th: " << fhe->invariant_noise_budget(x_4th) << " bits" << endl;
      fhe->decrypt(x_4th, decrypted_result);
      fhe->decode_int(decrypted_result, pod_result);
      print_matrix(pod_result, row_size);
@@ -124,6 +127,9 @@ TEST(Basics, BGV)
      cout << "    + size of x_8th: " << x_8th.size() << endl;
      fhe->relinearize(x_8th);
      cout << "    + size of x_8th (after relinearization): " << x_8th.size() << endl;
+     cout << "    + noise budget in x_8th: " << fhe->invariant_noise_budget(x_8th) << " bits" << endl;
+     fhe->power(x_encrypted, 8, x_8th);
+     cout << "    + size of x_8th (after power): " << x_8th.size() << endl;
      cout << "    + noise budget in x_8th: " << fhe->invariant_noise_budget(x_8th) << " bits" << endl;
      cout << "NOTE: Decryption can be incorrect if noise budget is zero." << endl;
 

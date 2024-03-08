@@ -383,6 +383,7 @@ public:
   void multiply(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
   void multiply(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) override;
   void square(ACiphertext &ctxt, ACiphertext &ctxt_res) override;
+  void power(ACiphertext &ctxt, int power, ACiphertext &ctxt_res) override;
 };
 
 #endif /* ASEAL_H */

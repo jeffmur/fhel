@@ -332,6 +332,15 @@ extern "C" {
     ACiphertext* square(Afhe* afhe, ACiphertext* ciphertext);
 
     /**
+     * @brief Raise ciphertext to a power.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext Pointer to the ciphertext.
+     * @param power Power to raise the ciphertext to.
+     * @return Pointer to the resulting ciphertext.
+    */
+    ACiphertext* power(Afhe* afhe, ACiphertext* ciphertext, int power);
+
+    /**
      * @brief Encode a vector of integers into a plaintext.
      * @param afhe Pointer to the backend library.
      * @param data Vector of integers to encode.
