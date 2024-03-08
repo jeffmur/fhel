@@ -73,7 +73,7 @@ TEST(Basics, BGV)
      print_line(__LINE__);
      cout << "Compute and relinearize x_squared (x^2)," << endl;
      AsealCiphertext x_squared;
-     fhe->multiply(x_encrypted, x_encrypted, x_squared); // TODO: pow()
+     fhe->square(x_encrypted, x_squared); // TODO: pow()
      cout << "    + size of x_squared: " << x_squared.size() << endl;
      fhe->relinearize(x_squared);
      cout << "    + size of x_squared (after relinearization): " << x_squared.size() << endl;
@@ -99,7 +99,7 @@ TEST(Basics, BGV)
      print_line(__LINE__);
      cout << "Compute and relinearize x_4th (x^4)," << endl;
      AsealCiphertext x_4th;
-     fhe->multiply(x_squared, x_squared, x_4th);
+     fhe->square(x_squared, x_4th);
      cout << "    + size of x_4th: " << x_4th.size() << endl;
      fhe->relinearize(x_4th);
      cout << "    + size of x_4th (after relinearization): " << x_4th.size() << endl;
@@ -120,7 +120,7 @@ TEST(Basics, BGV)
      print_line(__LINE__);
      cout << "Compute and relinearize x_8th (x^8)," << endl;
      AsealCiphertext x_8th;
-     fhe->multiply(x_4th, x_4th, x_8th);
+     fhe->square(x_4th, x_8th);
      cout << "    + size of x_8th: " << x_8th.size() << endl;
      fhe->relinearize(x_8th);
      cout << "    + size of x_8th (after relinearization): " << x_8th.size() << endl;
@@ -150,7 +150,7 @@ TEST(Basics, BGV)
      cout << "Compute and relinearize x_squared (x^2)," << endl;
      cout << "    + noise budget in x_squared (previously): " << fhe->invariant_noise_budget(x_squared) << " bits"
           << endl;
-     fhe->multiply(x_encrypted, x_encrypted, x_squared);
+     fhe->square(x_encrypted, x_squared);
      fhe->relinearize(x_squared);
      fhe->mod_switch_to_next(x_squared);
      cout << "    + noise budget in x_squared (with modulus switching): " << fhe->invariant_noise_budget(x_squared)
@@ -171,7 +171,7 @@ TEST(Basics, BGV)
      print_line(__LINE__);
      cout << "Compute and relinearize x_4th (x^4)," << endl;
      cout << "    + noise budget in x_4th (previously): " << fhe->invariant_noise_budget(x_4th) << " bits" << endl;
-     fhe->multiply(x_squared, x_squared, x_4th);
+     fhe->square(x_squared, x_4th);
      fhe->relinearize(x_4th);
      fhe->mod_switch_to_next(x_4th);
      cout << "    + noise budget in x_4th (with modulus switching): " << fhe->invariant_noise_budget(x_4th)
@@ -192,7 +192,7 @@ TEST(Basics, BGV)
      print_line(__LINE__);
      cout << "Compute and relinearize x_8th (x^8)," << endl;
      cout << "    + noise budget in x_8th (previously): " << fhe->invariant_noise_budget(x_8th) << " bits" << endl;
-     fhe->multiply(x_4th, x_4th, x_8th);
+     fhe->square(x_4th, x_8th);
      fhe->relinearize(x_8th);
      fhe->mod_switch_to_next(x_8th);
      cout << "    + noise budget in x_8th (with modulus switching): " << fhe->invariant_noise_budget(x_8th)
