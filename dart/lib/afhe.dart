@@ -20,7 +20,6 @@ part 'afhe/operation.dart';
 part 'afhe/crypto.dart';
 part 'afhe/codec.dart';
 part 'afhe/errors.dart';
-part 'afhe/serial.dart';
 
 /// Abstract Fully Homomorphic Encryption
 ///

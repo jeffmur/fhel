@@ -1,13 +1,20 @@
 /// Microsoft SEAL
+/// 
+/// “Microsoft SEAL (Release 4.1),” January 2023. https://github.com/Microsoft/SEAL.
+/// 
+/// Microsoft SEAL is a library for homomorphic encryption developed by Microsoft Research.
+/// It provides a set of cryptographic tools for performing computations on encrypted data.
 library seal;
 
 import 'package:fhel/afhe.dart';
 import 'dart:ffi';
 
+// Components
+part 'afhe/serial.dart';
+
 /// Expose basic functionalities of Microsoft SEAL.
-///
-/// “Microsoft SEAL (Release 4.1),” January 2023. https://github.com/Microsoft/SEAL.
-///
+/// 
+/// Overloads [Afhe] with SEAL specific functionalities.
 class Seal extends Afhe {
   /// Instanciates SEAL [Backend] with [Scheme]
   Seal(String scheme) : super('seal', scheme);
