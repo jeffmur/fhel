@@ -1,6 +1,6 @@
 name: fhel
 description: Dart library for Fully Homomorphic Encryption
-version: 0.0.3
+version: 0.0.4
 repository: https://github.com/jeffmur/fhel
 
 environment:

@@ -1,3 +1,12 @@
+## 0.0.4
+
+CKKS Scheme
+* Encode / Decode Vector[Float]
+* Encrypt / Decrypt Plaintext
+
+Save / Load Parameters and Ciphertext
+* Pointer[Uin8] references serialized byte string
+
 ## 0.0.3
 
 Library Restructure
@@ -18,4 +27,4 @@ Fully Homomorphic Encryption Library using [dart:ffi](https://dart.dev/interop/c
 [Microsoft SEAL](https://github.com/microsoft/SEAL)
 * Scheme: BFV
 * Operation: Add
-* Data Types: Integer, Hexadecimal, List<Int>
+* Data Types: Integer, Hexadecimal, List[Int]

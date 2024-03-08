@@ -45,5 +45,3 @@ jobs:
         uses: docker://ghcr.io/jeffmur/fhel:builder
         with:
           args: make dtest-ci
-
-      # TODO: Deploy Android APK

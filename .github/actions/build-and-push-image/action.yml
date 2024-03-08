@@ -13,11 +13,9 @@ inputs:
   push:
     description: 'Whether to push the image to the registry'
     default: 'true'
-    type: string
   token:
     description: 'The token to use to authenticate with the registry'
-    type: string
-    default: ""
+    default: ''
 
 runs:
   using: composite

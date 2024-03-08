@@ -43,6 +43,11 @@ build: trust-project build-cmake
 docs:
 	@cd $(DART_SRC); $(MAKE) docs
 
+# Publish dart package
+.PHONY: publish
+publish:
+	@cd $(DART_SRC); $(MAKE) publish
+
 # Test Abstract Layer (AFHEL)
 .PHONY: ctest
 ctest:
@@ -88,3 +93,9 @@ apk-ci: export ANDROID_SDK_ROOT ?= /tmp/android-sdk-linux
 apk-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
 	$(MAKE) apk
+
+# Publish dart package from github workflows
+.PHONY: publish-ci
+publish-ci: build-cmake
+	@git config --global --add safe.directory /tmp/flutter
+	@cd $(DART_SRC); $(MAKE) publish-force
