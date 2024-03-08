@@ -98,4 +98,4 @@ apk-ci: build-cmake
 .PHONY: publish-ci
 publish-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
-	@cd $(DART_SRC); $(MAKE) publish
+	@cd $(DART_SRC); $(MAKE) publish-force
