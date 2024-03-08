@@ -19,3 +19,8 @@ final _SubC _c_subtract_plain = dylib.lookup<NativeFunction<_SubC>>('subtract_pl
 typedef _MultiplyC = Pointer Function(Pointer library, Pointer a, Pointer b);
 final _MultiplyC _c_multiply = dylib.lookup<NativeFunction<_MultiplyC>>('multiply').asFunction();
 final _MultiplyC _c_multiply_plain = dylib.lookup<NativeFunction<_MultiplyC>>('multiply_plain').asFunction();
+
+// --- square ---
+
+typedef _SquareC = Pointer Function(Pointer library, Pointer a);
+final _SquareC _c_square = dylib.lookup<NativeFunction<_SquareC>>('square').asFunction();

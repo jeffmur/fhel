@@ -290,4 +290,11 @@ class Afhe {
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }
+
+  /// Squares the [Ciphertext].
+  Ciphertext square(Ciphertext a) {
+    Pointer ptr = _c_square(library, a.obj);
+    raiseForStatus();
+    return Ciphertext.fromPointer(backend, ptr);
+  }
 }

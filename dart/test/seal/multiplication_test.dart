@@ -140,7 +140,7 @@ void main() {
     fhe.genRelinKeys();
 
     final ct_x = fhe.encrypt(pt_x);
-    Ciphertext ct_squared = fhe.multiply(ct_x, ct_x);
+    Ciphertext ct_squared = fhe.square(ct_x);
     final ct_squared_relin = fhe.relinearize(ct_squared);
 
     Plaintext pt_pi = fhe.encodeDouble(pi);
