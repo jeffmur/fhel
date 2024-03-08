@@ -46,7 +46,7 @@ docs:
 # Publish dart package
 .PHONY: publish
 publish: build-cmake
-	@cd $(DART_SRC); $(MAKE) publish-dry
+	@cd $(DART_SRC); $(MAKE) publish
 
 # Test Abstract Layer (AFHEL)
 .PHONY: ctest

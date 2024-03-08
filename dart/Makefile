@@ -12,12 +12,12 @@ docs:
 
 .PHONY: publish
 publish:
-	@dart pub publish
+	@flutter pub publish
 
 .PHONY: publish-dry
 publish-dry:
-	@dart pub publish --dry-run
+	@flutter pub publish --dry-run
 
 .PHONY: publish-force
 publish-force:
-	@dart pub publish --force
+	@flutter pub publish --force

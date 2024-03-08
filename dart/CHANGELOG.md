@@ -1,3 +1,12 @@
+## 0.0.4
+
+CKKS Scheme
+* Encode / Decode Vector<Float>
+* Encrypt / Decrypt Plaintext
+
+Save / Load Parameters and Ciphertext
+* Pointer<Uin8> references serialized byte string
+
 ## 0.0.3
 
 Library Restructure
