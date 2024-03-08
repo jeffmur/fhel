@@ -298,7 +298,7 @@ TEST(Multiply, PiXSquared) {
 
   // x^2
   fhe->encrypt(pt_x, ct_x);
-  fhe->multiply(ct_x, ct_x, ct_squared);
+  fhe->square(ct_x, ct_squared);
   fhe->relinearize(ct_squared);
 
   // π * x^2

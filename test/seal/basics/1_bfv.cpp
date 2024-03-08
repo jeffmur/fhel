@@ -219,7 +219,7 @@ TEST(Basics, BFV)
     cout << "Compute x_sq_plus_one (x^2+1)." << endl;
     AsealCiphertext x_sq_plus_one;
     AsealCiphertext x_sq;
-    fhe->multiply(x_encrypted, x_encrypted, x_sq);
+    fhe->square(x_encrypted, x_sq);
     AsealPlaintext plain_one("1");
     fhe->add(x_sq, plain_one, x_sq_plus_one);
 
@@ -255,7 +255,7 @@ TEST(Basics, BFV)
     AsealCiphertext x_plus_one_sq;
     AsealCiphertext x_plus_one;
     fhe->add(x_encrypted, plain_one, x_plus_one);
-    fhe->multiply(x_plus_one, x_plus_one, x_plus_one_sq);
+    fhe->square(x_plus_one, x_plus_one_sq);
     cout << "    + size of x_plus_one_sq: " << x_plus_one_sq.size() << endl;
     cout << "    + noise budget in x_plus_one_sq: " << fhe->invariant_noise_budget(x_plus_one_sq) << " bits"
          << endl;
@@ -327,7 +327,7 @@ TEST(Basics, BFV)
     cout << "Compute and relinearize x_squared (x^2)," << endl;
     cout << string(13, ' ') << "then compute x_sq_plus_one (x^2+1)" << endl;
     AsealCiphertext x_squared;
-    fhe->multiply(x_encrypted, x_encrypted, x_squared);
+    fhe->square(x_encrypted, x_squared);
     cout << "    + size of x_squared: " << x_squared.size() << endl;
     EXPECT_EQ(3, x_squared.size());
     fhe->relinearize(x_squared);
@@ -345,7 +345,7 @@ TEST(Basics, BFV)
     cout << "Compute x_plus_one (x+1)," << endl;
     cout << string(13, ' ') << "then compute and relinearize x_plus_one_sq ((x+1)^2)." << endl;
     fhe->add(x_encrypted, plain_one, x_plus_one);
-    fhe->multiply(x_plus_one, x_plus_one, x_plus_one_sq);
+    fhe->square(x_plus_one, x_plus_one_sq);
     cout << "    + size of x_plus_one_sq: " << x_plus_one_sq.size() << endl;
     EXPECT_EQ(3, x_plus_one_sq.size());
     fhe->relinearize(x_plus_one_sq);

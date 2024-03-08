@@ -301,6 +301,16 @@ ACiphertext* multiply_plain(Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
     return ctxt_res;
 }
 
+ACiphertext* square(Afhe* afhe, ACiphertext* ctxt) {
+    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    ACiphertext* ctxt_res = init_ciphertext(lib);
+    try {
+        afhe->square(*ctxt, *ctxt_res);
+    }
+    catch (exception &e) { set_error(e); }
+    return ctxt_res;
+}
+
 APlaintext* encode_int(Afhe* afhe, uint64_t* data, int size) {
     backend_t lib = backend_map_backend_t[afhe->backend_lib];
     APlaintext* ptxt = init_plaintext(lib);
