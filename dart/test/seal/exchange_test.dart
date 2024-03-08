@@ -1,3 +1,4 @@
+import 'dart:js_util';
 import 'dart:math';
 
 import 'package:test/test.dart';
@@ -96,12 +97,29 @@ void main() {
       String g_ctx = guest.genContextFromParameters(h_param);
       expect(g_ctx, 'success: valid');
 
+      guest.genKeys();
+
       // Load the ciphertexts from host
       final ct_pi_g = guest.loadCiphertext(host_ct_pi, ct_pi_size);
       final ct_vec_g = guest.loadCiphertext(host_ct_vec, ct_vec_size);
 
-      // TODO: We should NOT be able to decrypt the ciphertexts
-      // Without the secret key
+      // Guest adds 1 to each ciphertext
+      final ct_pi_g_1 = guest.addPlain(ct_pi_g, guest.plain(1.toRadixString(16)));
+      final ct_vec_g_1 = guest.addPlain(ct_vec_g, guest.encodeVecInt([1, 1, 1, 1, 1]));
+
+      // Guest should not be able to decrypt the ciphertexts
+      final dec_pi = guest.decrypt(ct_pi_g_1);
+      expect('3', isNot(equals(dec_pi.text)));
+
+      final dec_vec = guest.decrypt(ct_vec_g_1);
+      expect([1, 2, 3, 4, 5], isNot(equals(guest.decodeVecInt(dec_vec, 5))));
+
+      // Host should be able to decrypt the loaded, modified, ciphertexts
+      final dec_pi_h = host.decrypt(ct_pi_g_1);
+      expect('4', equals(dec_pi_h.text));
+
+      final dec_vec_h = host.decrypt(ct_vec_g_1);
+      expect([2, 3, 4, 5, 6], equals(host.decodeVecInt(dec_vec_h, 5)));
     }
   });
 }
