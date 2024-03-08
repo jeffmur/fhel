@@ -1,5 +1,10 @@
 name: fhel
-description: Dart library for Fully Homomorphic Encryption
+description: |-
+  Dart library for Fully Homomorphic Encryption that enables secure computation on encrypted data. 
+  It exposes a set of basic functionalities for interacting with lower-level C FHE libraries, 
+  allowing users to perform operations on sensitive data without exposing the underlying information. 
+  The library is designed to be easy to use and efficient, making it suitable for a wide range of 
+  applications in privacy-preserving computation.
 version: 0.0.4
 repository: https://github.com/jeffmur/fhel
 
