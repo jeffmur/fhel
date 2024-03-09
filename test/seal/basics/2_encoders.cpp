@@ -173,7 +173,7 @@ TEST(Basics, BatchEncoder)
     fhe->decrypt(encrypted_matrix_square, plain_result);
     fhe->decode_int(plain_result, pod_result);
 
-    vector<size_t> pod_result_expected(pod_result.size(), 0ULL);
+    vector<size_t> pod_result_expected(slot_count, 0ULL);
     for (size_t i = 0; i < slot_count; i++) {
         int add_i = pod_matrix[i] + pod_matrix2[i];
         pod_result_expected[i] = add_i * add_i;
@@ -195,145 +195,135 @@ TEST(Basics, BatchEncoder)
     */
 }
 
-// void example_ckks_encoder()
-// {
-//     print_example_banner("Example: Encoders / CKKS Encoder");
+TEST(Basic, CKKSEncoder)
+{
+    /*
+    [CKKSEncoder] (For CKKS scheme only)
 
-//     /*
-//     [CKKSEncoder] (For CKKS scheme only)
+    In this example we demonstrate the Cheon-Kim-Kim-Song (CKKS) scheme for
+    computing on encrypted real or complex numbers. We start by creating
+    encryption parameters for the CKKS scheme. There are two important
+    differences compared to the BFV scheme:
 
-//     In this example we demonstrate the Cheon-Kim-Kim-Song (CKKS) scheme for
-//     computing on encrypted real or complex numbers. We start by creating
-//     encryption parameters for the CKKS scheme. There are two important
-//     differences compared to the BFV scheme:
+        (1) CKKS does not use the plain_modulus encryption parameter;
+        (2) Selecting the coeff_modulus in a specific way can be very important
+            when using the CKKS scheme. We will explain this further in the file
+            `ckks_basics.cpp'. In this example we use CoeffModulus::Create to
+            generate 5 40-bit prime numbers.
+    */
+    size_t poly_modulus_degree = 8192;
+    size_t ckks_encoder_scale = pow(2.0, 30); // 30-bit precision
 
-//         (1) CKKS does not use the plain_modulus encryption parameter;
-//         (2) Selecting the coeff_modulus in a specific way can be very important
-//             when using the CKKS scheme. We will explain this further in the file
-//             `ckks_basics.cpp'. In this example we use CoeffModulus::Create to
-//             generate 5 40-bit prime numbers.
-//     */
-//     EncryptionParameters parms(scheme_type::ckks);
+    Aseal* fhe = new Aseal();
+    string status = fhe->ContextGen(scheme::ckks, poly_modulus_degree, ckks_encoder_scale, -1, -1, { 40, 40, 40, 40, 40 });
+    EXPECT_EQ(status, "success: valid");
+    /*
+    We create the SEALContext as usual and print the parameters.
+    */
+    AsealContext context = _to_context(fhe->get_context());
+    print_parameters(context);
+    cout << endl;
 
-//     size_t poly_modulus_degree = 8192;
-//     parms.set_poly_modulus_degree(poly_modulus_degree);
-//     parms.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, { 40, 40, 40, 40, 40 }));
+    /*
+    Keys are created the same way as for the BFV scheme.
+    */
+    fhe->KeyGen();
+    fhe->RelinKeyGen();
 
-//     /*
-//     We create the SEALContext as usual and print the parameters.
-//     */
-//     SEALContext context(parms);
-//     print_parameters(context);
-//     cout << endl;
+    /*
+    In CKKS the number of slots is poly_modulus_degree / 2 and each slot encodes
+    one real or complex number. This should be contrasted with BatchEncoder in
+    the BFV scheme, where the number of slots is equal to poly_modulus_degree
+    and they are arranged into a matrix with two rows.
+    */
+    size_t slot_count = fhe->slot_count();
+    cout << "Number of slots: " << slot_count << endl;
 
-//     /*
-//     Keys are created the same way as for the BFV scheme.
-//     */
-//     KeyGenerator keygen(context);
-//     auto secret_key = keygen.secret_key();
-//     PublicKey public_key;
-//     keygen.create_public_key(public_key);
-//     RelinKeys relin_keys;
-//     keygen.create_relin_keys(relin_keys);
+    /*
+    We create a small vector to encode; the CKKSEncoder will implicitly pad it
+    with zeros to full size (poly_modulus_degree / 2) when encoding.
+    */
+    vector<double> input{ 0.0, 1.1, 2.2, 3.3 };
+    cout << "Input vector: " << endl;
+    print_vector(input);
 
-//     /*
-//     We also set up an Encryptor, Evaluator, and Decryptor as usual.
-//     */
-//     Encryptor encryptor(context, public_key);
-//     Evaluator evaluator(context);
-//     Decryptor decryptor(context, secret_key);
+    /*
+    Now we encode it with CKKSEncoder. The floating-point coefficients of `input'
+    will be scaled up by the parameter `scale'. This is necessary since even in
+    the CKKS scheme the plaintext elements are fundamentally polynomials with
+    integer coefficients. It is instructive to think of the scale as determining
+    the bit-precision of the encoding; naturally it will affect the precision of
+    the result.
 
-//     /*
-//     To create CKKS plaintexts we need a special encoder: there is no other way
-//     to create them. The BatchEncoder cannot be used with the
-//     CKKS scheme. The CKKSEncoder encodes vectors of real or complex numbers into
-//     Plaintext objects, which can subsequently be encrypted. At a high level this
-//     looks a lot like what BatchEncoder does for the BFV scheme, but the theory
-//     behind it is completely different.
-//     */
-//     CKKSEncoder encoder(context);
+    In CKKS the message is stored modulo coeff_modulus (in BFV it is stored modulo
+    plain_modulus), so the scaled message must not get too close to the total size
+    of coeff_modulus. In this case our coeff_modulus is quite large (200 bits) so
+    we have little to worry about in this regard. For this simple example a 30-bit
+    scale is more than enough.
+    */
+    AsealPlaintext plain;
+    print_line(__LINE__);
+    cout << "Encode input vector." << endl;
+    fhe->encode_double(input, plain);
 
-//     /*
-//     In CKKS the number of slots is poly_modulus_degree / 2 and each slot encodes
-//     one real or complex number. This should be contrasted with BatchEncoder in
-//     the BFV scheme, where the number of slots is equal to poly_modulus_degree
-//     and they are arranged into a matrix with two rows.
-//     */
-//     size_t slot_count = encoder.slot_count();
-//     cout << "Number of slots: " << slot_count << endl;
+    /*
+    We can instantly decode to check the correctness of encoding.
+    */
+    vector<double> output;
+    fhe->decode_double(plain, output);
+    vector<double> input_buffer(slot_count, 0.0);
+    for (size_t i = 0; i < input.size(); i++)
+    {
+        input_buffer[i] = input[i];
+    }
+    expect_equal_vector(input_buffer, output, 1e-1); // match input precision
+    cout << "    + Decode input vector ...... Correct." << endl;
+    print_vector(output);
 
-//     /*
-//     We create a small vector to encode; the CKKSEncoder will implicitly pad it
-//     with zeros to full size (poly_modulus_degree / 2) when encoding.
-//     */
-//     vector<double> input{ 0.0, 1.1, 2.2, 3.3 };
-//     cout << "Input vector: " << endl;
-//     print_vector(input);
+    /*
+    The vector is encrypted the same was as in BFV.
+    */
+    AsealCiphertext encrypted;
+    print_line(__LINE__);
+    cout << "Encrypt input vector, square, and relinearize." << endl;
+    fhe->encrypt(plain, encrypted);
 
-//     /*
-//     Now we encode it with CKKSEncoder. The floating-point coefficients of `input'
-//     will be scaled up by the parameter `scale'. This is necessary since even in
-//     the CKKS scheme the plaintext elements are fundamentally polynomials with
-//     integer coefficients. It is instructive to think of the scale as determining
-//     the bit-precision of the encoding; naturally it will affect the precision of
-//     the result.
+    /*
+    Basic operations on the ciphertexts are still easy to do. Here we square the
+    ciphertext, decrypt, decode, and print the result. We note also that decoding
+    returns a vector of full size (poly_modulus_degree / 2); this is because of
+    the implicit zero-padding mentioned above.
+    */
+    AsealCiphertext encrypted_squared;
+    fhe->square(encrypted, encrypted_squared);
+    fhe->relinearize(encrypted_squared);
 
-//     In CKKS the message is stored modulo coeff_modulus (in BFV it is stored modulo
-//     plain_modulus), so the scaled message must not get too close to the total size
-//     of coeff_modulus. In this case our coeff_modulus is quite large (200 bits) so
-//     we have little to worry about in this regard. For this simple example a 30-bit
-//     scale is more than enough.
-//     */
-//     Plaintext plain;
-//     double scale = pow(2.0, 30);
-//     print_line(__LINE__);
-//     cout << "Encode input vector." << endl;
-//     encoder.encode(input, scale, plain);
+    /*
+    We notice that the scale in the result has increased. In fact, it is now the
+    square of the original scale: 2^60.
+    */
+    cout << "    + Scale in squared input: " << encrypted_squared.scale() << " (" << log2(encrypted_squared.scale()) << " bits)"
+         << endl;
 
-//     /*
-//     We can instantly decode to check the correctness of encoding.
-//     */
-//     vector<double> output;
-//     cout << "    + Decode input vector ...... Correct." << endl;
-//     encoder.decode(plain, output);
-//     print_vector(output);
+    print_line(__LINE__);
+    cout << "Decrypt and decode." << endl;
+    fhe->decrypt(encrypted_squared, plain);
+    fhe->decode_double(plain, output);
+    
+    vector<double> input_squared(slot_count, 0.0);
+    for (size_t i = 0; i < input.size(); i++)
+    {
+        input_squared[i] = input[i] * input[i];
+    }
+    expect_equal_vector(input_squared, output, 1e-1);
+    cout << "    + Result vector ...... Correct." << endl;
+    print_vector(output);
 
-//     /*
-//     The vector is encrypted the same was as in BFV.
-//     */
-//     Ciphertext encrypted;
-//     print_line(__LINE__);
-//     cout << "Encrypt input vector, square, and relinearize." << endl;
-//     encryptor.encrypt(plain, encrypted);
-
-//     /*
-//     Basic operations on the ciphertexts are still easy to do. Here we square the
-//     ciphertext, decrypt, decode, and print the result. We note also that decoding
-//     returns a vector of full size (poly_modulus_degree / 2); this is because of
-//     the implicit zero-padding mentioned above.
-//     */
-//     evaluator.square_inplace(encrypted);
-//     evaluator.relinearize_inplace(encrypted, relin_keys);
-
-//     /*
-//     We notice that the scale in the result has increased. In fact, it is now the
-//     square of the original scale: 2^60.
-//     */
-//     cout << "    + Scale in squared input: " << encrypted.scale() << " (" << log2(encrypted.scale()) << " bits)"
-//          << endl;
-
-//     print_line(__LINE__);
-//     cout << "Decrypt and decode." << endl;
-//     decryptor.decrypt(encrypted, plain);
-//     encoder.decode(plain, output);
-//     cout << "    + Result vector ...... Correct." << endl;
-//     print_vector(output);
-
-//     /*
-//     The CKKS scheme allows the scale to be reduced between encrypted computations.
-//     This is a fundamental and critical feature that makes CKKS very powerful and
-//     flexible. We will discuss it in great detail in `3_levels.cpp' and later in
-//     `4_ckks_basics.cpp'.
-//     */
-// }
+    /*
+    The CKKS scheme allows the scale to be reduced between encrypted computations.
+    This is a fundamental and critical feature that makes CKKS very powerful and
+    flexible. We will discuss it in great detail in `3_levels.cpp' and later in
+    `4_ckks_basics.cpp'.
+    */
+}
 
