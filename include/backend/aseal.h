@@ -341,27 +341,37 @@ public:
   */
   void disable_mod_switch() override;
 
+  /**
+   * @brief Replaces the existing cEncoderScale, used for CKKSEncoder.
+   * Only affects subsequent encoding operations.
+   * @param scale The new scale.
+  */
+  void set_encoder_scale(double scale) override;
+
   // ------------------ Keys ------------------
   void KeyGen() override;
-  void KeyGen(ASecretKey &sec);
+  void KeyGen(string sk);
   void RelinKeyGen() override;
-  void relinearize(ACiphertext &ctxt) override;
-  void mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt) override;
-  void mod_switch_to(ACiphertext &to, ACiphertext &from) override;
-  void mod_switch_to_next(APlaintext &ptxt) override;
-  void mod_switch_to_next(ACiphertext &ctxt) override;
-  void rescale_to_next(ACiphertext &ctxt) override;
   APublicKey& get_public_key() override;
   ASecretKey& get_secret_key() override;
   string save_secret_key() override;
+  int save_secret_key_size() override;
   ASecretKey& load_secret_key(string sk) override;
   ARelinKey& get_relin_keys() override;
+  string save_relin_keys() override;
+  ARelinKey& load_relin_keys(string rk) override;
 
   // ------------------ Cryptography ------------------
 
   void encrypt(APlaintext &ptxt, ACiphertext &ctxt) override;
   void decrypt(ACiphertext &ctxt, APlaintext &ptxt) override;
   int invariant_noise_budget(ACiphertext &ctxt) override;
+  void relinearize(ACiphertext &ctxt) override;
+  void mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt) override;
+  void mod_switch_to(ACiphertext &to, ACiphertext &from) override;
+  void mod_switch_to_next(APlaintext &ptxt) override;
+  void mod_switch_to_next(ACiphertext &ctxt) override;
+  void rescale_to_next(ACiphertext &ctxt) override;
 
   // -------------------- Codec --------------------
 

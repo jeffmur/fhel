@@ -215,6 +215,11 @@ public:
   */
   virtual void disable_mod_switch() = 0;
 
+  /**
+   * @brief Set the encoder scale for CKKS scheme.
+  */
+  virtual void set_encoder_scale(double scale) = 0;
+
   // ------------------ Cryptography ------------------
 
   /**
@@ -236,6 +241,7 @@ public:
    * @brief Saves the secret key.
   */
   virtual string save_secret_key() = 0;
+  virtual int save_secret_key_size() = 0;
 
   /**
    * @brief Loads the secret key.
@@ -243,14 +249,24 @@ public:
   virtual ASecretKey& load_secret_key(string secret_key) = 0;
 
   /**
+   * @brief Generates a public and private key pair; derived from the private key.
+   */
+  virtual void RelinKeyGen() = 0;
+
+  /**
    * @brief Returns the relinearization keys.
   */
   virtual ARelinKey& get_relin_keys() = 0;
 
   /**
-   * @brief Generates a public and private key pair; derived from the private key.
-   */
-  virtual void RelinKeyGen() = 0;
+   * @brief Saves the relinearization keys.
+  */
+  virtual string save_relin_keys() = 0;
+
+  /**
+   * @brief Loads the relinearization keys.
+  */
+  virtual ARelinKey& load_relin_keys(string relin_keys) = 0;
 
   /**
    * @brief Reduces the size of a ciphertext.

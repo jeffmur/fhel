@@ -83,7 +83,7 @@ TEST(Exchange, Ciphertext)
 
     // Load the secret key from the host
     // You wouldn't do this in practice, but for testing purposes
-    guest->KeyGen(guest->load_secret_key(h_sec_key));
+    guest->KeyGen(h_sec_key);
 
     AsealCiphertext ctxt_four_guest;
     ctxt_four_guest.load(guest, cipher_out);
