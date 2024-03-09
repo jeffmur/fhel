@@ -136,7 +136,8 @@ void main() {
     // Encrypt + Save a double
     double addend = 1.2345;
     double pi = 3.14159;
-    double pi_res = addend + pi;
+    // CKKS generates a list of size host.slot_count doubles
+    List<double> pi_res = List.filled(host.slotCount, pi + addend);
     Plaintext pt_pi = host.encodeDouble(pi);
     Ciphertext ct_pi = host.encrypt(pt_pi);
 
@@ -177,7 +178,10 @@ void main() {
 
     // Host should be able to decrypt the loaded, modified, ciphertexts
     final dec_pi_h = host.decrypt(ct_pi_g_1);
-    // near(dec_pi_h.value, pi_res, eps: 1e-4); // TODO: Decode double?
+    final dec_vec_pi_h = host.decodeVecDouble(dec_pi_h, guest.slotCount); // only check first 5
+    for (var i = 0; i < pi_res.length; i++) {
+      near(pi_res[i], dec_vec_pi_h[i]);
+    }
 
     final dec_vec_h = host.decrypt(ct_vec_g_1);
     final dec_vec_h_d = host.decodeVecDouble(dec_vec_h, 5);

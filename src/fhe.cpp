@@ -95,22 +95,13 @@ int save_parameters_size(Afhe* afhe)
 
 }
 
-byte* save_parameters_bytes(Afhe* afhe)
+int get_slot_count(Afhe* afhe)
 {
     try {
-        vector<byte> byte_buffer(static_cast<size_t>(afhe->save_parameters_size()));
-        afhe->save_parameters_inplace(reinterpret_cast<byte *>(byte_buffer.data()), byte_buffer.size());
-        return byte_buffer.data();
+        int slot_count = afhe->slot_count();
+        return slot_count;
     }
-    catch (exception &e) { set_error(e); return nullptr; }
-}
-
-void load_parameters_bytes(Afhe* afhe, const byte* params, int size)
-{
-    try {
-       afhe->load_parameters_inplace(params, size);
-    }
-    catch (exception &e) { set_error(e); }
+    catch (exception &e) { set_error(e); return -1; }
 }
 
 void generate_keys(Afhe* afhe)

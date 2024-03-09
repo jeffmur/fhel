@@ -60,6 +60,13 @@ final _GenContextFromStr _c_gen_context_from_str = dylib
     .lookup<NativeFunction<_GenContextFromStrC>>('generate_context_from_str')
     .asFunction();
 
+// --- slot count ---
+
+typedef _SlotCountC = Int32 Function(Pointer library);
+typedef _SlotCount = int Function(Pointer library);
+final _SlotCount _c_slot_count = dylib
+    .lookup<NativeFunction<_SlotCountC>>('get_slot_count').asFunction();
+
 // --- encryption keys ---
 
 typedef _GenKeysC = Void Function(Pointer library);
