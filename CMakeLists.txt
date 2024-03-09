@@ -69,6 +69,7 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
         test/seal/relinearization.cpp
         test/seal/exchange.cpp
         test/seal/basics/1_bfv.cpp
+        test/seal/basics/2_encoders.cpp
         test/seal/basics/3_levels.cpp
         test/seal/basics/4_bgv.cpp
         test/seal/basics/5_ckks.cpp
@@ -88,11 +89,12 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
     # SEAL Basics
     add_executable(
         seal_basics
-        test/seal/basics/1_bfv.cpp
-        test/seal/basics/3_levels.cpp
-        test/seal/basics/4_bgv.cpp
-        test/seal/basics/5_ckks.cpp
-        test/seal/basics/7_serialization.cpp
+        # test/seal/basics/1_bfv.cpp
+        test/seal/basics/2_encoders.cpp
+        # test/seal/basics/3_levels.cpp
+        # test/seal/basics/4_bgv.cpp
+        # test/seal/basics/5_ckks.cpp
+        # test/seal/basics/7_serialization.cpp
     )
     include_directories(test/seal/basics)
     target_link_libraries(
