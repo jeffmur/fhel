@@ -154,6 +154,12 @@ extern "C" {
     int save_parameters_size(Afhe* afhe);
 
     /**
+     * @brief Number of slots available based on parameters.
+     * @param afhe Pointer to the backend library.
+    */
+    int get_slot_count(Afhe* afhe);
+
+    /**
      * @brief Generate keys for the backend library.
      * @param afhe Pointer to the backend library.
     */

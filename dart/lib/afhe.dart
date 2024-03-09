@@ -124,6 +124,9 @@ class Afhe {
     raiseForStatus();
     return ptr.toDartString();
   }
+  
+  /// Returns the number of slots based on parameters.
+  int get slotCount => _c_slot_count(library);
 
   /// Returns the string representation of FHE parameters.
   /// 
