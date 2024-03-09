@@ -224,9 +224,9 @@ TEST(Basics, Serialization)
         We need to save the secret key so we can decrypt later.
         */
         client->KeyGen();
-        string secret_key = client->save_secret_key();
-        int secret_key_size = client->save_secret_key_size();
-        sk_stream.write(secret_key.c_str(), secret_key_size);
+        AsealSecretKey secret_key = _to_secret_key(client->get_secret_key());
+        int secret_key_size = secret_key.save_size();
+        sk_stream.write(secret_key.save().c_str(), secret_key_size);
 
         cout << "Secret key: wrote " << secret_key_size << " bytes" << endl;
 
@@ -358,7 +358,8 @@ TEST(Basics, Serialization)
         /*
         Load back the secret key from sk_stream.
         */
-        ASecretKey sk = client->load_secret_key(sk_stream.str());
+        AsealSecretKey* sk = new AsealSecretKey();
+        sk->load(client, sk_stream.str());
         cout << "Secret key: loaded " << sk_stream.str().size() << " bytes" << endl;
         client->KeyGen(sk_stream.str());
 

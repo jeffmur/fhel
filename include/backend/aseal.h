@@ -166,13 +166,18 @@ public:
   using seal::PublicKey::PublicKey;
   AsealPublicKey(const seal::PublicKey &pk) : seal::PublicKey(pk) {};
   ~AsealPublicKey(){};
-  // seal::PublicKey& to_seal() {
-  //   return *this;
-  // }
-  // ACiphertext& data() override {
-  //   AsealCiphertext* ctxt = new AsealCiphertext(seal::PublicKey::data());
-  //   return _from_ciphertext(*ctxt);
-  // }
+  string save() override {
+    ostringstream stream;
+    seal::PublicKey::save(stream);
+    return stream.str();
+  }
+  int save_size() override {
+    return seal::PublicKey::save_size();
+  }
+  void load(Afhe* fhe, string data) override {
+    istringstream stream(data);
+    seal::PublicKey::load(_to_context(fhe->get_context()), stream);
+  }
 };
 
 // DYNAMIC CASTING
@@ -191,13 +196,18 @@ public:
   using seal::SecretKey::SecretKey;
   AsealSecretKey(const seal::SecretKey &sk) : seal::SecretKey(sk) {};
   ~AsealSecretKey(){};
-  // seal::SecretKey to_seal() {
-  //   return static_cast<seal::SecretKey&>(*this);
-  // }
-  // APlaintext& data() override {
-  //   AsealPlaintext* ctxt = new AsealPlaintext(seal::SecretKey::data());
-  //   return _from_plaintext(*ctxt);
-  // }
+  string save() override {
+    ostringstream stream;
+    seal::SecretKey::save(stream);
+    return stream.str();
+  }
+  int save_size() override {
+    return seal::SecretKey::save_size();
+  }
+  void load(Afhe* fhe, string data) override {
+    istringstream stream(data);
+    seal::SecretKey::load(_to_context(fhe->get_context()), stream);
+  }
 };
 
 // DYNAMIC CASTING
@@ -211,19 +221,31 @@ inline ASecretKey& _from_secret_key(AsealSecretKey& k){
 /**
  * @brief Abstraction for RelinKey
 */
-class AsealRelinKey : public ARelinKey, public seal::RelinKeys {
+class AsealRelinKey : public ARelinKeys, public seal::RelinKeys {
 public:
   using seal::RelinKeys::RelinKeys;
   AsealRelinKey(const seal::RelinKeys &rk) : seal::RelinKeys(rk) {};
   ~AsealRelinKey(){};
+  string save() override {
+    ostringstream stream;
+    seal::RelinKeys::save(stream);
+    return stream.str();
+  }
+  int save_size() override {
+    return seal::RelinKeys::save_size();
+  }
+  void load(Afhe* fhe, string data) override {
+    istringstream stream(data);
+    seal::RelinKeys::load(_to_context(fhe->get_context()), stream);
+  }
 };
 
 // DYNAMIC CASTING
-inline AsealRelinKey& _to_relin_keys(ARelinKey& k){
+inline AsealRelinKey& _to_relin_keys(ARelinKeys& k){
   return dynamic_cast<AsealRelinKey&>(k);
 };
-inline ARelinKey& _from_relin_keys(AsealRelinKey& k){
-  return dynamic_cast<ARelinKey&>(k);
+inline ARelinKeys& _from_relin_keys(AsealRelinKey& k){
+  return dynamic_cast<ARelinKeys&>(k);
 };
 
 
@@ -354,12 +376,7 @@ public:
   void RelinKeyGen() override;
   APublicKey& get_public_key() override;
   ASecretKey& get_secret_key() override;
-  string save_secret_key() override;
-  int save_secret_key_size() override;
-  ASecretKey& load_secret_key(string sk) override;
-  ARelinKey& get_relin_keys() override;
-  string save_relin_keys() override;
-  ARelinKey& load_relin_keys(string rk) override;
+  ARelinKeys& get_relin_keys() override;
 
   // ------------------ Cryptography ------------------
 

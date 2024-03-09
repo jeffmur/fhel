@@ -66,7 +66,7 @@ TEST(Exchange, Ciphertext)
 
     // Save the secret key
     host->KeyGen();
-    string h_sec_key = host->save_secret_key();
+    string h_sec_key = host->get_secret_key().save();
     AsealPlaintext four("4");
     AsealCiphertext ctxt_four;
     host->encrypt(four, ctxt_four);

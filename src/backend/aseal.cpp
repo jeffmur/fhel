@@ -277,52 +277,6 @@ ASecretKey& Aseal::get_secret_key()
   return _from_secret_key(*secretKey);
 }
 
-string Aseal::save_secret_key()
-{
-  // Share as a binary string
-  ostringstream ss;
-
-  if (this->secretKey == nullptr)
-  {
-    throw logic_error("Secret Key is not set, cannot save it.");
-  }
-
-  // Save secret key to stringstream
-  this->secretKey->save(ss, seal::compr_mode_type::none);
-
-  return ss.str();
-}
-
-int Aseal::save_secret_key_size()
-{
-  if (this->secretKey == nullptr)
-  {
-    throw logic_error("Secret Key is not set, cannot save it.");
-  }
-
-  // Save secret key to stringstream
-  return this->secretKey->save_size(seal::compr_mode_type::none);
-}
-
-ASecretKey& Aseal::load_secret_key(string sec_key)
-{
-  // Initialize a SecretKey object
-  SecretKey *sealKey = new SecretKey();
-
-  if (this->context == nullptr)
-  {
-    throw logic_error("Context is not set, cannot load secret key.");
-  }
-
-  // Load secret key from string
-  istringstream ss(sec_key);
-  sealKey->load(*this->context, ss);
-
-  AsealSecretKey* secretKey = new AsealSecretKey(*sealKey);
-
-  return _from_secret_key(*secretKey);
-}
-
 void Aseal::RelinKeyGen()
 {
   // Gather current context, resolves object
@@ -339,43 +293,8 @@ void Aseal::RelinKeyGen()
   keyGenObj->create_relin_keys(*relinKeys);
 }
 
-ARelinKey& Aseal::get_relin_keys(){
+ARelinKeys& Aseal::get_relin_keys(){
   AsealRelinKey* relinKeys = new AsealRelinKey(*this->relinKeys);
-  return _from_relin_keys(*relinKeys);
-}
-
-string Aseal::save_relin_keys()
-{
-  // Share as a binary string
-  ostringstream ss;
-
-  if (this->relinKeys == nullptr)
-  {
-    throw logic_error("Relin Keys are not set, cannot save them.");
-  }
-
-  // Save Relin Keys to stringstream
-  this->relinKeys->save(ss);
-
-  return ss.str();
-}
-
-ARelinKey& Aseal::load_relin_keys(string relin_keys)
-{
-  // Initialize a RelinKeys object
-  RelinKeys *sealKeys = new RelinKeys();
-
-  if (this->context == nullptr)
-  {
-    throw logic_error("Context is not set, cannot load relin keys.");
-  }
-
-  // Load Relin Keys from string
-  istringstream ss(relin_keys);
-  sealKeys->load(*this->context, ss);
-
-  AsealRelinKey* relinKeys = new AsealRelinKey(*sealKeys);
-
   return _from_relin_keys(*relinKeys);
 }
 
