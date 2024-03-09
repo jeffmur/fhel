@@ -114,8 +114,10 @@ public:
 class APublicKey {
 public:
   virtual ~APublicKey() = default;
+  virtual string save() = 0;
+  virtual int save_size() = 0;
+  virtual void load(Afhe* fhe, string key) = 0;
   // virtual ACiphertext& data() = 0;
-  // virtual TODO param_id() = 0;
 };
 
 /**
@@ -124,15 +126,19 @@ public:
 class ASecretKey {
 public:
   virtual ~ASecretKey() = default;
+  virtual string save() = 0;
+  virtual int save_size() = 0;
+  virtual void load(Afhe* fhe, string key) = 0;
   // virtual APlaintext& data() = 0;
-  // virtual TODO param_id() = 0;
 };
 
-class ARelinKey {
+class ARelinKeys {
 public:
-  virtual ~ARelinKey() = default;
+  virtual ~ARelinKeys() = default;
+  virtual string save() = 0;
+  virtual int save_size() = 0;
+  virtual void load(Afhe* fhe, string key) = 0;
   // virtual ACiphertext& data() = 0;
-  // virtual TODO param_id() = 0;
 };
 
 /**
@@ -215,6 +221,11 @@ public:
   */
   virtual void disable_mod_switch() = 0;
 
+  /**
+   * @brief Set the encoder scale for CKKS scheme.
+  */
+  virtual void set_encoder_scale(double scale) = 0;
+
   // ------------------ Cryptography ------------------
 
   /**
@@ -233,24 +244,14 @@ public:
   virtual ASecretKey& get_secret_key() = 0;
 
   /**
-   * @brief Saves the secret key.
-  */
-  virtual string save_secret_key() = 0;
-
-  /**
-   * @brief Loads the secret key.
-  */
-  virtual ASecretKey& load_secret_key(string secret_key) = 0;
+   * @brief Generates a public and private key pair; derived from the private key.
+   */
+  virtual void RelinKeyGen() = 0;
 
   /**
    * @brief Returns the relinearization keys.
   */
-  virtual ARelinKey& get_relin_keys() = 0;
-
-  /**
-   * @brief Generates a public and private key pair; derived from the private key.
-   */
-  virtual void RelinKeyGen() = 0;
+  virtual ARelinKeys& get_relin_keys() = 0;
 
   /**
    * @brief Reduces the size of a ciphertext.

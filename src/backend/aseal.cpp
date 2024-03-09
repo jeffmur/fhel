@@ -215,6 +215,11 @@ void Aseal::disable_mod_switch()
   this->context = make_shared<SEALContext>(*this->params, false);
 }
 
+void Aseal::set_encoder_scale(double scale)
+{
+  this->cEncoderScale = scale;
+}
+
 void Aseal::KeyGen()
 {
   // Gather current context, resolves object
@@ -236,16 +241,19 @@ void Aseal::KeyGen()
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
 }
 
-void Aseal::KeyGen(ASecretKey &sec)
+void Aseal::KeyGen(string secret_key)
 {
   // Gather current context, resolves object
   auto &seal_context = *_this_context();
 
-  // Copy Secret Key
-  this->secretKey = make_shared<SecretKey>(_to_secret_key(sec));
+  this->secretKey = make_shared<SecretKey>();
+
+  istringstream ss(secret_key);
+  this->secretKey->load(seal_context, ss);
 
   // Initialize KeyGen object
-  this->keyGenObj = make_shared<KeyGenerator>(seal_context, *this->secretKey);
+  this->keyGenObj = make_shared<KeyGenerator>(seal_context);
+
 
   // Initialize empty PublicKey object
   this->publicKey = make_shared<PublicKey>();
@@ -269,46 +277,6 @@ ASecretKey& Aseal::get_secret_key()
   return _from_secret_key(*secretKey);
 }
 
-string Aseal::save_secret_key()
-{
-  // Share as a binary string
-  ostringstream ss;
-
-  if (this->secretKey == nullptr)
-  {
-    throw logic_error("Secret Key is not set, cannot save it.");
-  }
-
-  // Save secret key to stringstream
-  this->secretKey->save(ss, seal::compr_mode_type::none);
-
-  return ss.str();
-}
-
-ASecretKey& Aseal::load_secret_key(string sec_key)
-{
-  // Initialize a SecretKey object
-  SecretKey *sealKey = new SecretKey();
-
-  if (this->context == nullptr)
-  {
-    throw logic_error("Context is not set, cannot load secret key.");
-  }
-
-  // Load secret key from string
-  istringstream ss(sec_key);
-  sealKey->load(*this->context, ss);
-
-  AsealSecretKey* secretKey = new AsealSecretKey(*sealKey);
-
-  return _from_secret_key(*secretKey);
-}
-
-ARelinKey& Aseal::get_relin_keys(){
-  AsealRelinKey* relinKeys = new AsealRelinKey(*this->relinKeys);
-  return _from_relin_keys(*relinKeys);
-}
-
 void Aseal::RelinKeyGen()
 {
   // Gather current context, resolves object
@@ -323,6 +291,11 @@ void Aseal::RelinKeyGen()
   // Generate Relin Key
   this->relinKeys = make_shared<RelinKeys>();
   keyGenObj->create_relin_keys(*relinKeys);
+}
+
+ARelinKeys& Aseal::get_relin_keys(){
+  AsealRelinKey* relinKeys = new AsealRelinKey(*this->relinKeys);
+  return _from_relin_keys(*relinKeys);
 }
 
 void Aseal::relinearize(ACiphertext &ctxt)
