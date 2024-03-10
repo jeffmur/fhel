@@ -1,21 +1,20 @@
 import 'dart:ffi';
 import 'dart:math';
 import 'package:test/test.dart';
-import 'package:fhel/seal.dart' show Seal;
-import 'package:fhel/afhe.dart' show Key;
+import 'package:fhel/seal.dart' show Seal, SealKey;
 
 void main() {
 
   test("Invalid", () {
     try {
-      Key("invalid", nullptr);
+      SealKey("invalid", nullptr);
     } catch (e) {
       expect(e.toString(), "Exception: Unsupported Key Type: invalid");
     }
   });
 
   test("Cannot save key", () {
-    Key pk = Key("public", nullptr);
+    SealKey pk = SealKey("public", nullptr);
     try {
       pk.save();
     } catch (e) {
@@ -35,11 +34,11 @@ void main() {
     ckks.genRelinKeys();
 
     // Retrieve the generated keys
-    Key pk = ckks.publicKey;
+    SealKey pk = ckks.publicKey;
     expect(pk.obj, isNot(null));
     expect(pk.type, 1);
 
-    Key sk = ckks.secretKey;
+    SealKey sk = ckks.secretKey;
     expect(sk.obj, isNot(null));
     expect(sk.type, 2);
 
@@ -52,7 +51,7 @@ void main() {
     expect(sk.size, greaterThan(1));
 
     // Copy Public Key (Type)
-    Key pkLoad = Key.ofType(pk);
+    SealKey pkLoad = SealKey.ofType(pk);
     expect(pkLoad.obj, nullptr);
     expect(pkLoad.type, 1);
     expect(pkLoad.name, pk.name);
@@ -61,7 +60,7 @@ void main() {
     pkLoad.load(ckks.library, pk.serialized, pk.size);
 
     // Copy Secret Key (Type)
-    Key skLoad = Key.ofType(sk);
+    SealKey skLoad = SealKey.ofType(sk);
     expect(skLoad.obj, nullptr);
     expect(skLoad.type, 2);
     expect(skLoad.name, sk.name);
