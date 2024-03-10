@@ -68,6 +68,7 @@ if(DEFINED UNIT_TEST AND UNIT_TEST STREQUAL "ON")
         test/seal/multiplication.cpp
         test/seal/relinearization.cpp
         test/seal/exchange.cpp
+        test/seal/keys.cpp
         test/seal/basics/1_bfv.cpp
         test/seal/basics/2_encoders.cpp
         test/seal/basics/3_levels.cpp

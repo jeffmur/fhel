@@ -109,36 +109,36 @@ public:
 };
 
 /**
- * @brief Abstraction for public keys.
+ * @brief Abstraction for keys.
 */
-class APublicKey {
+class AKey {
 public:
-  virtual ~APublicKey() = default;
-  virtual string save() = 0;
-  virtual int save_size() = 0;
-  virtual void load(Afhe* fhe, string key) = 0;
-  // virtual ACiphertext& data() = 0;
-};
+  virtual ~AKey() = default;
 
-/**
- * @brief Abstraction for secret keys.
-*/
-class ASecretKey {
-public:
-  virtual ~ASecretKey() = default;
+  /**
+   * @brief Saves the key.
+   * @return A string representation of the key.
+  */
   virtual string save() = 0;
-  virtual int save_size() = 0;
-  virtual void load(Afhe* fhe, string key) = 0;
-  // virtual APlaintext& data() = 0;
-};
 
-class ARelinKeys {
-public:
-  virtual ~ARelinKeys() = default;
-  virtual string save() = 0;
+  /**
+   * @brief Calucate the save size of the key.
+   * @return The size of the key in bytes.
+  */
   virtual int save_size() = 0;
+
+  /**
+   * @brief Loads string representation of the key into the key.
+   * @param fhe The backend library to validate the key.
+   * @param key The key to be loaded.
+  */
   virtual void load(Afhe* fhe, string key) = 0;
-  // virtual ACiphertext& data() = 0;
+
+  /**
+   * @brief Returns the parameter ids of the key.
+   * @return A vector of integers representing the key parameters.
+  */
+  virtual vector<uint64_t> param_ids() = 0;
 };
 
 /**
@@ -236,12 +236,12 @@ public:
   /**
    * @brief Returns the public key.
   */
-  virtual APublicKey& get_public_key() = 0;
+  virtual AKey& get_public_key() = 0;
 
   /**
    * @brief Returns the secret key.
   */
-  virtual ASecretKey& get_secret_key() = 0;
+  virtual AKey& get_secret_key() = 0;
 
   /**
    * @brief Generates a public and private key pair; derived from the private key.
@@ -251,7 +251,7 @@ public:
   /**
    * @brief Returns the relinearization keys.
   */
-  virtual ARelinKeys& get_relin_keys() = 0;
+  virtual AKey& get_relin_keys() = 0;
 
   /**
    * @brief Reduces the size of a ciphertext.

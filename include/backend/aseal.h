@@ -161,7 +161,7 @@ inline ACiphertext& _from_ciphertext(AsealCiphertext& c){
 /**
  * @brief Abstraction for PublicKey
 */
-class AsealPublicKey : public APublicKey, public seal::PublicKey {
+class AsealPublicKey : public AKey, public seal::PublicKey {
 public:
   using seal::PublicKey::PublicKey;
   AsealPublicKey(const seal::PublicKey &pk) : seal::PublicKey(pk) {};
@@ -178,20 +178,26 @@ public:
     istringstream stream(data);
     seal::PublicKey::load(_to_context(fhe->get_context()), stream);
   }
+  vector<uint64_t> param_ids() override {
+    // Typically returns a 4-element array
+    array<uint64_t, 4> params = seal::PublicKey::parms_id();
+    vector<std::uint64_t> vec(params.begin(), params.end());
+    return vec;
+  }
 };
 
 // DYNAMIC CASTING
-inline AsealPublicKey& _to_public_key(APublicKey& k){
+inline AsealPublicKey& _to_public_key(AKey& k){
   return static_cast<AsealPublicKey&>(k);
 };
-inline APublicKey& _from_public_key(AsealPublicKey& k){
-  return static_cast<APublicKey&>(k);
+inline AKey& _from_public_key(AsealPublicKey& k){
+  return static_cast<AKey&>(k);
 };
 
 /**
  * @brief Abstraction for SecretKey
 */
-class AsealSecretKey : public ASecretKey, public seal::SecretKey {
+class AsealSecretKey : public AKey, public seal::SecretKey {
 public:
   using seal::SecretKey::SecretKey;
   AsealSecretKey(const seal::SecretKey &sk) : seal::SecretKey(sk) {};
@@ -208,20 +214,26 @@ public:
     istringstream stream(data);
     seal::SecretKey::load(_to_context(fhe->get_context()), stream);
   }
+  vector<uint64_t> param_ids() override {
+    // Typically returns a 4-element array
+    array<uint64_t, 4> params = seal::SecretKey::parms_id();
+    vector<std::uint64_t> vec(params.begin(), params.end());
+    return vec;
+  }
 };
 
 // DYNAMIC CASTING
-inline AsealSecretKey& _to_secret_key(ASecretKey& k){
+inline AsealSecretKey& _to_secret_key(AKey& k){
   return static_cast<AsealSecretKey&>(k);
 };
-inline ASecretKey& _from_secret_key(AsealSecretKey& k){
-  return static_cast<ASecretKey&>(k);
+inline AKey& _from_secret_key(AsealSecretKey& k){
+  return static_cast<AKey&>(k);
 };
 
 /**
  * @brief Abstraction for RelinKey
 */
-class AsealRelinKey : public ARelinKeys, public seal::RelinKeys {
+class AsealRelinKey : public AKey, public seal::RelinKeys {
 public:
   using seal::RelinKeys::RelinKeys;
   AsealRelinKey(const seal::RelinKeys &rk) : seal::RelinKeys(rk) {};
@@ -238,14 +250,20 @@ public:
     istringstream stream(data);
     seal::RelinKeys::load(_to_context(fhe->get_context()), stream);
   }
+  vector<uint64_t> param_ids() override {
+    // Typically returns a 4-element array
+    array<uint64_t, 4> params = seal::RelinKeys::parms_id();
+    vector<std::uint64_t> vec(params.begin(), params.end());
+    return vec;
+  }
 };
 
 // DYNAMIC CASTING
-inline AsealRelinKey& _to_relin_keys(ARelinKeys& k){
+inline AsealRelinKey& _to_relin_keys(AKey& k){
   return dynamic_cast<AsealRelinKey&>(k);
 };
-inline ARelinKeys& _from_relin_keys(AsealRelinKey& k){
-  return dynamic_cast<ARelinKeys&>(k);
+inline AKey& _from_relin_keys(AsealRelinKey& k){
+  return dynamic_cast<AKey&>(k);
 };
 
 
@@ -374,9 +392,9 @@ public:
   void KeyGen() override;
   void KeyGen(string sk);
   void RelinKeyGen() override;
-  APublicKey& get_public_key() override;
-  ASecretKey& get_secret_key() override;
-  ARelinKeys& get_relin_keys() override;
+  AKey& get_public_key() override;
+  AKey& get_secret_key() override;
+  AKey& get_relin_keys() override;
 
   // ------------------ Cryptography ------------------
 
