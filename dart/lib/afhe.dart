@@ -21,6 +21,7 @@ part 'afhe/crypto.dart';
 part 'afhe/codec.dart';
 part 'afhe/errors.dart';
 part 'afhe/serial.dart';
+part 'afhe/key.dart';
 
 /// Abstract Fully Homomorphic Encryption
 ///
@@ -47,6 +48,7 @@ class Afhe {
     backend = Backend.set(backendName);
     scheme = Scheme.set(schemeName);
     library = _c_init_backend(backend.value);
+    raiseForStatus();
   }
 
   /// Initializes the [Backend] without a [Scheme].
@@ -157,6 +159,12 @@ class Afhe {
     raiseForStatus();
   }
 
+  /// Fetch the public key.
+  Key get publicKey => Key("public", _c_get_public_key(library));
+
+  /// Fetch the secret key.
+  Key get secretKey => Key("secret", _c_get_secret_key(library));
+
   /// Encrypts the plaintext message.
   Ciphertext encrypt(Plaintext plaintext) {
     final ptr = _c_encrypt(library, plaintext.obj);
@@ -218,8 +226,7 @@ class Afhe {
 
   /// Encodes a list of doubles into a [Plaintext].
   Plaintext encodeVecDouble(List<double> vec) {
-    Pointer ptr =
-        _c_encode_vector_double(library, doubleListToArray(vec), vec.length);
+    Pointer ptr = _c_encode_vector_double(library, doubleListToArray(vec), vec.length);
     raiseForStatus();
     // String cannot be extracted from C object for CKKS
     return Plaintext.fromPointer(backend, ptr, extractStr: false);

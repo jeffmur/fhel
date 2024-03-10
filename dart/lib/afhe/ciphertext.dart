@@ -62,7 +62,7 @@ class Ciphertext {
   int get size => _c_get_ciphertext_size(obj);
 
   /// Calculates the number of bytes of the serialized ciphertext.
-  int get save_size => _c_get_ciphertext_save_size(obj);
+  int get saveSize => _c_get_ciphertext_save_size(obj);
 
   /// Saves the [Ciphertext] to a non-human-readable format.
   /// Useful for saving to disk or sending over the network.

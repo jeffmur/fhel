@@ -28,8 +28,8 @@ using namespace std;
  */
 enum backend : int
 {
-  _none = 0,   /* No Backend Set */
-  _seal = 1,   /* Microsoft SEAL */
+  no_backend = 0,   /* No Backend Set */
+  seal_backend = 1, /* Microsoft SEAL */
 };
 
 // ------------------ Scheme Type ------------------
@@ -39,10 +39,24 @@ enum backend : int
  */
 enum scheme : int
 {
-  none = 0, /* No Scheme Set */
-  bfv = 1,  /* Brakerski-Fan-Vercauteren */
-  ckks = 2, /* Cheon-Kim-Kim-Song */
-  bgv = 3,  /* Brakerski-Gentry-Vaikuntanathan */
+  no_scheme = 0, /* No Scheme Set */
+  bfv = 1,       /* Brakerski-Fan-Vercauteren */
+  ckks = 2,      /* Cheon-Kim-Kim-Song */
+  bgv = 3,       /* Brakerski-Gentry-Vaikuntanathan */
+};
+
+// ------------------ Key Type ------------------
+/**
+ * @brief Enum for the key type.
+ * @return Integer representing the key type.
+ */
+enum key : int
+{
+  no_key = 0,      /* No Key Set */
+  public_key = 1,  /* Public Key */
+  secret_key = 2,  /* Secret Key */
+  relin_keys = 3,  /* Relinearization Keys */
+  galois_keys = 4, /* Galois Keys */
 };
 
 // ------------------ Abstractions ------------------

@@ -84,13 +84,13 @@ void main() {
       // Encrypt + Save a hexidecimal number
       Plaintext pi = host.plain(3.toRadixString(16));
       Ciphertext ct_pi = host.encrypt(pi);
-      int ct_pi_size = ct_pi.save_size;
+      int ct_pi_size = ct_pi.saveSize;
       Pointer<Uint8> host_ct_pi = ct_pi.save();
 
       // Encrypt + Save an integer vector
       Plaintext vec = host.encodeVecInt([1, 2, 3, 4, 5]);
       Ciphertext ct_vec = host.encrypt(vec);
-      int ct_vec_size = ct_vec.save_size;
+      int ct_vec_size = ct_vec.saveSize;
       Pointer<Uint8> host_ct_vec = ct_vec.save();
 
       // Initialize guest
@@ -142,7 +142,7 @@ void main() {
     Ciphertext ct_pi = host.encrypt(pt_pi);
 
     // Save the ciphertext
-    int ct_pi_size = ct_pi.save_size;
+    int ct_pi_size = ct_pi.saveSize;
     Pointer<Uint8> host_ct_pi = ct_pi.save();
 
     // Encrypt + Save a double vector
@@ -152,7 +152,7 @@ void main() {
     Ciphertext ct_vec = host.encrypt(pt_vec);
 
     // Save the ciphertext
-    int ct_vec_size = ct_vec.save_size;
+    int ct_vec_size = ct_vec.saveSize;
     Pointer<Uint8> host_vec_pi = ct_vec.save();
 
     // Initialize guest

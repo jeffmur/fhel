@@ -38,7 +38,7 @@ class AsealPoly;
  * @brief Scheme types
  */
 static map<scheme, seal::scheme_type> scheme_map_to_seal {
-    {scheme::none, seal::scheme_type::none},
+    {scheme::no_scheme, seal::scheme_type::none},
     {scheme::bfv, seal::scheme_type::bfv},
     {scheme::ckks, seal::scheme_type::ckks},
     {scheme::bgv, seal::scheme_type::bgv},
@@ -292,7 +292,7 @@ public:
   /**
    * @brief Default constructor for the Aseal class.
    */
-  Aseal(){ this->backend_lib = backend::_seal; };
+  Aseal(){ this->backend_lib = backend::seal_backend; };
 
   /**
    * @brief Copy constructor for the Aseal class.
