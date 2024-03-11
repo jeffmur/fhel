@@ -9,6 +9,21 @@ permissions:
   packages: write
 
 jobs:
+  compile:
+    name: Compile 🛠️
+    strategy:
+      matrix:
+        runner: [ 'ubuntu-latest', 'macos-latest' ]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+      - uses: dart-lang/setup-dart@v1
+      - uses: aminya/setup-cpp@v1
+      - run: make build
+
   build:
     name: Builder 👷
     runs-on: ubuntu-latest
@@ -39,23 +54,6 @@ jobs:
         with:
           image_tag: ${{ steps.tag.outputs.TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
-
-  compile:
-    name: Compile 🛠️
-    needs: build
-    strategy:
-      matrix:
-        runner: [ 'ubuntu-latest', 'macos-latest' ]
-    runs-on: ${{ matrix.runner }}
-    container:
-      image: ghcr.io/jeffmur/fhel:${{ needs.build.outputs.IMAGE_TAG }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: 'true'
-
-      - run: make build
 
   docs:
     name: Documentation 📚
