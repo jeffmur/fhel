@@ -66,7 +66,10 @@ typedef _LoadKey = Pointer Function(int keyType, Pointer library, Pointer<Uint8>
 final _LoadKey _c_load_key = dylib
     .lookup<NativeFunction<_LoadKeyC>>('load_key').asFunction();
 
-/// A class that represents a key
+/// Represents an underlying key object in memory
+/// 
+/// A key is used to encrypt and decrypt data. Typically, keys are generated
+/// within the [Backend] library and are immutable.
 class Key {
   /// The memory address of the underlying C key object
   /// 

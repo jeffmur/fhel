@@ -47,13 +47,16 @@ class Seal extends Afhe {
   }
 }
 
-/// Perform a magic number check on the serialized SEAL data
+/// Represents an underlying key object in memory
+///
+/// Extends [Key] to perform SEAL validation on [save] and [load] operations.
+/// Performs a magic number check on the serialized data.
 ///
 class SealKey extends Key {
   /// Constructs a key referencing the underlying C [obj] in memory
   /// 
   /// The [type] and [name] are used to classify the type of key
-  SealKey(String name, Pointer obj) : super(name, obj);
+  SealKey(super.name, super.obj);
 
   /// Constructs a key from the existing [SealKey]
   SealKey.ofType(SealKey key) : super(key.name, nullptr);
