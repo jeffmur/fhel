@@ -7,7 +7,7 @@
 TEST(Exchange, NullTerminated)
 {
     Aseal* host = new Aseal();
-    const char* ctx = generate_context(host, scheme_t::bfv_s, 1024, 0, 1024, 128, nullptr, 0);
+    const char* ctx = generate_context(host, fhe_scheme_t::bfv_s, 1024, 0, 1024, 128, nullptr, 0);
     EXPECT_STREQ(ctx, "success: valid");
 
     // Contain null-terminated characters, we should validate that this works
@@ -66,7 +66,7 @@ TEST(Exchange, Ciphertext)
 
     // Save the secret key
     host->KeyGen();
-    string h_sec_key = host->save_secret_key();
+    string h_sec_key = host->get_secret_key().save();
     AsealPlaintext four("4");
     AsealCiphertext ctxt_four;
     host->encrypt(four, ctxt_four);
@@ -83,7 +83,7 @@ TEST(Exchange, Ciphertext)
 
     // Load the secret key from the host
     // You wouldn't do this in practice, but for testing purposes
-    guest->KeyGen(guest->load_secret_key(h_sec_key));
+    guest->KeyGen(h_sec_key);
 
     AsealCiphertext ctxt_four_guest;
     ctxt_four_guest.load(guest, cipher_out);

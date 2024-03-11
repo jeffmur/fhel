@@ -24,42 +24,66 @@ extern "C" {
      * @brief Enum for the supported backend libraries.
      * @return Integer representing the backend library type.
      */
-    enum backend_t : int32_t
+    enum fhe_backend_t : int32_t
     {
-        no_b = backend::_none,   /* No Backend Set */
-        seal_b = backend::_seal, /* Microsoft SEAL */
+        no_b = backend::no_backend,     /* No Backend Set */
+        seal_b = backend::seal_backend, /* Microsoft SEAL */
     };
 
     /**
      * @brief Enum for the supported schemes.
      * @return Integer representing the scheme type.
     */
-    enum scheme_t : int32_t
+    enum fhe_scheme_t : int32_t
     {
-        no_s = scheme::none,   /* No Scheme Set */
-        bfv_s = scheme::bfv,   /* Brakerski-Fan-Vercauteren */
-        ckks_s = scheme::ckks, /* Cheon-Kim-Kim-Song */
-        bgv_s = scheme::bgv,   /* Brakerski-Gentry-Vaikuntanathan */
+        no_s = scheme::no_scheme, /* No Scheme Set */
+        bfv_s = scheme::bfv,      /* Brakerski-Fan-Vercauteren */
+        ckks_s = scheme::ckks,    /* Cheon-Kim-Kim-Song */
+        bgv_s = scheme::bgv,      /* Brakerski-Gentry-Vaikuntanathan */
+    };
+
+    /**
+     * @brief Enum for the supported keys.
+     * @return Integer representing the key type.
+    */
+    enum fhe_key_t : int32_t
+    {
+        no_k = key::no_key,            /* No Key Set */
+        public_k = key::public_key,    /* Public Key */
+        secret_k = key::secret_key,    /* Secret Key */
+        relin_k = key::relin_keys,     /* Relinearization Keys */
+        galois_k = key::galois_keys,   /* Galois Keys */
     };
 
 }
 
 /**
- * @brief Map (abstract) backend type to backend_t
+ * @brief Map (abstract) backend type to fhe_backend_t
 */
-static map<backend, backend_t> backend_map_backend_t{
-  {backend::_none, backend_t::no_b},
-  {backend::_seal, backend_t::seal_b},
+static map<backend, fhe_backend_t> backend_map_backend_t{
+  {backend::no_backend, fhe_backend_t::no_b},
+  {backend::seal_backend, fhe_backend_t::seal_b},
 };
 
 /**
  * @brief Map scheme_t to (abstract) scheme type
 */
-static map<scheme_t, scheme> scheme_t_map_scheme{
-  {scheme_t::no_s, scheme::none},
-  {scheme_t::bfv_s, scheme::bfv},
-  {scheme_t::ckks_s, scheme::ckks},
-  {scheme_t::bgv_s, scheme::bgv},
+static map<fhe_scheme_t, scheme> scheme_t_map_scheme{
+  {fhe_scheme_t::no_s, scheme::no_scheme},
+  {fhe_scheme_t::bfv_s, scheme::bfv},
+  {fhe_scheme_t::ckks_s, scheme::ckks},
+  {fhe_scheme_t::bgv_s, scheme::bgv},
+};
+
+/**
+ * @brief Map key_t to (abstract) key type
+*/
+static map<key_t, key> key_t_map_key {
+  {fhe_key_t::no_k, key::no_key},
+  {fhe_key_t::public_k, key::public_key},
+  {fhe_key_t::secret_k, key::secret_key},
+  {fhe_key_t::relin_k, key::relin_keys},
+  {fhe_key_t::galois_k, key::galois_keys},
 };
 
 struct cmp_str
@@ -73,17 +97,27 @@ struct cmp_str
 /**
  * @brief Map string to type for the supported schemes.
 */
-static map<const char*, scheme_t, cmp_str> scheme_t_map{
-  {"bfv", scheme_t::bfv_s},
-  {"ckks", scheme_t::ckks_s},
-  {"bgv", scheme_t::bgv_s},
+static map<const char*, fhe_scheme_t, cmp_str> scheme_t_map{
+  {"bfv", fhe_scheme_t::bfv_s},
+  {"ckks", fhe_scheme_t::ckks_s},
+  {"bgv", fhe_scheme_t::bgv_s},
 };
 
 /**
  * @brief Map string to type for the supported backend libraries.
 */
-static map<const char*, backend_t, cmp_str> backend_t_map{
-  {"seal", backend_t::seal_b},
+static map<const char*, fhe_backend_t, cmp_str> backend_t_map{
+  {"seal", fhe_backend_t::seal_b},
+};
+
+/**
+ * @brief Map string to type for the supported key types.
+*/
+static map<const char*, fhe_key_t, cmp_str> key_t_map{
+  {"public", fhe_key_t::public_k},
+  {"secret", fhe_key_t::secret_k},
+  {"relin", fhe_key_t::relin_k},
+  {"galois", fhe_key_t::galois_k},
 };
 
 extern "C" {
@@ -92,7 +126,7 @@ extern "C" {
      * @param backend Backend library to convert.
      * @return String representing the backend library.
      */
-    // const char* backend_t_to_string(backend_t backend);
+    // const char* fhe_backend_t_to_string(fhe_backend_t backend);
 
     /**
      * @brief Check for an error.
@@ -110,14 +144,14 @@ extern "C" {
      * @param backend String to convert.
      * @return Backend library type.
      */
-    backend_t backend_t_from_string(const char* backend);
+    fhe_backend_t backend_t_from_string(const char* backend);
 
     /**
      * @brief Convert scheme type to string.
      * @param scheme Scheme to convert.
      * @return String representing the scheme.
      */
-    scheme_t scheme_t_from_string(const char* scheme);
+    fhe_scheme_t scheme_t_from_string(const char* scheme);
 
     /**
      * @brief Generate a context for the backend library.
@@ -131,7 +165,7 @@ extern "C" {
      * @param qi_sizes_length Length of the array of primes.
      * @return String representing the context.
     */
-    const char* generate_context(Afhe* afhe, scheme_t scheme, uint64_t poly_mod_degree, uint64_t pt_mod_bit, uint64_t pt_mod, uint64_t sec_level, const uint64_t* qi_sizes, uint64_t qi_sizes_length);
+    const char* generate_context(Afhe* afhe, fhe_scheme_t scheme, uint64_t poly_mod_degree, uint64_t pt_mod_bit, uint64_t pt_mod, uint64_t sec_level, const uint64_t* qi_sizes, uint64_t qi_sizes_length);
 
     /**
      * @brief Generate a context for the backend library from parameters.
@@ -154,11 +188,31 @@ extern "C" {
     int save_parameters_size(Afhe* afhe);
 
     /**
+     * @brief Number of slots available based on parameters.
+     * @param afhe Pointer to the backend library.
+    */
+    int get_slot_count(Afhe* afhe);
+
+    /**
+     * @brief Convert string to key type.
+     * @param key name to convert.
+     * @return Key type.
+     */
+    fhe_key_t key_t_from_string(const char* key);
+
+    /**
+     * @brief Initialize a key for the backend library.
+     * @param afhe Pointer to the backend library.
+     * @param key_type Type of key to initialize.
+    */
+    AKey* init_key(Afhe* afhe, fhe_key_t key_type);
+
+    /**
      * @brief Generate keys for the backend library.
      * @param afhe Pointer to the backend library.
     */
     void generate_keys(Afhe* afhe);
-
+  
     /**
      * @brief Generate relinearization keys for the backend library.
      * @param afhe Pointer to the backend library.
@@ -166,18 +220,74 @@ extern "C" {
     void generate_relin_keys(Afhe* afhe);
 
     /**
+     * @brief Save key to a serialized format.
+     * @param key Pointer to the key.
+     * @return String representing the key.
+    */
+    const char* save_key(AKey* key);
+
+    /**
+     * @brief Save the size of the key.
+     * @param key Pointer to the key.
+     * @return Size of the serialized key payload.
+    */
+    int save_key_size(AKey* key);
+
+    /**
+     * @brief Load a key from a serialized format.
+     * @param afhe Pointer to the backend library.
+     * @param data String representing the key.
+     * @param size Size of the key.
+     * @return Pointer to the loaded key.
+    */
+    AKey* load_key(fhe_key_t key_type, Afhe* afhe, const char* data, int size);
+
+    /**
+     * @brief Retrieve the key data.
+     * @param key Pointer to the key.
+     * @return Vector of integers representing the key.
+     * @note Returned data cannot be used to reconstruct the key.
+    */
+    uint64_t* get_key_data(AKey* key);
+
+    /**
+     * @brief Retrieve the key data size.
+     * @param key Pointer to the key.
+     * @return Size of the key data.
+    */
+    int get_key_data_size(AKey* key);
+
+    /**
+     * @brief Retrieve the public key.
+     * @param afhe Pointer to the backend library.
+    */
+    AKey* get_public_key(Afhe* afhe);
+
+    /**
+     * @brief Retrieve the secret key.
+     * @param afhe Pointer to the backend library.
+    */
+    AKey* get_secret_key(Afhe* afhe);
+
+    /**
+     * @brief Retrieve the relinearization keys.
+     * @param afhe Pointer to the backend library.
+    */
+    AKey* get_relin_keys(Afhe* afhe);
+
+    /**
      * @brief Initialize the backend library.
      * @param backend Backend library to use.
      * @return Pointer to the backend library.
      */
-    Afhe* init_backend(backend_t backend);
+    Afhe* init_backend(fhe_backend_t backend);
 
     /**
      * @brief Initialize a plaintext.
      * @param backend Backend library to use.
      * @return Pointer to the plaintext.
      */
-    APlaintext* init_plaintext(backend_t backend);
+    APlaintext* init_plaintext(fhe_backend_t backend);
 
     /**
      * @brief Initialize a plaintext with a value.
@@ -185,7 +295,7 @@ extern "C" {
      * @param value Value to initialize the plaintext with.
      * @return Pointer to the plaintext.
      */
-    APlaintext* init_plaintext_value(backend_t backend, const char* value);
+    APlaintext* init_plaintext_value(fhe_backend_t backend, const char* value);
 
     /**
      * @brief Get the value of a plaintext.
@@ -199,7 +309,7 @@ extern "C" {
      * @param backend Backend library to use.
      * @return Pointer to the ciphertext.
      */
-    ACiphertext* init_ciphertext(backend_t backend);
+    ACiphertext* init_ciphertext(fhe_backend_t backend);
 
     /**
      * @brief Get the size of a ciphertext.
@@ -330,6 +440,15 @@ extern "C" {
      * @return Pointer to the resulting ciphertext.
     */
     ACiphertext* square(Afhe* afhe, ACiphertext* ciphertext);
+
+    /**
+     * @brief Raise ciphertext to a power.
+     * @param afhe Pointer to the backend library.
+     * @param ciphertext Pointer to the ciphertext.
+     * @param power Power to raise the ciphertext to.
+     * @return Pointer to the resulting ciphertext.
+    */
+    ACiphertext* power(Afhe* afhe, ACiphertext* ciphertext, int power);
 
     /**
      * @brief Encode a vector of integers into a plaintext.

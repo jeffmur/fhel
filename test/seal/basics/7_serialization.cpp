@@ -99,23 +99,25 @@ TEST(Basics, Serialization)
     accordingly.
     */
     {
-        Aseal* fhe = new Aseal();
+        Aseal* server = new Aseal();
         size_t poly_modulus_degree = 8192;
-        fhe->ContextGen(scheme::ckks, poly_modulus_degree, -1, pow(2.0, 50), -1, { 50, 30, 50 });
+        string ctxt = server->ContextGen(scheme::ckks, poly_modulus_degree, -1, pow(2.0, 30), -1, { 50, 30, 50 });
+        EXPECT_EQ(ctxt, "success: valid");
 
         /*
         Serialization of the encryption parameters to our shared stream is very
         simple with the EncryptionParameters::save function.
         */
-        string params = fhe->save_parameters();
-        int size = fhe->save_parameters_size();
+        string server_params = server->save_parameters();
+        int server_param_size = server->save_parameters_size();
+        parms_stream.write(server_params.c_str(), server_param_size);
 
         /*
         The return value of this function is the actual byte count of data written
         to the stream.
         */
         print_line(__LINE__);
-        cout << "EncryptionParameters: wrote " << size << " bytes" << endl;
+        cout << "EncryptionParameters: wrote " << server_param_size << " bytes" << endl;
 
         /*
         Before moving on, we will take some time to discuss further options in
@@ -168,20 +170,20 @@ TEST(Basics, Serialization)
         */
         print_line(__LINE__);
         cout << "EncryptionParameters: data size upper bound (compr_mode_type::none): "
-             << fhe->save_parameters_size(/* defaults to 'none' */) << endl;
+             << server->save_parameters_size(/* defaults to 'none' */) << endl;
         cout << "             "
              << "EncryptionParameters: data size upper bound (compr_mod_type::zlib): "
-             << fhe->save_parameters_size("zlib") << endl;
+             << server->save_parameters_size("zlib") << endl;
         cout << "             "
              << "EncryptionParameters: data size upper bound (compr_mod_type::zstd): "
-             << fhe->save_parameters_size("zstd") << endl;
+             << server->save_parameters_size("zstd") << endl;
 
         /*
         As an example, we now serialize the encryption parameters to a fixed size
         buffer.
         */
-        vector<byte> byte_buffer(static_cast<size_t>(fhe->save_parameters_size()));
-        fhe->save_parameters_inplace(reinterpret_cast<byte *>(byte_buffer.data()), byte_buffer.size());
+        vector<byte> byte_buffer(static_cast<size_t>(server->save_parameters_size()));
+        server->save_parameters_inplace(reinterpret_cast<byte *>(byte_buffer.data()), byte_buffer.size());
 
         /*
         To illustrate deserialization, we load back the encryption parameters
@@ -191,15 +193,15 @@ TEST(Basics, Serialization)
         The serialization format includes the true size of the data and the size
         of the buffer is only used for a sanity check.
         */
-        Aseal* fhe2 = new Aseal();
-        fhe2->load_parameters_inplace(reinterpret_cast<const byte *>(byte_buffer.data()), byte_buffer.size());
+        Aseal* client = new Aseal();
+        client->load_parameters_inplace(reinterpret_cast<const byte *>(byte_buffer.data()), byte_buffer.size());
 
         /*
         We can check that the saved and loaded encryption parameters indeed match.
-        TODO?
         */
-        // print_line(__LINE__);
-        // cout << "EncryptionParameters: parms == parms2: " << boolalpha << (fhe == fhe2) << endl;
+        print_line(__LINE__);
+        cout << "EncryptionParameters: parms == parms2: " << boolalpha << (server->save_parameters_size() == client->save_parameters_size()) << endl;
+        EXPECT_EQ(server->save_parameters_size(), client->save_parameters_size());
 
         /*
         The functions presented and used here exist for all Microsoft SEAL objects
@@ -211,205 +213,174 @@ TEST(Basics, Serialization)
 
     /*
     Client starts by loading the encryption parameters, sets up the SEALContext,
-    and creates the required keys.
+    configures encoders, and creates the required keys.
     */
-    // {
-    //     EncryptionParameters parms;
-    //     parms.load(parms_stream);
+    {
+        Aseal* client = new Aseal();
+        string status = client->ContextGen(parms_stream.str());
+        EXPECT_EQ(status, "success: valid");
 
-    //     /*
-    //     Seek the parms_stream get head back to beginning of the stream because we
-    //     will use the same stream to read the parameters repeatedly.
-    //     */
-    //     parms_stream.seekg(0, parms_stream.beg);
+        /*
+        We need to save the secret key so we can decrypt later.
+        */
+        client->KeyGen();
+        AsealSecretKey secret_key = _to_secret_key(client->get_secret_key());
+        int secret_key_size = secret_key.save_size();
+        sk_stream.write(secret_key.save().c_str(), secret_key_size);
 
-    //     SEALContext context(parms);
+        cout << "Secret key: wrote " << secret_key_size << " bytes" << endl;
 
-    //     KeyGenerator keygen(context);
-    //     auto sk = keygen.secret_key();
-    //     PublicKey pk;
-    //     keygen.create_public_key(pk);
+        /*
+        As in previous examples, in this example we will encrypt in public-key
+        mode. If we want to send a public key over the network, we should instead
+        have created it as a seeded object as follows:
 
-    //     /*
-    //     We need to save the secret key so we can decrypt later.
-    //     */
-    //     sk.save(sk_stream);
+            Serializable<PublicKey> pk = keygen.create_public_key();
 
-    //     /*
-    //     As in previous examples, in this example we will encrypt in public-key
-    //     mode. If we want to send a public key over the network, we should instead
-    //     have created it as a seeded object as follows:
+        In this example we will also use relinearization keys. These we will
+        absolutely want to create as seeded objects to minimize communication
+        cost, unlike in prior examples.
+        */
+        // client->RelinKeyGen();
+        // client->save_relin_keys(data_stream); // TODO
 
-    //         Serializable<PublicKey> pk = keygen.create_public_key();
+        /*
+        Next set up the CKKSEncoder and Encryptor, and encrypt some numbers.
+        */
+        AsealPlaintext plain1;
 
-    //     In this example we will also use relinearization keys. These we will
-    //     absolutely want to create as seeded objects to minimize communication
-    //     cost, unlike in prior examples.
-    //     */
-    //     Serializable<RelinKeys> rlk = keygen.create_relin_keys();
+        client->set_encoder_scale(pow(2.0, 30));
+        client->encode_double(2.3, plain1);
 
-    //     /*
-    //     To demonstrate the significant space saving from this method, we will
-    //     create another set of relinearization keys, this time fully expanded.
-    //     */
-    //     RelinKeys rlk_big;
-    //     keygen.create_relin_keys(rlk_big);
+        /*
+        The client will not compute on ciphertexts that it creates, so it can
+        just as well create Serializable<Ciphertext> objects. In fact, we do
+        not even need to name those objects and instead immediately call
+        Serializable<Ciphertext>::save.
+        */
+        AsealCiphertext cipher1;
+        client->encrypt(plain1, cipher1);
+        int size_cipher1 = cipher1.save_size();
+        data_stream.write(cipher1.save().c_str(), size_cipher1);
 
-    //     /*
-    //     We serialize both relinearization keys to demonstrate the concrete size
-    //     difference. If compressed serialization is used, the compression rate
-    //     will be the same in both cases. We omit specifying the compression mode
-    //     to use the default, as determined by the Microsoft SEAL build system.
-    //     */
-    //     auto size_rlk = rlk.save(data_stream);
-    //     auto size_rlk_big = rlk_big.save(data_stream);
+        /*
+        As we discussed in the beginning of this example, ciphertexts can be
+        created in a seeded state in secret-key mode, providing a huge reduction
+        in the data size upon serialization. To do this, we need to provide the
+        Encryptor with the secret key in its constructor, or at a later point
+        with the Encryptor::set_secret_key function, and use the
+        Encryptor::encrypt_symmetric function to encrypt.
+        */
+        // TODO: Symmetric encryption
+        // encryptor.set_secret_key(secret_key);
+        // auto size_sym_encrypted2 = encryptor.encrypt_symmetric(plain2).save(data_stream);
 
-    //     print_line(__LINE__);
-    //     cout << "Serializable<RelinKeys>: wrote " << size_rlk << " bytes" << endl;
-    //     cout << "             "
-    //          << "RelinKeys wrote " << size_rlk_big << " bytes" << endl;
+        /*
+        The size reduction is substantial.
+        */
+        print_line(__LINE__);
+        cout << "Ciphertext (client): wrote " << size_cipher1 << " bytes" << endl;
+        // cout << "             "
+        //      << "Serializable<Ciphertext> (seeded secret-key): wrote " << size_sym_encrypted2 << " bytes" << endl;
 
-    //     /*
-    //     Seek back in data_stream to where rlk data ended, i.e., size_rlk_big
-    //     bytes backwards from current position.
-    //     */
-    //     data_stream.seekp(-size_rlk_big, data_stream.cur);
+        /*
+        We have seen how creating seeded objects can result in huge space
+        savings compared to creating unseeded objects. This is particularly
+        important when creating Galois keys, which can be very large. We have
+        seen how secret-key encryption can be used to achieve much smaller
+        ciphertext sizes when the public-key functionality is not needed.
 
-    //     /*
-    //     Next set up the CKKSEncoder and Encryptor, and encrypt some numbers.
-    //     */
-    //     double scale = pow(2.0, 30);
-    //     CKKSEncoder encoder(context);
-    //     Plaintext plain1, plain2;
-    //     encoder.encode(2.3, scale, plain1);
-    //     encoder.encode(4.5, scale, plain2);
-
-    //     Encryptor encryptor(context, pk);
-
-    //     /*
-    //     The client will not compute on ciphertexts that it creates, so it can
-    //     just as well create Serializable<Ciphertext> objects. In fact, we do
-    //     not even need to name those objects and instead immediately call
-    //     Serializable<Ciphertext>::save.
-    //     */
-    //     auto size_encrypted1 = encryptor.encrypt(plain1).save(data_stream);
-
-    //     /*
-    //     As we discussed in the beginning of this example, ciphertexts can be
-    //     created in a seeded state in secret-key mode, providing a huge reduction
-    //     in the data size upon serialization. To do this, we need to provide the
-    //     Encryptor with the secret key in its constructor, or at a later point
-    //     with the Encryptor::set_secret_key function, and use the
-    //     Encryptor::encrypt_symmetric function to encrypt.
-    //     */
-    //     encryptor.set_secret_key(sk);
-    //     auto size_sym_encrypted2 = encryptor.encrypt_symmetric(plain2).save(data_stream);
-
-    //     /*
-    //     The size reduction is substantial.
-    //     */
-    //     print_line(__LINE__);
-    //     cout << "Serializable<Ciphertext> (public-key): wrote " << size_encrypted1 << " bytes" << endl;
-    //     cout << "             "
-    //          << "Serializable<Ciphertext> (seeded secret-key): wrote " << size_sym_encrypted2 << " bytes" << endl;
-
-    //     /*
-    //     We have seen how creating seeded objects can result in huge space
-    //     savings compared to creating unseeded objects. This is particularly
-    //     important when creating Galois keys, which can be very large. We have
-    //     seen how secret-key encryption can be used to achieve much smaller
-    //     ciphertext sizes when the public-key functionality is not needed.
-
-    //     We would also like to draw attention to the fact there we could easily
-    //     serialize multiple Microsoft SEAL objects sequentially in a stream. Each
-    //     object writes its own size into the stream, so deserialization knows
-    //     exactly how many bytes to read. We will see this working below.
-    //     */
-    // }
+        We would also like to draw attention to the fact there we could easily
+        serialize multiple Microsoft SEAL objects sequentially in a stream. Each
+        object writes its own size into the stream, so deserialization knows
+        exactly how many bytes to read. We will see this working below.
+        */
+    }
 
     /*
     The server can now compute on the encrypted data. We will recreate the
     SEALContext and set up an Evaluator here.
     */
-    // {
-    //     EncryptionParameters parms;
-    //     parms.load(parms_stream);
-    //     parms_stream.seekg(0, parms_stream.beg);
-    //     SEALContext context(parms);
+    {
+        Aseal* server = new Aseal();
+        string ctx = server->ContextGen(parms_stream.str());
+        EXPECT_EQ(ctx, "success: valid");
 
-    //     Evaluator evaluator(context);
+        /*
+        Next we need to load the ciphertext from our data_stream.
+        */
+        // ARelinKey server_relin_key;
 
-    //     /*
-    //     Next we need to load relinearization keys and the ciphertexts from our
-    //     data_stream.
-    //     */
-    //     RelinKeys rlk;
-    //     Ciphertext encrypted1, encrypted2;
+        /*
+        Deserialization is as easy as serialization.
+        */
+        AsealCiphertext client_cipher;
+        client_cipher.load(server, data_stream.str());
 
-    //     /*
-    //     Deserialization is as easy as serialization.
-    //     */
-    //     rlk.load(context, data_stream);
-    //     encrypted1.load(context, data_stream);
-    //     encrypted2.load(context, data_stream);
+        // Clear the data_stream
+        data_stream.str("");
+        data_stream.clear();
 
-    //     /*
-    //     Compute the product, rescale, and relinearize.
-    //     */
-    //     Ciphertext encrypted_prod;
-    //     evaluator.multiply(encrypted1, encrypted2, encrypted_prod);
-    //     evaluator.relinearize_inplace(encrypted_prod, rlk);
-    //     evaluator.rescale_to_next_inplace(encrypted_prod);
+        /*
+        Compute the product, rescale, and relinearize.
+        */
 
-    //     /*
-    //     we use data_stream to communicate encrypted_prod back to the client.
-    //     there is no way to save the encrypted_prod as a seeded object: only
-    //     freshly encrypted secret-key ciphertexts can be seeded. Note how the
-    //     size of the result ciphertext is smaller than the size of a fresh
-    //     ciphertext because it is at a lower level due to the rescale operation.
-    //     */
-    //     data_stream.seekp(0, parms_stream.beg);
-    //     data_stream.seekg(0, parms_stream.beg);
-    //     auto size_encrypted_prod = encrypted_prod.save(data_stream);
+        AsealPlaintext server_plain;
+        server->set_encoder_scale(pow(2.0, 30));
+        server->encode_double(4.5, server_plain);
 
-    //     print_line(__LINE__);
-    //     cout << "Ciphertext (secret-key): wrote " << size_encrypted_prod << " bytes" << endl;
-    // }
+        AsealCiphertext encrypted_prod;
+        server->multiply(client_cipher, server_plain, encrypted_prod);
+        // server->relinearize(encrypted_prod);
+        // server->rescale_to_next(encrypted_prod);
+
+        /*
+        we use data_stream to communicate encrypted_prod back to the client.
+        there is no way to save the encrypted_prod as a seeded object: only
+        freshly encrypted secret-key ciphertexts can be seeded. Note how the
+        size of the result ciphertext is smaller than the size of a fresh
+        ciphertext because it is at a lower level due to the rescale operation.
+        */
+        int size_encrypted_prod = encrypted_prod.save_size();
+        data_stream.write(encrypted_prod.save().c_str(), size_encrypted_prod); // push encrypted_prod
+
+        print_line(__LINE__);
+        cout << "Ciphertext (server): wrote " << size_encrypted_prod << " bytes" << endl;
+    }
 
     /*
     In the final step the client decrypts the result.
     */
-    // {
-    //     EncryptionParameters parms;
-    //     parms.load(parms_stream);
-    //     parms_stream.seekg(0, parms_stream.beg);
-    //     SEALContext context(parms);
+    {
+        Aseal* client = new Aseal();
+        client->ContextGen(parms_stream.str());
 
-    //     /*
-    //     Load back the secret key from sk_stream.
-    //     */
-    //     SecretKey sk;
-    //     sk.load(context, sk_stream);
-    //     Decryptor decryptor(context, sk);
-    //     CKKSEncoder encoder(context);
+        /*
+        Load back the secret key from sk_stream.
+        */
+        AsealSecretKey* sk = new AsealSecretKey();
+        sk->load(client, sk_stream.str());
+        cout << "Secret key: loaded " << sk_stream.str().size() << " bytes" << endl;
+        client->KeyGen(sk_stream.str());
 
-    //     Ciphertext encrypted_result;
-    //     encrypted_result.load(context, data_stream);
+        AsealCiphertext encrypted_result;
+        encrypted_result.load(client, data_stream.str());
 
-    //     Plaintext plain_result;
-    //     decryptor.decrypt(encrypted_result, plain_result);
-    //     vector<double> result;
-    //     encoder.decode(plain_result, result);
+        AsealPlaintext plain_result;
+        client->decrypt(encrypted_result, plain_result);
+        vector<double> result;
+        client->decode_double(plain_result, result);
 
-    //     print_line(__LINE__);
-    //     cout << "Decrypt the loaded ciphertext" << endl;
-    //     cout << "    + Expected result:" << endl;
-    //     vector<double> true_result(encoder.slot_count(), 2.3 * 4.5);
-    //     print_vector(true_result, 3, 7);
+        print_line(__LINE__);
+        cout << "Decrypt the loaded ciphertext" << endl;
+        cout << "    + Expected result:" << endl;
+        vector<double> true_result(client->slot_count(), 2.3 * 4.5);
+        print_vector(true_result, 3, 7);
 
-    //     cout << "    + Computed result ...... Correct." << endl;
-    //     print_vector(result, 3, 7);
-    // }
+        expect_equal_vector(result, true_result, 1e-2); // match precision of input vars
+        cout << "    + Computed result ...... Correct." << endl;
+        print_vector(result, 3, 7);
+    }
 
     /*
     Finally, we give a little bit more explanation of the structure of data
@@ -433,24 +404,24 @@ TEST(Basics, Serialization)
     Note that the SEALHeader is never compressed, so there is no need to specify
     the compression mode.
     */
-    // Plaintext pt("1x^2 + 3");
-    // stringstream stream;
-    // auto data_size = pt.save(stream);
+    AsealPlaintext pt("1x^2 + 3");
+    stringstream stream;
+    auto data_size = pt.save(stream);
 
-    // /*
-    // We can now load just the SEALHeader back from the stream as follows.
-    // */
-    // Serialization::SEALHeader header;
-    // Serialization::LoadHeader(stream, header);
+    /*
+    We can now load just the SEALHeader back from the stream as follows.
+    */
+    seal::Serialization::SEALHeader header;
+    seal::Serialization::LoadHeader(stream, header);
 
-    // /*
-    // Now confirm that the size of data written to stream matches with what is
-    // indicated by the SEALHeader.
-    // */
-    // print_line(__LINE__);
-    // cout << "Size written to stream: " << data_size << " bytes" << endl;
-    // cout << "             "
-    //      << "Size indicated in SEALHeader: " << header.size << " bytes" << endl;
-    // cout << endl;
+    /*
+    Now confirm that the size of data written to stream matches with what is
+    indicated by the SEALHeader.
+    */
+    print_line(__LINE__);
+    cout << "Size written to stream: " << data_size << " bytes" << endl;
+    cout << "             "
+         << "Size indicated in SEALHeader: " << header.size << " bytes" << endl;
+    cout << endl;
 #endif
 }

@@ -20,6 +20,7 @@ part 'afhe/operation.dart';
 part 'afhe/crypto.dart';
 part 'afhe/codec.dart';
 part 'afhe/errors.dart';
+part 'afhe/key.dart';
 
 /// Abstract Fully Homomorphic Encryption
 ///
@@ -46,6 +47,7 @@ class Afhe {
     backend = Backend.set(backendName);
     scheme = Scheme.set(schemeName);
     library = _c_init_backend(backend.value);
+    raiseForStatus();
   }
 
   /// Initializes the [Backend] without a [Scheme].
@@ -123,6 +125,9 @@ class Afhe {
     raiseForStatus();
     return ptr.toDartString();
   }
+  
+  /// Returns the number of slots based on parameters.
+  int get slotCount => _c_slot_count(library);
 
   /// Returns the string representation of FHE parameters.
   /// 
@@ -152,6 +157,15 @@ class Afhe {
     _c_gen_relin_keys(library);
     raiseForStatus();
   }
+
+  /// Fetch the public key.
+  Key get publicKey => Key("public", _c_get_public_key(library));
+
+  /// Fetch the secret key.
+  Key get secretKey => Key("secret", _c_get_secret_key(library));
+
+  /// Fetch the relinearization keys.
+  Key get relinKeys => Key("relin", _c_get_relin_keys(library));
 
   /// Encrypts the plaintext message.
   Ciphertext encrypt(Plaintext plaintext) {
@@ -214,8 +228,7 @@ class Afhe {
 
   /// Encodes a list of doubles into a [Plaintext].
   Plaintext encodeVecDouble(List<double> vec) {
-    Pointer ptr =
-        _c_encode_vector_double(library, doubleListToArray(vec), vec.length);
+    Pointer ptr = _c_encode_vector_double(library, doubleListToArray(vec), vec.length);
     raiseForStatus();
     // String cannot be extracted from C object for CKKS
     return Plaintext.fromPointer(backend, ptr, extractStr: false);
@@ -294,6 +307,17 @@ class Afhe {
   /// Squares the [Ciphertext].
   Ciphertext square(Ciphertext a) {
     Pointer ptr = _c_square(library, a.obj);
+    raiseForStatus();
+    return Ciphertext.fromPointer(backend, ptr);
+  }
+
+  /// Raises the [Ciphertext] to a [power].
+  /// 
+  /// Only supported for BFV/BGV [Scheme].
+  /// The [power] must be a positive integer.
+  /// Applies relinearization after each multiplication step.
+  Ciphertext power(Ciphertext a, int power) {
+    Pointer ptr = _c_power(library, a.obj, power);
     raiseForStatus();
     return Ciphertext.fromPointer(backend, ptr);
   }

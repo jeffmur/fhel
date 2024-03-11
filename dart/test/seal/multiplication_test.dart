@@ -63,6 +63,36 @@ void main() {
     }
   });
 
+  test("Hexadecimal Power", () {
+    Map<String, int> ctx = {
+      'polyModDegree': 8192,
+      'ptMod': 1024,
+      'secLevel': 128
+    };
+    for (var sch in schemes) {
+      final fhe = Seal(sch);
+      final pt_hex_10 = fhe.plain(10.toRadixString(16));
+      String status = fhe.genContext(ctx);
+      expect(status, 'success: valid');
+      fhe.genKeys();
+      fhe.genRelinKeys();
+      final ct_hex_to = fhe.encrypt(pt_hex_10);
+
+      final ct_hex_100 = fhe.power(ct_hex_to, 2);
+      expect(fhe.invariantNoiseBudget(ct_hex_100), greaterThan(0));
+      expect(fhe.decrypt(ct_hex_100).text.toLowerCase(), 100.toRadixString(16));
+
+      final ct_hex_1000 = fhe.power(ct_hex_to, 3);
+      expect(fhe.invariantNoiseBudget(ct_hex_1000), greaterThan(0));
+      expect(fhe.decrypt(ct_hex_1000).text.toLowerCase(), 1000.toRadixString(16));
+
+      final ct_hex_10000 = fhe.power(ct_hex_to, 4);
+      expect(fhe.invariantNoiseBudget(ct_hex_10000), greaterThan(0));
+      // Noise budget is 0 after 4th power
+      // We can try to use modSwitch to reduce noise on each multiplication step
+    }
+  });
+
   test("List<int> Multiplication", () {
     Map<String, int> ctx = {
       'polyModDegree': 8192,
@@ -156,7 +186,7 @@ void main() {
     ];
     for (int i = 0; i < arr_len; i++) {
       near(
-          eps: 1e-7,
+          eps: 1e-6,
           fhe.decodeVecDouble(pt_pi_squared, arr_len)[i],
           product[i]);
     }

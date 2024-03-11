@@ -28,8 +28,8 @@ using namespace std;
  */
 enum backend : int
 {
-  _none = 0,   /* No Backend Set */
-  _seal = 1,   /* Microsoft SEAL */
+  no_backend = 0,   /* No Backend Set */
+  seal_backend = 1, /* Microsoft SEAL */
 };
 
 // ------------------ Scheme Type ------------------
@@ -39,10 +39,24 @@ enum backend : int
  */
 enum scheme : int
 {
-  none = 0, /* No Scheme Set */
-  bfv = 1,  /* Brakerski-Fan-Vercauteren */
-  ckks = 2, /* Cheon-Kim-Kim-Song */
-  bgv = 3,  /* Brakerski-Gentry-Vaikuntanathan */
+  no_scheme = 0, /* No Scheme Set */
+  bfv = 1,       /* Brakerski-Fan-Vercauteren */
+  ckks = 2,      /* Cheon-Kim-Kim-Song */
+  bgv = 3,       /* Brakerski-Gentry-Vaikuntanathan */
+};
+
+// ------------------ Key Type ------------------
+/**
+ * @brief Enum for the key type.
+ * @return Integer representing the key type.
+ */
+enum key : int
+{
+  no_key = 0,      /* No Key Set */
+  public_key = 1,  /* Public Key */
+  secret_key = 2,  /* Secret Key */
+  relin_keys = 3,  /* Relinearization Keys */
+  galois_keys = 4, /* Galois Keys */
 };
 
 // ------------------ Abstractions ------------------
@@ -109,30 +123,38 @@ public:
 };
 
 /**
- * @brief Abstraction for public keys.
+ * @brief Abstraction for keys.
 */
-class APublicKey {
+class AKey {
 public:
-  virtual ~APublicKey() = default;
-  // virtual ACiphertext& data() = 0;
-  // virtual TODO param_id() = 0;
-};
+  virtual ~AKey() = default;
 
-/**
- * @brief Abstraction for secret keys.
-*/
-class ASecretKey {
-public:
-  virtual ~ASecretKey() = default;
-  // virtual APlaintext& data() = 0;
-  // virtual TODO param_id() = 0;
-};
+  /**
+   * @brief Saves the key.
+   * @return A string representation of the key.
+  */
+  virtual string save() = 0;
 
-class ARelinKey {
-public:
-  virtual ~ARelinKey() = default;
-  // virtual ACiphertext& data() = 0;
-  // virtual TODO param_id() = 0;
+  /**
+   * @brief Calucate the save size of the key.
+   * @return The size of the key in bytes.
+  */
+  virtual int save_size() = 0;
+
+  /**
+   * @brief Loads string representation of the key into the key.
+   * @param fhe The backend library to validate the key.
+   * @param key The key to be loaded.
+  */
+  virtual void load(Afhe* fhe, string key) = 0;
+
+  /**
+   * @brief Returns the data of the key.
+   * @return A vector of integers representing a unique key.
+   * @note The key data is unique to the backend library, and
+   *       cannot not be used to recreate the key.
+  */
+  virtual vector<uint64_t> data() = 0;
 };
 
 /**
@@ -215,6 +237,11 @@ public:
   */
   virtual void disable_mod_switch() = 0;
 
+  /**
+   * @brief Set the encoder scale for CKKS scheme.
+  */
+  virtual void set_encoder_scale(double scale) = 0;
+
   // ------------------ Cryptography ------------------
 
   /**
@@ -225,32 +252,22 @@ public:
   /**
    * @brief Returns the public key.
   */
-  virtual APublicKey& get_public_key() = 0;
+  virtual AKey& get_public_key() = 0;
 
   /**
    * @brief Returns the secret key.
   */
-  virtual ASecretKey& get_secret_key() = 0;
-
-  /**
-   * @brief Saves the secret key.
-  */
-  virtual string save_secret_key() = 0;
-
-  /**
-   * @brief Loads the secret key.
-  */
-  virtual ASecretKey& load_secret_key(string secret_key) = 0;
-
-  /**
-   * @brief Returns the relinearization keys.
-  */
-  virtual ARelinKey& get_relin_keys() = 0;
+  virtual AKey& get_secret_key() = 0;
 
   /**
    * @brief Generates a public and private key pair; derived from the private key.
    */
   virtual void RelinKeyGen() = 0;
+
+  /**
+   * @brief Returns the relinearization keys.
+  */
+  virtual AKey& get_relin_keys() = 0;
 
   /**
    * @brief Reduces the size of a ciphertext.
@@ -472,6 +489,16 @@ public:
    * This function performs the squaring operation on a ciphertext and stores the result in another ciphertext.
   */
   virtual void square(ACiphertext &ctxt, ACiphertext &ctxt_res) = 0;
+
+  /**
+   * @brief Raises a ciphertext to a power and stores the result in another ciphertext.
+   * 
+   * Applies relinearization after each multiplication step.
+   * @param ctxt The ciphertext to be raised to a power.
+   * @param power The power to raise the ciphertext to.
+   * @param ctxt_res The ciphertext where the result will be stored.
+  */
+  virtual void power(ACiphertext &ctxt, int power, ACiphertext &ctxt_res) = 0;
 };
 
 #endif /* AFHE_H */

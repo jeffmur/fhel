@@ -215,6 +215,11 @@ void Aseal::disable_mod_switch()
   this->context = make_shared<SEALContext>(*this->params, false);
 }
 
+void Aseal::set_encoder_scale(double scale)
+{
+  this->cEncoderScale = scale;
+}
+
 void Aseal::KeyGen()
 {
   // Gather current context, resolves object
@@ -236,16 +241,18 @@ void Aseal::KeyGen()
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
 }
 
-void Aseal::KeyGen(ASecretKey &sec)
+void Aseal::KeyGen(string secret_key)
 {
   // Gather current context, resolves object
   auto &seal_context = *_this_context();
 
-  // Copy Secret Key
-  this->secretKey = make_shared<SecretKey>(_to_secret_key(sec));
+  this->secretKey = make_shared<SecretKey>();
+
+  istringstream ss(secret_key);
+  this->secretKey->load(seal_context, ss);
 
   // Initialize KeyGen object
-  this->keyGenObj = make_shared<KeyGenerator>(seal_context, *this->secretKey);
+  this->keyGenObj = make_shared<KeyGenerator>(seal_context);
 
   // Initialize empty PublicKey object
   this->publicKey = make_shared<PublicKey>();
@@ -257,56 +264,16 @@ void Aseal::KeyGen(ASecretKey &sec)
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
 }
 
-APublicKey& Aseal::get_public_key()
+AKey& Aseal::get_public_key()
 {
   AsealPublicKey* publicKey = new AsealPublicKey(*this->publicKey);
   return _from_public_key(*publicKey);
 }
 
-ASecretKey& Aseal::get_secret_key()
+AKey& Aseal::get_secret_key()
 {
   AsealSecretKey* secretKey = new AsealSecretKey(*this->secretKey);
   return _from_secret_key(*secretKey);
-}
-
-string Aseal::save_secret_key()
-{
-  // Share as a binary string
-  ostringstream ss;
-
-  if (this->secretKey == nullptr)
-  {
-    throw logic_error("Secret Key is not set, cannot save it.");
-  }
-
-  // Save secret key to stringstream
-  this->secretKey->save(ss, seal::compr_mode_type::none);
-
-  return ss.str();
-}
-
-ASecretKey& Aseal::load_secret_key(string sec_key)
-{
-  // Initialize a SecretKey object
-  SecretKey *sealKey = new SecretKey();
-
-  if (this->context == nullptr)
-  {
-    throw logic_error("Context is not set, cannot load secret key.");
-  }
-
-  // Load secret key from string
-  istringstream ss(sec_key);
-  sealKey->load(*this->context, ss);
-
-  AsealSecretKey* secretKey = new AsealSecretKey(*sealKey);
-
-  return _from_secret_key(*secretKey);
-}
-
-ARelinKey& Aseal::get_relin_keys(){
-  AsealRelinKey* relinKeys = new AsealRelinKey(*this->relinKeys);
-  return _from_relin_keys(*relinKeys);
 }
 
 void Aseal::RelinKeyGen()
@@ -323,6 +290,11 @@ void Aseal::RelinKeyGen()
   // Generate Relin Key
   this->relinKeys = make_shared<RelinKeys>();
   keyGenObj->create_relin_keys(*relinKeys);
+}
+
+AKey& Aseal::get_relin_keys(){
+  AsealRelinKey* relinKeys = new AsealRelinKey(*this->relinKeys);
+  return _from_relin_keys(*relinKeys);
 }
 
 void Aseal::relinearize(ACiphertext &ctxt)
@@ -592,4 +564,25 @@ void Aseal::square(ACiphertext &ctxt, ACiphertext &ctxt_res)
 
   // Square using casted types
   this->evaluator->square(_to_ciphertext(ctxt), _to_ciphertext(ctxt_res));
+}
+
+void Aseal::power(ACiphertext &ctxt, int power, ACiphertext &ctxt_res)
+{
+  if (power < 0)
+  {
+    throw invalid_argument("Power must be a positive integer");
+  }
+  if (this->relinKeys == nullptr)
+  {
+    throw logic_error("RelinKeys must be set to perform power operation");
+  }
+
+  // Gather current context, resolves object
+  auto &seal_context = *_this_context();
+
+  // Initialize Evaluator object
+  this->evaluator = make_shared<Evaluator>(seal_context);
+
+  // Power using casted types
+  this->evaluator->exponentiate(_to_ciphertext(ctxt), power, *this->relinKeys, _to_ciphertext(ctxt_res));
 }

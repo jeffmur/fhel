@@ -38,7 +38,7 @@ class AsealPoly;
  * @brief Scheme types
  */
 static map<scheme, seal::scheme_type> scheme_map_to_seal {
-    {scheme::none, seal::scheme_type::none},
+    {scheme::no_scheme, seal::scheme_type::none},
     {scheme::bfv, seal::scheme_type::bfv},
     {scheme::ckks, seal::scheme_type::ckks},
     {scheme::bgv, seal::scheme_type::bgv},
@@ -161,69 +161,120 @@ inline ACiphertext& _from_ciphertext(AsealCiphertext& c){
 /**
  * @brief Abstraction for PublicKey
 */
-class AsealPublicKey : public APublicKey, public seal::PublicKey {
+class AsealPublicKey : public AKey, public seal::PublicKey {
 public:
   using seal::PublicKey::PublicKey;
   AsealPublicKey(const seal::PublicKey &pk) : seal::PublicKey(pk) {};
   ~AsealPublicKey(){};
-  // seal::PublicKey& to_seal() {
-  //   return *this;
-  // }
-  // ACiphertext& data() override {
-  //   AsealCiphertext* ctxt = new AsealCiphertext(seal::PublicKey::data());
-  //   return _from_ciphertext(*ctxt);
-  // }
+  string save() override {
+    ostringstream stream;
+    seal::PublicKey::save(stream);
+    return stream.str();
+  }
+  int save_size() override {
+    return seal::PublicKey::save_size();
+  }
+  void load(Afhe* fhe, string data) override {
+    istringstream stream(data);
+    seal::PublicKey::load(_to_context(fhe->get_context()), stream);
+  }
+  vector<uint64_t> data() override {
+    seal::Ciphertext ctxt = seal::PublicKey::data();
+    vector<uint64_t> data;
+    for (size_t i = 0; i < ctxt.size(); i++) {
+      // cout << ctxt.data()[i] << endl;
+      data.push_back(ctxt.data()[i]);
+    }
+    return data;
+  }
 };
 
 // DYNAMIC CASTING
-inline AsealPublicKey& _to_public_key(APublicKey& k){
+inline AsealPublicKey& _to_public_key(AKey& k){
   return static_cast<AsealPublicKey&>(k);
 };
-inline APublicKey& _from_public_key(AsealPublicKey& k){
-  return static_cast<APublicKey&>(k);
+inline AKey& _from_public_key(AsealPublicKey& k){
+  return static_cast<AKey&>(k);
 };
 
 /**
  * @brief Abstraction for SecretKey
 */
-class AsealSecretKey : public ASecretKey, public seal::SecretKey {
+class AsealSecretKey : public AKey, public seal::SecretKey {
 public:
   using seal::SecretKey::SecretKey;
   AsealSecretKey(const seal::SecretKey &sk) : seal::SecretKey(sk) {};
   ~AsealSecretKey(){};
-  // seal::SecretKey to_seal() {
-  //   return static_cast<seal::SecretKey&>(*this);
-  // }
-  // APlaintext& data() override {
-  //   AsealPlaintext* ctxt = new AsealPlaintext(seal::SecretKey::data());
-  //   return _from_plaintext(*ctxt);
-  // }
+  string save() override {
+    ostringstream stream;
+    seal::SecretKey::save(stream);
+    return stream.str();
+  }
+  int save_size() override {
+    return seal::SecretKey::save_size();
+  }
+  void load(Afhe* fhe, string data) override {
+    istringstream stream(data);
+    seal::SecretKey::load(_to_context(fhe->get_context()), stream);
+  }
+  vector<uint64_t> data() override {
+    seal::Plaintext ptxt = seal::SecretKey::data();
+    vector<uint64_t> data;
+    for (size_t i = 0; i < ptxt.scale(); i++) { // TODO: BFV / BGV?
+      // cout << ptxt.data()[i] << endl;
+      data.push_back(ptxt.data()[i]);
+    }
+    return data;
+  }
 };
 
 // DYNAMIC CASTING
-inline AsealSecretKey& _to_secret_key(ASecretKey& k){
+inline AsealSecretKey& _to_secret_key(AKey& k){
   return static_cast<AsealSecretKey&>(k);
 };
-inline ASecretKey& _from_secret_key(AsealSecretKey& k){
-  return static_cast<ASecretKey&>(k);
+inline AKey& _from_secret_key(AsealSecretKey& k){
+  return static_cast<AKey&>(k);
 };
 
 /**
  * @brief Abstraction for RelinKey
 */
-class AsealRelinKey : public ARelinKey, public seal::RelinKeys {
+class AsealRelinKey : public AKey, public seal::RelinKeys {
 public:
   using seal::RelinKeys::RelinKeys;
   AsealRelinKey(const seal::RelinKeys &rk) : seal::RelinKeys(rk) {};
   ~AsealRelinKey(){};
+  string save() override {
+    ostringstream stream;
+    seal::RelinKeys::save(stream);
+    return stream.str();
+  }
+  int save_size() override {
+    return seal::RelinKeys::save_size();
+  }
+  void load(Afhe* fhe, string data) override {
+    istringstream stream(data);
+    seal::RelinKeys::load(_to_context(fhe->get_context()), stream);
+  }
+  vector<uint64_t> data() override {
+    vector<vector<seal::PublicKey>> pk = seal::RelinKeys::data();
+    vector<uint64_t> data;
+    for (size_t i = 0; i < pk.size(); i++) {
+      for (size_t j = 0; j < pk[i].size(); j++) {
+        // cout << pk[i][j].data()[0] << endl;
+        data.push_back(pk[i][j].data()[0]);
+      }
+    }
+    return data;
+  }
 };
 
 // DYNAMIC CASTING
-inline AsealRelinKey& _to_relin_keys(ARelinKey& k){
+inline AsealRelinKey& _to_relin_keys(AKey& k){
   return dynamic_cast<AsealRelinKey&>(k);
 };
-inline ARelinKey& _from_relin_keys(AsealRelinKey& k){
-  return dynamic_cast<ARelinKey&>(k);
+inline AKey& _from_relin_keys(AsealRelinKey& k){
+  return dynamic_cast<AKey&>(k);
 };
 
 
@@ -252,7 +303,7 @@ public:
   /**
    * @brief Default constructor for the Aseal class.
    */
-  Aseal(){ this->backend_lib = backend::_seal; };
+  Aseal(){ this->backend_lib = backend::seal_backend; };
 
   /**
    * @brief Copy constructor for the Aseal class.
@@ -341,27 +392,32 @@ public:
   */
   void disable_mod_switch() override;
 
+  /**
+   * @brief Replaces the existing cEncoderScale, used for CKKSEncoder.
+   * Only affects subsequent encoding operations.
+   * @param scale The new scale.
+  */
+  void set_encoder_scale(double scale) override;
+
   // ------------------ Keys ------------------
   void KeyGen() override;
-  void KeyGen(ASecretKey &sec);
+  void KeyGen(string sk);
   void RelinKeyGen() override;
-  void relinearize(ACiphertext &ctxt) override;
-  void mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt) override;
-  void mod_switch_to(ACiphertext &to, ACiphertext &from) override;
-  void mod_switch_to_next(APlaintext &ptxt) override;
-  void mod_switch_to_next(ACiphertext &ctxt) override;
-  void rescale_to_next(ACiphertext &ctxt) override;
-  APublicKey& get_public_key() override;
-  ASecretKey& get_secret_key() override;
-  string save_secret_key() override;
-  ASecretKey& load_secret_key(string sk) override;
-  ARelinKey& get_relin_keys() override;
+  AKey& get_public_key() override;
+  AKey& get_secret_key() override;
+  AKey& get_relin_keys() override;
 
   // ------------------ Cryptography ------------------
 
   void encrypt(APlaintext &ptxt, ACiphertext &ctxt) override;
   void decrypt(ACiphertext &ctxt, APlaintext &ptxt) override;
   int invariant_noise_budget(ACiphertext &ctxt) override;
+  void relinearize(ACiphertext &ctxt) override;
+  void mod_switch_to(APlaintext &ptxt, ACiphertext &ctxt) override;
+  void mod_switch_to(ACiphertext &to, ACiphertext &from) override;
+  void mod_switch_to_next(APlaintext &ptxt) override;
+  void mod_switch_to_next(ACiphertext &ctxt) override;
+  void rescale_to_next(ACiphertext &ctxt) override;
 
   // -------------------- Codec --------------------
 
@@ -383,6 +439,7 @@ public:
   void multiply(ACiphertext &ctxt1, ACiphertext &ctxt2, ACiphertext &ctxt_res) override;
   void multiply(ACiphertext &ctxt, APlaintext &ptxt, ACiphertext &ctxt_res) override;
   void square(ACiphertext &ctxt, ACiphertext &ctxt_res) override;
+  void power(ACiphertext &ctxt, int power, ACiphertext &ctxt_res) override;
 };
 
 #endif /* ASEAL_H */

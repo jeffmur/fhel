@@ -31,7 +31,7 @@ void clear_error() {
     et.clear();
 }
 
-backend_t backend_t_from_string(const char* backend)
+fhe_backend_t backend_t_from_string(const char* backend)
 {
     // Treat empty string as null
     if (strcmp(backend, "") == 0) { backend = "null"; }
@@ -40,10 +40,10 @@ backend_t backend_t_from_string(const char* backend)
         return backend_t_map.at(backend);
     }
     catch (out_of_range &e) { set_error(invalid_argument("Unsupported Backend: "+string(backend))); }
-    return backend_t::no_b;
+    return fhe_backend_t::no_b;
 }
 
-scheme_t scheme_t_from_string(const char* scheme)
+fhe_scheme_t scheme_t_from_string(const char* scheme)
 {
     // Treat empty string as null
     if (strcmp(scheme, "") == 0) { scheme = "null"; }
@@ -51,10 +51,10 @@ scheme_t scheme_t_from_string(const char* scheme)
         return scheme_t_map.at(scheme);
     }
     catch (out_of_range &e) { set_error(invalid_argument("Unsupported Scheme: "+string(scheme))); }
-    return scheme_t::no_s;
+    return fhe_scheme_t::no_s;
 }
 
-const char* generate_context(Afhe* afhe, scheme_t scheme_type, uint64_t poly_mod_degree, uint64_t pt_mod_bit, uint64_t pt_mod, uint64_t sec_level, const uint64_t* qi_sizes, uint64_t qi_sizes_length)
+const char* generate_context(Afhe* afhe, fhe_scheme_t scheme_type, uint64_t poly_mod_degree, uint64_t pt_mod_bit, uint64_t pt_mod, uint64_t sec_level, const uint64_t* qi_sizes, uint64_t qi_sizes_length)
 {
     try {
         scheme a_scheme = scheme_t_map_scheme.at(scheme_type);
@@ -95,22 +95,47 @@ int save_parameters_size(Afhe* afhe)
 
 }
 
-byte* save_parameters_bytes(Afhe* afhe)
+int get_slot_count(Afhe* afhe)
 {
     try {
-        vector<byte> byte_buffer(static_cast<size_t>(afhe->save_parameters_size()));
-        afhe->save_parameters_inplace(reinterpret_cast<byte *>(byte_buffer.data()), byte_buffer.size());
-        return byte_buffer.data();
+        int slot_count = afhe->slot_count();
+        return slot_count;
     }
-    catch (exception &e) { set_error(e); return nullptr; }
+    catch (exception &e) { set_error(e); return -1; }
 }
 
-void load_parameters_bytes(Afhe* afhe, const byte* params, int size)
+fhe_key_t key_t_from_string(const char* key)
 {
     try {
-       afhe->load_parameters_inplace(params, size);
+        return key_t_map.at(key);
     }
-    catch (exception &e) { set_error(e); }
+    catch (out_of_range &e) { set_error(invalid_argument("Unsupported Key Type: "+string(key))); }
+    return fhe_key_t::no_k;
+}
+
+AKey* init_key(Afhe* afhe, fhe_key_t key_type)
+{
+    if (afhe == nullptr) { set_error(invalid_argument("[init_key] Invalid Afhe")); return nullptr; }
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    switch (lib)
+    {
+    case fhe_backend_t::seal_b:
+        switch (key_type)
+        {
+        case fhe_key_t::public_k:
+            return new AsealPublicKey();
+        case fhe_key_t::secret_k:
+            return new AsealSecretKey();
+        case fhe_key_t::relin_k:
+            return new AsealRelinKey();
+        default:
+            set_error(invalid_argument("[init_key] Unsupported Key Type"));
+            return nullptr;
+        }
+    default:
+        set_error(logic_error("[init_key] No backend set"));
+        return nullptr;
+    }
 }
 
 void generate_keys(Afhe* afhe)
@@ -125,10 +150,88 @@ void generate_relin_keys(Afhe* afhe)
     catch (exception &e) { set_error(e); }
 }
 
-Afhe* init_backend(backend_t backend) {
+const char* save_key(AKey* key)
+{
+    try {
+        string sk = key->save();
+        return to_char(sk, true);
+    }
+    catch (exception &e) { set_error(e); return nullptr; }
+}
+
+int save_key_size(AKey* key)
+{
+    try {
+        int sk_size = key->save_size();
+        return sk_size;
+    }
+    catch (exception &e) { set_error(e); return -1; }
+}
+
+AKey* load_key(fhe_key_t key_type, Afhe* afhe, const char* data, int size)
+{
+    AKey* key = init_key(afhe, key_type);
+    try {
+        string data_str(data, size);
+        key->load(afhe, data_str);
+    }
+    catch (exception &e) { set_error(e); }
+    return key;
+}
+
+uint64_t* get_key_data(AKey* key)
+{
+    try {
+        vector<uint64_t> key_data = key->data();
+        // // TEST: print vector contents [ a, b, c ]
+        // cout << "c: [";
+        // for (int i = 0; i < key_data.size(); i++) { cout << key_data[i] << " "; }
+        // cout << "]" << endl;
+        // Extract vector contents to array
+        uint64_t* result = new uint64_t[key_data.size()];
+        copy(key_data.begin(), key_data.end(), result);
+        return result;
+    }
+    catch (exception &e) { set_error(e); return nullptr; }
+}
+
+int get_key_data_size(AKey* key)
+{
+    try {
+        vector<uint64_t> key_data = key->data();
+        return key_data.size();
+    }
+    catch (exception &e) { set_error(e); return -1; }
+}
+
+AKey* get_public_key(Afhe* afhe)
+{
+    try {
+        return &afhe->get_public_key();
+    }
+    catch (exception &e) { set_error(e); return nullptr; }
+}
+
+AKey* get_secret_key(Afhe* afhe)
+{
+    try {
+        return &afhe->get_secret_key();
+    }
+    catch (exception &e) { set_error(e); return nullptr; }
+}
+
+AKey* get_relin_keys(Afhe* afhe)
+{
+    try {
+        return &afhe->get_relin_keys();
+    }
+    catch (exception &e) { set_error(e); return nullptr; }
+}
+
+Afhe* init_backend(fhe_backend_t backend) {
     switch (backend)
     {
-    case backend_t::seal_b:
+    case fhe_backend_t::seal_b:
         return new Aseal();
     default:
         set_error(logic_error("[init_backend] No backend set"));
@@ -136,10 +239,10 @@ Afhe* init_backend(backend_t backend) {
     }
 }
 
-APlaintext* init_plaintext(backend_t backend) {
+APlaintext* init_plaintext(fhe_backend_t backend) {
     switch (backend)
     {
-    case backend_t::seal_b:
+    case fhe_backend_t::seal_b:
         return new AsealPlaintext();
     default:
         set_error(logic_error("[init_plaintext] No backend set"));
@@ -147,10 +250,10 @@ APlaintext* init_plaintext(backend_t backend) {
     }
 }
 
-APlaintext* init_plaintext_value(backend_t backend, const char* value) {
+APlaintext* init_plaintext_value(fhe_backend_t backend, const char* value) {
     switch (backend)
     {
-    case backend_t::seal_b:
+    case fhe_backend_t::seal_b:
         return new AsealPlaintext(value);
     default:
         set_error(logic_error("[init_plaintext_value] No backend set"));
@@ -163,10 +266,10 @@ const char* get_plaintext_value(APlaintext* plaintext) {
 }
 
 
-ACiphertext* init_ciphertext(backend_t backend) {
+ACiphertext* init_ciphertext(fhe_backend_t backend) {
     switch (backend)
     {
-    case backend_t::seal_b:
+    case fhe_backend_t::seal_b:
         return new AsealCiphertext();
     default:
         set_error(logic_error("[init_ciphertext] No backend set"));
@@ -187,7 +290,7 @@ int save_ciphertext_size(ACiphertext* ciphertext) {
 }
 
 ACiphertext* load_ciphertext(Afhe* fhe, const char* data, int size) {
-    backend_t lib = backend_map_backend_t[fhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[fhe->backend_lib];
     ACiphertext* ctxt = init_ciphertext(lib);
     try {
         string data_str(data, size);
@@ -198,7 +301,7 @@ ACiphertext* load_ciphertext(Afhe* fhe, const char* data, int size) {
 }
 
 ACiphertext* encrypt(Afhe* afhe, APlaintext* ptxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     ACiphertext* ctxt = init_ciphertext(lib);
     try {
         afhe->encrypt(*ptxt, *ctxt);
@@ -208,7 +311,7 @@ ACiphertext* encrypt(Afhe* afhe, APlaintext* ptxt) {
 }
 
 APlaintext* decrypt(Afhe* afhe, ACiphertext* ctxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     APlaintext* ptxt = init_plaintext(lib);
     try {
         afhe->decrypt(*ctxt, *ptxt);
@@ -242,7 +345,7 @@ void mod_switch_to_next(Afhe* afhe, ACiphertext* ctxt) {
 }
 
 ACiphertext* add(Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     ACiphertext* ctxt = init_ciphertext(lib);
     try {
         afhe->add(*ctxt1, *ctxt2, *ctxt);
@@ -252,7 +355,7 @@ ACiphertext* add(Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
 }
 
 ACiphertext* add_plain(Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     ACiphertext* ctxt_res = init_ciphertext(lib);
     try {
         afhe->add(*ctxt, *ptxt, *ctxt_res);
@@ -262,7 +365,7 @@ ACiphertext* add_plain(Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
 }
 
 ACiphertext* subtract(Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     ACiphertext* ctxt = init_ciphertext(lib);
     try {
         afhe->subtract(*ctxt1, *ctxt2, *ctxt);
@@ -272,7 +375,7 @@ ACiphertext* subtract(Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
 }
 
 ACiphertext* subtract_plain(Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     ACiphertext* ctxt_res = init_ciphertext(lib);
     try {
         afhe->subtract(*ctxt, *ptxt, *ctxt_res);
@@ -282,7 +385,7 @@ ACiphertext* subtract_plain(Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
 }
 
 ACiphertext* multiply(Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     ACiphertext* ctxt = init_ciphertext(lib);
     try {
         afhe->multiply(*ctxt1, *ctxt2, *ctxt);
@@ -292,7 +395,7 @@ ACiphertext* multiply(Afhe* afhe, ACiphertext* ctxt1, ACiphertext* ctxt2) {
 }
 
 ACiphertext* multiply_plain(Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     ACiphertext* ctxt_res = init_ciphertext(lib);
     try {
         afhe->multiply(*ctxt, *ptxt, *ctxt_res);
@@ -302,7 +405,7 @@ ACiphertext* multiply_plain(Afhe* afhe, ACiphertext* ctxt, APlaintext* ptxt) {
 }
 
 ACiphertext* square(Afhe* afhe, ACiphertext* ctxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     ACiphertext* ctxt_res = init_ciphertext(lib);
     try {
         afhe->square(*ctxt, *ctxt_res);
@@ -311,8 +414,18 @@ ACiphertext* square(Afhe* afhe, ACiphertext* ctxt) {
     return ctxt_res;
 }
 
+ACiphertext* power(Afhe* afhe, ACiphertext* ctxt, int power) {
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    ACiphertext* ctxt_res = init_ciphertext(lib);
+    try {
+        afhe->power(*ctxt, power, *ctxt_res);
+    }
+    catch (exception &e) { set_error(e); }
+    return ctxt_res;
+}
+
 APlaintext* encode_int(Afhe* afhe, uint64_t* data, int size) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     APlaintext* ptxt = init_plaintext(lib);
     try {
         // Convert array to vector
@@ -324,7 +437,7 @@ APlaintext* encode_int(Afhe* afhe, uint64_t* data, int size) {
 }
 
 uint64_t* decode_int(Afhe* afhe, APlaintext* ptxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     vector<uint64_t> data;
     try {
         afhe->decode_int(*ptxt, data);
@@ -337,7 +450,7 @@ uint64_t* decode_int(Afhe* afhe, APlaintext* ptxt) {
 }
 
 APlaintext* encode_double(Afhe* afhe, double* data, int size) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     APlaintext* ptxt = init_plaintext(lib);
     try {
         // Convert array to vector
@@ -349,7 +462,7 @@ APlaintext* encode_double(Afhe* afhe, double* data, int size) {
 }
 
 APlaintext* encode_double_value(Afhe* afhe, double data) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     APlaintext* ptxt = init_plaintext(lib);
     try {
         afhe->encode_double(data, *ptxt);
@@ -359,7 +472,7 @@ APlaintext* encode_double_value(Afhe* afhe, double data) {
 }
 
 double* decode_double(Afhe* afhe, APlaintext* ptxt) {
-    backend_t lib = backend_map_backend_t[afhe->backend_lib];
+    fhe_backend_t lib = backend_map_backend_t[afhe->backend_lib];
     vector<double> data;
     try {
         afhe->decode_double(*ptxt, data);
