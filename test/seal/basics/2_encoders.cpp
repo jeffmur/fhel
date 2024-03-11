@@ -173,13 +173,13 @@ TEST(Basics, BatchEncoder)
     fhe->decrypt(encrypted_matrix_square, plain_result);
     fhe->decode_int(plain_result, pod_result);
 
-    vector<size_t> pod_result_expected(slot_count, 0ULL);
+    vector<uint64_t> pod_result_expected(slot_count, 0ULL);
     for (size_t i = 0; i < slot_count; i++) {
         int add_i = pod_matrix[i] + pod_matrix2[i];
         pod_result_expected[i] = add_i * add_i;
     }
 
-    // expect_equal_vector(pod_result, pod_result_expected);
+    expect_equal_vector(pod_result, pod_result_expected);
     cout << "    + Result plaintext matrix ...... Correct." << endl;
     print_matrix(pod_result, row_size);
 
