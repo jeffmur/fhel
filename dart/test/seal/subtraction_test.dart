@@ -1,3 +1,6 @@
+// ignore_for_file: non_constant_identifier_names
+
+import 'package:fhel/afhe.dart';
 import 'package:test/test.dart';
 import 'package:fhel/seal.dart' show Seal;
 import 'test_utils.dart';
@@ -15,7 +18,7 @@ String sub(String scheme, String a, String b, Map<String, int> ctx,
   final ct_x = fhe.encrypt(pt_x);
   final pt_sub = fhe.plain(b);
 
-  var ct_res;
+  Ciphertext ct_res;
   if (encryptSubtrahend) {
     final ct_sub = fhe.encrypt(pt_sub);
     ct_res = fhe.subtract(ct_x, ct_sub);

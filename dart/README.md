@@ -20,34 +20,37 @@ A Fully Homomorphic Encryption Library (FHEL) interface that exposes the basic f
 To use this plugin, add `fhel` as a dependency in your pubspec.yaml
 
 ```dart
-
-// SEALContext with BFV Scheme
-final fhe = FHE.withScheme('seal', 'bfv');
+import 'package:fhel/seal.dart';
 
 // Generate context w/ parameters
 Map<String, int> ctx = {
-      'polyModDegree': 4096,
-      'ptMod': 1024,
-      'secLevel': 128
+'polyModDegree': 4096,
+'ptMod': 1024,
+'secLevel': 128
 };
-String status = fhe.genContext(context);
-assert(status == 'success: valid', status)
+// SEALContext with BFV Scheme
+final bfv = Seal('bfv');
+
+// Initialize context and verify
+String status = bfv.genContext(ctx);
+assert(status == 'success: valid', status);
 
 // Generate public/private keys
-fhe.genKeys();
+bfv.genKeys();
 
-// Create Plaintext obj, contain pointer SEALPlaintext
-final pt_x = Plaintext.withValue(fhe.backend, '1');
-final pt_add = Plaintext.withValue(fhe.backend, '2');
+// Create Plaintext obj, contains pointer C obj in memory
+final plainOne = bfv.plain(2.toRadixString(16));
+final plainTwo = bfv.plain(2.toRadixString(16));
 
 // Create Ciphertext obj, contain pointer to SEALCiphertext
-final ct_x = fhe.encrypt(pt_x);
-final ct_add = fhe.encrypt(pt_add);
+final cipherOne = bfv.encrypt(plainOne);
 
-// Add Ciphertexts, enc(1) + enc(2) = enc(3)
-final ct_res = fhe.add(ct_x, ct_add);
-final pt_res = fhe.decrypt(ct_res);
+// Add Ciphertexts, enc(1) + 2 = enc(3)
+final cipherAdd = bfv.addPlain(cipherOne, plainTwo);
+final plainAdd = bfv.decrypt(cipherAdd);
 
-assert(pt_res.text == '3', 'Addition Failed')
+// Decode Plaintext to int
+final result = int.parse(plainAdd.text, radix: 16);
+assert(result == 4, result);
 
 ```

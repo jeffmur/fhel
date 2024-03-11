@@ -1,4 +1,6 @@
 /// This file contains the types of supported backend libraries.
+// ignore_for_file: non_constant_identifier_names
+
 part of '../afhe.dart';
 
 typedef BackendType = Int;

@@ -5,7 +5,7 @@ typedef SchemeType = Int;
 
 typedef _StringtoSchemeTypeC = SchemeType Function(Pointer<Utf8> scheme);
 typedef _StringToSchemeType = int Function(Pointer<Utf8> scheme);
-
+// ignore: non_constant_identifier_names
 final _StringToSchemeType _c_string_to_scheme_type = dylib
     .lookup<NativeFunction<_StringtoSchemeTypeC>>('scheme_t_from_string')
     .asFunction();

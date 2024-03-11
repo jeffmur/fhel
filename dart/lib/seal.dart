@@ -1,34 +1,49 @@
-/// Microsoft SEAL
+/// Microsoft SEAL Library Wrapper
+/// 
+/// This Dart package provides a wrapper for the Microsoft SEAL library, a homomorphic encryption library developed by Microsoft Research.
+/// This package allows developers to use the cryptographic tools provided by Microsoft SEAL to perform computations on encrypted data.
+/// 
+/// For more information about Microsoft SEAL, see: https://github.com/Microsoft/SEAL
 library seal;
 
 import 'package:fhel/afhe.dart';
 import 'dart:ffi';
 
-/// Expose basic functionalities of Microsoft SEAL.
-///
-/// “Microsoft SEAL (Release 4.1),” January 2023. https://github.com/Microsoft/SEAL.
-///
+// Components
+part 'afhe/serial.dart';
+
+/// A wrapper for the Microsoft SEAL library.
+/// 
+/// Extends [Afhe] and provides additional functionalities specific to Microsoft SEAL.
 class Seal extends Afhe {
-  /// Instanciates SEAL [Backend] with [Scheme]
+  /// Creates a new instance of the SEAL backend with a given scheme.
+  ///
+  /// The [scheme] parameter specifies the encryption scheme to use.
   Seal(String scheme) : super('seal', scheme);
 
-  /// Instanciates SEAL [Backend] without [Scheme]
-  /// Used for loading parameters from a saved context.
+  /// Creates a new instance of the SEAL backend without a scheme.
+  ///
+  /// This constructor is used when loading parameters from a saved context.
   Seal.noScheme() : super.noScheme('seal');
 
-  /// Generate a [Plaintext] object from a string.
+  /// Creates a new [Plaintext] object from a string.
+  ///
+  /// The [value] parameter specifies the string to encrypt.
   Plaintext plain(String value) => Plaintext.withValue(backend, value);
 
-  /// Generate a empty [Ciphertext] object.
+  /// Creates a new, empty [Ciphertext] object.
   Ciphertext cipher() => Ciphertext(backend);
 
   /// Generate a [SealKey] representing a publicKey.
+  @override
   SealKey get publicKey => SealKey("public", super.publicKey.obj);
 
   /// Generate a [SealKey] representing a secretKey.
+  @override
   SealKey get secretKey => SealKey("secret", super.secretKey.obj);
 
   /// Generate a [SealKey] representing a relinKeys.
+  @override
   SealKey get relinKeys => SealKey("relin", super.relinKeys.obj);
 
   /// Validate Serialized Encryption Parameters
@@ -39,7 +54,9 @@ class Seal extends Afhe {
     return params;
   }
 
-  /// Validate Serialized Ciphertext
+  /// Validates a serialized ciphertext and returns it as a [Ciphertext] object.
+  ///
+  /// This method overrides the [loadCiphertext] method in the [Afhe] class.
   @override
   Ciphertext loadCiphertext(Pointer<Uint8> data, int size) {
     sealMagicNumber(data, size);
