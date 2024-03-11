@@ -9,6 +9,20 @@ permissions:
   packages: write
 
 jobs:
+  compile:
+    name: Compile 🛠️
+    strategy:
+      matrix:
+        runner: [ 'ubuntu-latest', 'macos-latest' ]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+      - uses: dart-lang/setup-dart@v1
+      - run: make build
+
   build:
     name: Builder 👷
     runs-on: ubuntu-latest
