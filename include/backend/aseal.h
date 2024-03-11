@@ -345,7 +345,7 @@ public:
     return this->context;
   }
 
-  AContext& get_context() {
+  AContext& get_context() override {
     return _from_context(static_cast<AsealContext&>(*_this_context()));
   }
 

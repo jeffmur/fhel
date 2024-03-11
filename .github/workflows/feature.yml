@@ -40,6 +40,23 @@ jobs:
           image_tag: ${{ steps.tag.outputs.TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+  compile:
+    name: Compile 🛠️
+    needs: build
+    strategy:
+      matrix:
+        runner: [ 'ubuntu-latest', 'macos-latest' ]
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: ghcr.io/jeffmur/fhel:${{ needs.build.outputs.IMAGE_TAG }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - run: make build
+
   docs:
     name: Documentation 📚
     runs-on: ubuntu-latest
