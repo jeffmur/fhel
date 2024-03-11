@@ -165,6 +165,9 @@ class Afhe {
   /// Fetch the secret key.
   Key get secretKey => Key("secret", _c_get_secret_key(library));
 
+  /// Fetch the relinearization keys.
+  Key get relinKeys => Key("relin", _c_get_relin_keys(library));
+
   /// Encrypts the plaintext message.
   Ciphertext encrypt(Plaintext plaintext) {
     final ptr = _c_encrypt(library, plaintext.obj);

@@ -149,10 +149,12 @@ public:
   virtual void load(Afhe* fhe, string key) = 0;
 
   /**
-   * @brief Returns the parameter ids of the key.
-   * @return A vector of integers representing the key parameters.
+   * @brief Returns the data of the key.
+   * @return A vector of integers representing a unique key.
+   * @note The key data is unique to the backend library, and
+   *       cannot not be used to recreate the key.
   */
-  virtual vector<uint64_t> param_ids() = 0;
+  virtual vector<uint64_t> data() = 0;
 };
 
 /**

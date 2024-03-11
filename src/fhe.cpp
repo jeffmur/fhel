@@ -179,6 +179,31 @@ AKey* load_key(fhe_key_t key_type, Afhe* afhe, const char* data, int size)
     return key;
 }
 
+uint64_t* get_key_data(AKey* key)
+{
+    try {
+        vector<uint64_t> key_data = key->data();
+        // // TEST: print vector contents [ a, b, c ]
+        // cout << "c: [";
+        // for (int i = 0; i < key_data.size(); i++) { cout << key_data[i] << " "; }
+        // cout << "]" << endl;
+        // Extract vector contents to array
+        uint64_t* result = new uint64_t[key_data.size()];
+        copy(key_data.begin(), key_data.end(), result);
+        return result;
+    }
+    catch (exception &e) { set_error(e); return nullptr; }
+}
+
+int get_key_data_size(AKey* key)
+{
+    try {
+        vector<uint64_t> key_data = key->data();
+        return key_data.size();
+    }
+    catch (exception &e) { set_error(e); return -1; }
+}
+
 AKey* get_public_key(Afhe* afhe)
 {
     try {
@@ -191,6 +216,14 @@ AKey* get_secret_key(Afhe* afhe)
 {
     try {
         return &afhe->get_secret_key();
+    }
+    catch (exception &e) { set_error(e); return nullptr; }
+}
+
+AKey* get_relin_keys(Afhe* afhe)
+{
+    try {
+        return &afhe->get_relin_keys();
     }
     catch (exception &e) { set_error(e); return nullptr; }
 }

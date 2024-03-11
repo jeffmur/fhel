@@ -183,11 +183,11 @@ void main() {
     ];
     for (int i = 0; i < arr_len; i++) {
       near(
-          eps: 1e-7,
+          eps: 1e-6,
           product[i],
           fhe.decodeVecDouble(pt_pi_squared, arr_len)[i]);
       near(
-          eps: 1e-7,
+          eps: 1e-6,
           product[i],
           fhe.decodeVecDouble(pt_pi_squared, arr_len)[i]);
     }

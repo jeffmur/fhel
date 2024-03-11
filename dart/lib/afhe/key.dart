@@ -43,6 +43,20 @@ final _GetKey _c_get_public_key = dylib
 final _GetKey _c_get_secret_key = dylib
     .lookup<NativeFunction<_GetKey>>('get_secret_key').asFunction();
 
+final _GetKey _c_get_relin_keys = dylib
+    .lookup<NativeFunction<_GetKey>>('get_relin_keys').asFunction();
+
+// --- key data ---
+
+typedef _GetKeyData = Pointer<Uint64> Function(Pointer key);
+final _GetKeyData _c_get_key_data = dylib
+    .lookup<NativeFunction<_GetKeyData>>('get_key_data').asFunction();
+
+typedef _GetKeyDataSizeC = Int32 Function(Pointer key);
+typedef _GetKeyDataSize = int Function(Pointer key);
+final _GetKeyDataSize _c_get_key_data_size = dylib
+    .lookup<NativeFunction<_GetKeyDataSizeC>>('get_key_data_size').asFunction();
+
 
 // --- load keys ---
 
@@ -109,4 +123,23 @@ class Key {
     raiseForStatus();
   }
 
+  /// Returns the key data as a List<int>
+  ///
+  /// A key cannot be reconstructed from this data,
+  /// as this is intended for uniquely identifying keys
+  List<int> get data {
+    if (obj == nullptr)
+    {
+      throw Exception("Cannot get key data, as obj is not set");
+    }
+    Pointer<Uint64> data = _c_get_key_data(obj);
+    int length = _c_get_key_data_size(obj);
+    List<int> keyData = data.asTypedList(length).toList();
+    return keyData;
+  }
+
+  /// Returns [data] as a List<Hexadecimal>
+  List<String> get hexData {
+    return data.map((e) => e.toRadixString(16)).toList();
+  }
 }

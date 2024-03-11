@@ -178,11 +178,14 @@ public:
     istringstream stream(data);
     seal::PublicKey::load(_to_context(fhe->get_context()), stream);
   }
-  vector<uint64_t> param_ids() override {
-    // Typically returns a 4-element array
-    array<uint64_t, 4> params = seal::PublicKey::parms_id();
-    vector<std::uint64_t> vec(params.begin(), params.end());
-    return vec;
+  vector<uint64_t> data() override {
+    seal::Ciphertext ctxt = seal::PublicKey::data();
+    vector<uint64_t> data;
+    for (size_t i = 0; i < ctxt.size(); i++) {
+      // cout << ctxt.data()[i] << endl;
+      data.push_back(ctxt.data()[i]);
+    }
+    return data;
   }
 };
 
@@ -214,11 +217,14 @@ public:
     istringstream stream(data);
     seal::SecretKey::load(_to_context(fhe->get_context()), stream);
   }
-  vector<uint64_t> param_ids() override {
-    // Typically returns a 4-element array
-    array<uint64_t, 4> params = seal::SecretKey::parms_id();
-    vector<std::uint64_t> vec(params.begin(), params.end());
-    return vec;
+  vector<uint64_t> data() override {
+    seal::Plaintext ptxt = seal::SecretKey::data();
+    vector<uint64_t> data;
+    for (size_t i = 0; i < ptxt.scale(); i++) { // TODO: BFV / BGV?
+      // cout << ptxt.data()[i] << endl;
+      data.push_back(ptxt.data()[i]);
+    }
+    return data;
   }
 };
 
@@ -250,11 +256,16 @@ public:
     istringstream stream(data);
     seal::RelinKeys::load(_to_context(fhe->get_context()), stream);
   }
-  vector<uint64_t> param_ids() override {
-    // Typically returns a 4-element array
-    array<uint64_t, 4> params = seal::RelinKeys::parms_id();
-    vector<std::uint64_t> vec(params.begin(), params.end());
-    return vec;
+  vector<uint64_t> data() override {
+    vector<vector<seal::PublicKey>> pk = seal::RelinKeys::data();
+    vector<uint64_t> data;
+    for (size_t i = 0; i < pk.size(); i++) {
+      for (size_t j = 0; j < pk[i].size(); j++) {
+        // cout << pk[i][j].data()[0] << endl;
+        data.push_back(pk[i][j].data()[0]);
+      }
+    }
+    return data;
   }
 };
 

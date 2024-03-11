@@ -28,6 +28,9 @@ class Seal extends Afhe {
   /// Generate a [SealKey] representing a secretKey.
   SealKey get secretKey => SealKey("secret", super.secretKey.obj);
 
+  /// Generate a [SealKey] representing a relinKeys.
+  SealKey get relinKeys => SealKey("relin", super.relinKeys.obj);
+
   /// Validate Serialized Encryption Parameters
   @override
   Map saveParameters() {

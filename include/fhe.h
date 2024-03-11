@@ -116,7 +116,7 @@ static map<const char*, fhe_backend_t, cmp_str> backend_t_map{
 static map<const char*, fhe_key_t, cmp_str> key_t_map{
   {"public", fhe_key_t::public_k},
   {"secret", fhe_key_t::secret_k},
-  {"relinearization", fhe_key_t::relin_k},
+  {"relin", fhe_key_t::relin_k},
   {"galois", fhe_key_t::galois_k},
 };
 
@@ -243,6 +243,21 @@ extern "C" {
     AKey* load_key(fhe_key_t key_type, Afhe* afhe, const char* data, int size);
 
     /**
+     * @brief Retrieve the key data.
+     * @param key Pointer to the key.
+     * @return Vector of integers representing the key.
+     * @note Returned data cannot be used to reconstruct the key.
+    */
+    uint64_t* get_key_data(AKey* key);
+
+    /**
+     * @brief Retrieve the key data size.
+     * @param key Pointer to the key.
+     * @return Size of the key data.
+    */
+    int get_key_data_size(AKey* key);
+
+    /**
      * @brief Retrieve the public key.
      * @param afhe Pointer to the backend library.
     */
@@ -253,6 +268,12 @@ extern "C" {
      * @param afhe Pointer to the backend library.
     */
     AKey* get_secret_key(Afhe* afhe);
+
+    /**
+     * @brief Retrieve the relinearization keys.
+     * @param afhe Pointer to the backend library.
+    */
+    AKey* get_relin_keys(Afhe* afhe);
 
     /**
      * @brief Initialize the backend library.
