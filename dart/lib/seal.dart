@@ -35,12 +35,15 @@ class Seal extends Afhe {
   Ciphertext cipher() => Ciphertext(backend);
 
   /// Generate a [SealKey] representing a publicKey.
+  @override
   SealKey get publicKey => SealKey("public", super.publicKey.obj);
 
   /// Generate a [SealKey] representing a secretKey.
+  @override
   SealKey get secretKey => SealKey("secret", super.secretKey.obj);
 
   /// Generate a [SealKey] representing a relinKeys.
+  @override
   SealKey get relinKeys => SealKey("relin", super.relinKeys.obj);
 
   /// Validate Serialized Encryption Parameters

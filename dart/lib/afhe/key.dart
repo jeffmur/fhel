@@ -1,5 +1,6 @@
 /// This file contains the FFI bindings for encryption and decryption methods.
 part of '../afhe.dart';
+// ignore_for_file: non_constant_identifier_names
 
 typedef KeyType = Int;
 
