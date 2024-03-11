@@ -81,6 +81,7 @@ void main() {
 
       // Load Public Key
       pkLoad.load(fhe.library, pk.serialized, pk.size);
+      expect(pk.data, pkLoad.data);
 
       // Copy Secret Key (Type)
       SealKey skLoad = SealKey.ofType(sk);
@@ -90,6 +91,7 @@ void main() {
 
       // Load Secret Key
       skLoad.load(fhe.library, sk.serialized, sk.size);
+      expect(sk.data, skLoad.data);
 
       // Copy Relin Key (Type)
       SealKey rkLoad = SealKey.ofType(rk);
@@ -99,6 +101,7 @@ void main() {
 
       // Load Relin Key
       rkLoad.load(fhe.library, rk.serialized, rk.size);
+      expect(rk.data, rkLoad.data);
     });
   });
 
@@ -132,6 +135,35 @@ void main() {
       expect(pkData, isNot(skData));
       expect(rkData, isNot(skData));
       expect(rkData, isNot(pkData));
+    });
+  });
+
+  test("Unique Session", (){
+    scheme.forEach((scheme, ctx) {
+      final host = Seal(scheme);
+      host.genContext(ctx);
+      host.genKeys();
+      host.genRelinKeys();
+
+      // Host Key Data
+      List<int> pkHostData = host.publicKey.data;
+      List<int> skHostData = host.secretKey.data;
+      List<int> rkHostData = host.relinKeys.data;
+
+      final guest = Seal(scheme);
+      guest.genContext(ctx);
+      guest.genKeys();
+      guest.genRelinKeys();
+
+      // Guest Keys
+      List<int> pkGuestData = guest.publicKey.data;
+      List<int> skGuestData = guest.secretKey.data;
+      List<int> rkGuestData = guest.relinKeys.data;
+
+      // Check that the data is not the same
+      expect(pkHostData, isNot(pkGuestData));
+      expect(skHostData, isNot(skGuestData));
+      expect(rkHostData, isNot(rkGuestData));
     });
   });
 }
