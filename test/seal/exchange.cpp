@@ -7,7 +7,7 @@
 TEST(Exchange, NullTerminated)
 {
     Aseal* host = new Aseal();
-    const char* ctx = generate_context(host, scheme_t::bfv_s, 1024, 0, 1024, 128, nullptr, 0);
+    const char* ctx = generate_context(host, fhe_scheme_t::bfv_s, 1024, 0, 1024, 128, nullptr, 0);
     EXPECT_STREQ(ctx, "success: valid");
 
     // Contain null-terminated characters, we should validate that this works

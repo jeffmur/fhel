@@ -67,19 +67,7 @@ typedef _SlotCount = int Function(Pointer library);
 final _SlotCount _c_slot_count = dylib
     .lookup<NativeFunction<_SlotCountC>>('get_slot_count').asFunction();
 
-// --- encryption keys ---
-
-typedef _GenKeysC = Void Function(Pointer library);
-typedef _GenKeys = void Function(Pointer library);
-final _GenKeys _c_gen_keys = dylib
-    .lookup<NativeFunction<_GenKeysC>>('generate_keys').asFunction();
-
 // --- relinearization ---
-
-typedef _GenRelinKeysC = Void Function(Pointer library);
-typedef _GenRelinKeys = void Function(Pointer library);
-final _GenRelinKeys _c_gen_relin_keys = dylib
-    .lookup<NativeFunction<_GenRelinKeysC>>('generate_relin_keys').asFunction();
 
 typedef _RelinCiphertextC = Pointer Function(Pointer library, Pointer ciphertext);
 final _RelinCiphertextC _c_relin_ciphertext = dylib

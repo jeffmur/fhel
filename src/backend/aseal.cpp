@@ -254,7 +254,6 @@ void Aseal::KeyGen(string secret_key)
   // Initialize KeyGen object
   this->keyGenObj = make_shared<KeyGenerator>(seal_context);
 
-
   // Initialize empty PublicKey object
   this->publicKey = make_shared<PublicKey>();
 
@@ -265,13 +264,13 @@ void Aseal::KeyGen(string secret_key)
   this->encryptor = make_shared<Encryptor>(seal_context, *this->publicKey);
 }
 
-APublicKey& Aseal::get_public_key()
+AKey& Aseal::get_public_key()
 {
   AsealPublicKey* publicKey = new AsealPublicKey(*this->publicKey);
   return _from_public_key(*publicKey);
 }
 
-ASecretKey& Aseal::get_secret_key()
+AKey& Aseal::get_secret_key()
 {
   AsealSecretKey* secretKey = new AsealSecretKey(*this->secretKey);
   return _from_secret_key(*secretKey);
@@ -293,7 +292,7 @@ void Aseal::RelinKeyGen()
   keyGenObj->create_relin_keys(*relinKeys);
 }
 
-ARelinKeys& Aseal::get_relin_keys(){
+AKey& Aseal::get_relin_keys(){
   AsealRelinKey* relinKeys = new AsealRelinKey(*this->relinKeys);
   return _from_relin_keys(*relinKeys);
 }
