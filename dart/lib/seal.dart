@@ -14,7 +14,7 @@ part 'afhe/serial.dart';
 
 /// A wrapper for the Microsoft SEAL library.
 /// 
-/// This class extends [Afhe] and provides additional functionalities specific to Microsoft SEAL.
+/// Extends [Afhe] and provides additional functionalities specific to Microsoft SEAL.
 class Seal extends Afhe {
   /// Creates a new instance of the SEAL backend with a given scheme.
   ///
