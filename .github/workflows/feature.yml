@@ -21,7 +21,6 @@ jobs:
         with:
           submodules: 'true'
       - uses: dart-lang/setup-dart@v1
-      - uses: aminya/setup-cpp@v1
       - run: make build
 
   build:
