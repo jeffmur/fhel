@@ -7,8 +7,6 @@
  * ------------------------------------------------------------------
  * @author Jeffrey Murray Jr (jeffmur)
  */
-#include <assert.h> /* assert */
-#include <memory>   /* Smart Pointers*/
 #include <cstring>  /* strcpy */
 #include <iostream> /* Print in cout */
 using namespace std;
@@ -29,7 +27,7 @@ public:
     ErrorTranslator& operator=(const ErrorTranslator&) = delete;
 
     // Translate a C++ exception to a Dart exception message
-    void set_error(const std::exception& e) {
+    void set_error(const exception& e) {
         string message = e.what();
 
         // str -> char* to avoid memory leak

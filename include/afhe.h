@@ -12,6 +12,7 @@
 #include <string>  /* string class */
 #include <cstdint> /* uint64_t */
 #include <vector>  /* vector */
+
 // Forward Declarations
 class ACiphertext; /* Ciphertext */
 class APlaintext;  /* Plaintext */
