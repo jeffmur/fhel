@@ -11,7 +11,6 @@
 
 #include "aseal.h"
 #include "afhe.h"
-#include <bitset>
 
 using namespace std;
 using namespace seal;

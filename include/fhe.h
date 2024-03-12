@@ -10,8 +10,7 @@
 #ifndef FHE_H
 #define FHE_H
 
-#include <vector> /* Vectorizing all operations */
-#include <string> /* string class */
+
 #include <map>    /* map */
 #include "afhe.h" /* Abstraction Layer */
 #include "error_handling.h" /* Error Handling */
@@ -212,7 +211,7 @@ extern "C" {
      * @param afhe Pointer to the backend library.
     */
     void generate_keys(Afhe* afhe);
-  
+
     /**
      * @brief Generate relinearization keys for the backend library.
      * @param afhe Pointer to the backend library.

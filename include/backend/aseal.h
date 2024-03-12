@@ -12,15 +12,9 @@
 #ifndef ASEAL_H
 #define ASEAL_H
 
-#include <iostream> /* Print in cout */
 #include <string>   /* string class */
 #include <vector>   /* Vectorizing all operations */
-#include <thread>   /* memory pools, multithread*/
 #include <memory>   /* Smart Pointers*/
-#include <complex>  /* Complex Numbers */
-#include <math.h>   /* pow */
-#include <fstream>  /* file management */
-#include <assert.h> /* assert */
 #include <map>      /* map */
 
 #include "seal/seal.h" /* Microsoft SEAL */
@@ -352,7 +346,7 @@ public:
   /**
    * @brief Assign Encoders used for encoding and decoding.
    * @param ignore_exception If true, ignore exceptions.
-   * 
+   *
    * We may want to ignore exceptions if we are setting the encoders without
    * access to the original parameters.
   */
