@@ -12,8 +12,6 @@
 #include <string>  /* string class */
 #include <cstdint> /* uint64_t */
 #include <vector>  /* vector */
-#include <memory>  /* shared_ptr */
-
 // Forward Declarations
 class ACiphertext; /* Ciphertext */
 class APlaintext;  /* Plaintext */
@@ -196,11 +194,11 @@ public:
 
   /**
    * @brief Generates a context for the Fully Homomorphic Encryption (FHE) scheme from a set of parameters.
-   * 
+   *
    * The context contains all the public parameters needed for the encryption and decryption processes.
-   * 
+   *
    * @param params A string representing the parameters used to generate the context.
-   * 
+   *
    * @return A string representing the status of generated context.
   */
   virtual string ContextGen(string params) = 0;
@@ -225,7 +223,7 @@ public:
    * Exposes lower level interface for saving parameters.
   */
   virtual void save_parameters_inplace(byte* out, int size, string compression_mode="none") = 0;
-  
+
   /**
    * @brief Loads the parameters, used for re-generating the context.
    * Exposure lower level interface for loading parameters.
@@ -492,7 +490,7 @@ public:
 
   /**
    * @brief Raises a ciphertext to a power and stores the result in another ciphertext.
-   * 
+   *
    * Applies relinearization after each multiplication step.
    * @param ctxt The ciphertext to be raised to a power.
    * @param power The power to raise the ciphertext to.
