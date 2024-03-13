@@ -240,7 +240,6 @@ class ParameterForm extends State<ContextForm> {
               child: TextFormField(
                 key: _plainMod,
                 enabled: !isDefaultParams,
-                // initialValue: globalSession.ctx['ptModBit'].toString(),
                 decoration: InputDecoration(
                   hintText: isBatchingEnabled == true
                       ? "Plain Modulus Bit Size"
@@ -275,9 +274,6 @@ class ParameterForm extends State<ContextForm> {
               child: TextFormField(
                 key: _secLevel,
                 enabled: !isDefaultParams,
-                initialValue: isBatchingEnabled
-                    ? globalSession.ctx['secLevel'].toString()
-                    : null,
                 decoration: const InputDecoration(
                   hintText: 'Security Level',
                   // prefixText: "Security Level: "
