@@ -12,20 +12,21 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     print('Settings build');
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: Container(
-        width: double.infinity,
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Parameters'),
-            ContextForm(),
-            Text('Keys'),
-            KeyDerivation(),
-          ],
-        ),
-      ),
-    );
+        appBar: AppBar(title: const Text('Settings')),
+        body: SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Parameters'),
+                ContextForm(),
+                Text('Keys'),
+                KeyDerivation()
+              ],
+            ),
+          ),
+        ));
   }
 }
 
@@ -48,8 +49,57 @@ class ParameterForm extends State<ContextForm> {
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
+  final _polyModDegree = GlobalKey<FormFieldState>();
+  final _scalar = GlobalKey<FormFieldState>();
+  final _coeffMod = GlobalKey<FormFieldState>();
+  final _plainMod = GlobalKey<FormFieldState>();
+  final _secLevel = GlobalKey<FormFieldState>();
 
-  bool isBatchingEnabled = false;
+  bool isBatchingEnabled = true;
+  bool isDefaultParams = false;
+
+  void defaultContext() {
+    String sch = globalSession.scheme;
+
+    Map ctx = switch (sch) {
+      'ckks' => ckks,
+      // BFV / BGV
+      _ => isBatchingEnabled ? batching : plainModulus
+    };
+
+    _polyModDegree.currentState?.setState(() {
+      isDefaultParams
+          ? _polyModDegree.currentState!
+              .didChange(ctx['polyModDegree'].toString())
+          : _polyModDegree.currentState!.didChange('');
+    });
+    _scalar.currentState?.setState(() {
+      isDefaultParams
+          ? _scalar.currentState!
+              .didChange((log(ctx['encodeScalar']) / log(2)).toString())
+          : _scalar.currentState!.didChange('');
+    });
+    _coeffMod.currentState?.setState(() {
+      isDefaultParams
+          ? _coeffMod.currentState!
+            .didChange(ctx['qSizes'].toString())
+          : _coeffMod.currentState!.didChange('');
+    });
+    _plainMod.currentState?.setState(() {
+      isDefaultParams
+          ? isBatchingEnabled
+              ? _plainMod.currentState!
+                .didChange(ctx['ptModBit'].toString())
+              : _plainMod.currentState!
+                .didChange(ctx['ptMod'].toString())
+          : _plainMod.currentState!.didChange('');
+    });
+    _secLevel.currentState?.setState(() {
+      isDefaultParams
+          ? _secLevel.currentState!.didChange(ctx['secLevel'].toString())
+          : _secLevel.currentState!.didChange('');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,12 +110,21 @@ class ParameterForm extends State<ContextForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
+            width: WIDTH,
+            child: CheckboxListTile(
+                title: const Text('Use Default'),
+                value: isDefaultParams,
+                onChanged: (_) {
+                  setState(() {
+                    isDefaultParams = !isDefaultParams;
+                  });
+                  defaultContext();
+                }),
+          ),
+          SizedBox(
             width: WIDTH, // Set the desired width value
             child: DropdownButtonFormField(
-              // value: 'bfv', // Set the default value to 'bfv'
-              decoration: const InputDecoration(
-                hintText: 'Scheme',
-              ),
+              value: globalSession.scheme,
               items: const [
                 DropdownMenuItem(
                   value: 'bfv',
@@ -83,6 +142,8 @@ class ParameterForm extends State<ContextForm> {
               onChanged: (value) {
                 setState(() {
                   globalSession.setScheme(value!);
+                  isDefaultParams = false;
+                  defaultContext();
                 });
               },
             ),
@@ -93,6 +154,7 @@ class ParameterForm extends State<ContextForm> {
             child: SizedBox(
               width: WIDTH,
               child: CheckboxListTile(
+                  enabled: !isDefaultParams,
                   title: const Text('Batching'),
                   value: isBatchingEnabled,
                   onChanged: (value) {
@@ -105,11 +167,13 @@ class ParameterForm extends State<ContextForm> {
           SizedBox(
             width: WIDTH, // Set the desired width value
             child: TextFormField(
-              // initialValue: globalSession.ctx['polyModDegree'].toString(),
-              decoration: const InputDecoration(hintText: "Poly Modulus Degree"
-                  // prefixText: 'Poly Modulus Degree: ',
-                  ),
+              key: _polyModDegree,
+              enabled: !isDefaultParams,
+              keyboardType: TextInputType.number,
+              decoration:
+                  const InputDecoration(hintText: "Poly Modulus Degree"),
               validator: (value) {
+                if (isDefaultParams) return null;
                 try {
                   int.parse(value!);
                 } catch (e) {
@@ -117,9 +181,8 @@ class ParameterForm extends State<ContextForm> {
                 }
                 return null;
               },
-              onChanged: (value) {
-                globalSession.ctx['polyModDegree'] = int.parse(value);
-              },
+              onSaved: (newValue) =>
+                  globalSession.ctx['polyModDegree'] = int.parse(newValue!),
             ),
           ),
           Visibility(
@@ -127,9 +190,12 @@ class ParameterForm extends State<ContextForm> {
             child: SizedBox(
               width: WIDTH, // Set the desired width value
               child: TextFormField(
+                key: _scalar,
+                enabled: !isDefaultParams,
                 decoration: const InputDecoration(
                     hintText: 'Encoder Scalar', prefixText: '2^'),
                 validator: (value) {
+                  if (isDefaultParams) return null;
                   try {
                     int.parse(value!);
                   } catch (e) {
@@ -137,9 +203,8 @@ class ParameterForm extends State<ContextForm> {
                   }
                   return null;
                 },
-                onChanged: (value) {
-                  globalSession.ctx['encodeScalar'] = pow(2, int.parse(value));
-                },
+                onSaved: (newValue) => globalSession.ctx['encodeScalar'] =
+                    pow(2, int.parse(newValue!)),
               ),
             ),
           ),
@@ -148,9 +213,13 @@ class ParameterForm extends State<ContextForm> {
             child: SizedBox(
               width: WIDTH, // Set the desired width value
               child: TextFormField(
+                key: _coeffMod,
+                enabled: !isDefaultParams,
                 decoration:
                     const InputDecoration(hintText: 'Coeff Mod Bit Sizes'),
+                keyboardType: TextInputType.number,
                 validator: (value) {
+                  if (isDefaultParams) return null;
                   try {
                     value!.split(',').map(int.parse).toList();
                   } catch (e) {
@@ -158,10 +227,8 @@ class ParameterForm extends State<ContextForm> {
                   }
                   return null;
                 },
-                onChanged: (value) {
-                  globalSession.ctx['qSizes'] =
-                      value.split(',').map(int.parse).toList();
-                },
+                onSaved: (value) => globalSession.ctx['qSizes'] =
+                    value!.split(',').map(int.parse).toList(),
               ),
             ),
           ),
@@ -171,6 +238,8 @@ class ParameterForm extends State<ContextForm> {
             child: SizedBox(
               width: WIDTH, // Set the desired width value
               child: TextFormField(
+                key: _plainMod,
+                enabled: !isDefaultParams,
                 // initialValue: globalSession.ctx['ptModBit'].toString(),
                 decoration: InputDecoration(
                   hintText: isBatchingEnabled == true
@@ -178,7 +247,9 @@ class ParameterForm extends State<ContextForm> {
                       : "Plain Modulus Size",
                   // prefixText: "Plain Modulus Bit Size: "
                 ),
+                keyboardType: TextInputType.number,
                 validator: (value) {
+                  if (!isDefaultParams) return null;
                   try {
                     int.parse(value!);
                   } catch (e) {
@@ -186,11 +257,11 @@ class ParameterForm extends State<ContextForm> {
                   }
                   return null;
                 },
-                onChanged: (value) {
+                onSaved: (value) {
                   if (isBatchingEnabled) {
-                    globalSession.ctx['ptModBit'] = int.parse(value);
+                    globalSession.ctx['ptModBit'] = int.parse(value!);
                   } else {
-                    globalSession.ctx['ptMod'] = int.parse(value);
+                    globalSession.ctx['ptMod'] = int.parse(value!);
                   }
                 },
               ),
@@ -202,12 +273,18 @@ class ParameterForm extends State<ContextForm> {
             child: SizedBox(
               width: WIDTH, // Set the desired width value
               child: TextFormField(
-                // initialValue: globalSession.ctx['secLevel'].toString(),
+                key: _secLevel,
+                enabled: !isDefaultParams,
+                initialValue: isBatchingEnabled
+                    ? globalSession.ctx['secLevel'].toString()
+                    : null,
                 decoration: const InputDecoration(
                   hintText: 'Security Level',
                   // prefixText: "Security Level: "
                 ),
+                keyboardType: TextInputType.number,
                 validator: (value) {
+                  if (isDefaultParams) return null;
                   try {
                     int.parse(value!);
                   } catch (e) {
@@ -215,8 +292,8 @@ class ParameterForm extends State<ContextForm> {
                   }
                   return null;
                 },
-                onChanged: (value) {
-                  globalSession.ctx['secLevel'] = int.parse(value);
+                onSaved: (value) {
+                  globalSession.ctx['secLevel'] = int.parse(value!);
                 },
               ),
             ),
@@ -230,8 +307,7 @@ class ParameterForm extends State<ContextForm> {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.
                   globalSession =
-                      Session.init(globalSession.scheme, globalSession.ctx);
-
+                      Session(globalSession.scheme, globalSession.ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(globalSession.ctxStatus)),
                   );
@@ -267,21 +343,21 @@ class KeyDerivationState extends State<KeyDerivation> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListView(
-                shrinkWrap: true,
-                children: [
-                  ListTile(
-                    title: const Text('Public Key'),
-                    subtitle: Text(globalSession.publicKey),
-                  ),
-                  ListTile(
-                    title: const Text('Secret Key'),
-                    subtitle: Text(globalSession.secretKey),
-                  ),
-                  ListTile(
-                    title: const Text('Relin Keys'),
-                    subtitle: Text(globalSession.relinKeys),
-                  ),
-                ],
+            shrinkWrap: true,
+            children: [
+              ListTile(
+                title: const Text('Public Key'),
+                subtitle: Text(globalSession.publicKey),
+              ),
+              ListTile(
+                title: const Text('Secret Key'),
+                subtitle: Text(globalSession.secretKey),
+              ),
+              ListTile(
+                title: const Text('Relin Keys'),
+                subtitle: Text(globalSession.relinKeys),
+              ),
+            ],
           ),
           ElevatedButton(
             onPressed: () {
@@ -296,6 +372,7 @@ class KeyDerivationState extends State<KeyDerivation> {
             child: const Text('Generate Keys'),
           ),
         ],
-    ));
+      ),
+    );
   }
 }

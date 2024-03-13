@@ -8,11 +8,11 @@ Map ckks = {
   'qSizes': [60, 40, 40, 60]
 };
 
-/// BFV with batching enabled
-Map bfv = {'polyModDegree': 4096, 'ptModBit': 20, 'secLevel': 128};
+// BFV / BGV with batching enabled
+Map batching = {'polyModDegree': 4096, 'ptModBit': 20, 'secLevel': 128};
 
-// BGV with batching disabled
-Map bgv = {'polyModDegree': 4096, 'ptMod': 4096, 'secLevel': 128};
+// BFV / BGV with batching disabled
+Map plainModulus = {'polyModDegree': 4096, 'ptMod': 4096, 'secLevel': 128};
 
 // Store the parameters that are used within the session
 
@@ -27,19 +27,9 @@ class Session {
   /// Initialize the session with the scheme
   ///
   /// When [ctx] is empty, use default parameters based on the [scheme]
-  Session.init(this.scheme, this.ctx) {
+  Session(this.scheme, this.ctx) {
     fhe = Seal(scheme);
-    if (ctx.isEmpty) {
-      ctx = switch (scheme) {
-        'bfv' => bfv,
-        'bgv' => bgv,
-        'ckks' => ckks,
-        _ => {}
-      };
-      if (ctx.isEmpty) {
-        throw Exception('Invalid scheme');
-      }
-    }
+    print(ctx);
     ctxStatus = fhe.genContext(ctx);
     // Generate keys
     fhe.genKeys();
@@ -54,8 +44,7 @@ class Session {
 
   /// Retrieve the relin keys
   String get relinKeys => fhe.relinKeys.hexData.join(' ');
-
 }
 
 /// Global session
-Session globalSession = Session.init('bfv', {});
+Session globalSession = Session('bfv', batching);
