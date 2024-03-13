@@ -1,6 +1,9 @@
 import 'dart:math';
 import 'package:fhel/seal.dart';
 
+// ignore: constant_identifier_names
+const double WIDTH = 200;
+
 // Default context based on scheme
 Map ckks = {
   'polyModDegree': 8192,
@@ -29,8 +32,9 @@ class Session {
   /// When [ctx] is empty, use default parameters based on the [scheme]
   Session(this.scheme, this.ctx) {
     fhe = Seal(scheme);
-    print(ctx);
+    print("Set $ctx");
     ctxStatus = fhe.genContext(ctx);
+
     // Generate keys
     fhe.genKeys();
     fhe.genRelinKeys();

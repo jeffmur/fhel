@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:fhel/seal.dart';
 import 'dart:math';
-import '../globals.dart';
-
-// ignore: constant_identifier_names
-const double WIDTH = 200;
+import 'package:fhel_example/page/utils.dart';
+import 'package:fhel_example/globals.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -27,6 +27,23 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
         ));
+  }
+}
+
+class SessionChanges extends ChangeNotifier {
+  Session _session = globalSession;
+
+  Map get context => _session.ctx;
+  String get status => _session.ctxStatus;
+  Seal get fhe => _session.fhe;
+
+  String get publicKey => _session.publicKey;
+  String get secretKey => _session.secretKey;
+  String get relinKeys => _session.relinKeys;
+
+  void validate(String scheme, Map context) {
+    _session = Session(scheme, context);
+    notifyListeners();
   }
 }
 
@@ -55,54 +72,59 @@ class ParameterForm extends State<ContextForm> {
   final _plainMod = GlobalKey<FormFieldState>();
   final _secLevel = GlobalKey<FormFieldState>();
 
+  var _scheme = globalSession.scheme; // Copy initial scheme
+  var _context = globalSession.ctx; // Copy initial context
+
   bool isBatchingEnabled = true;
   bool isDefaultParams = false;
 
   void defaultContext() {
-    String sch = globalSession.scheme;
-
-    Map ctx = switch (sch) {
+    Map defaults = switch (_scheme) {
       'ckks' => ckks,
       // BFV / BGV
       _ => isBatchingEnabled ? batching : plainModulus
     };
 
+    print("$_scheme defaults? $defaults");
+
     _polyModDegree.currentState?.setState(() {
       isDefaultParams
           ? _polyModDegree.currentState!
-              .didChange(ctx['polyModDegree'].toString())
+              .didChange(defaults['polyModDegree'].toString())
           : _polyModDegree.currentState!.didChange('');
     });
+    int defaultScalar =
+        _scheme != 'ckks' ? -1 : log(defaults['encodeScalar']) ~/ log(2);
     _scalar.currentState?.setState(() {
-      isDefaultParams
-          ? _scalar.currentState!
-              .didChange((log(ctx['encodeScalar']) / log(2)).toString())
+      isDefaultParams && _scheme == 'ckks'
+          ? _scalar.currentState!.didChange(defaultScalar.toString())
           : _scalar.currentState!.didChange('');
     });
+    String defaultQSizes =
+        _scheme != 'ckks' ? '' : defaults['qSizes']?.join(',');
     _coeffMod.currentState?.setState(() {
-      isDefaultParams
-          ? _coeffMod.currentState!
-            .didChange(ctx['qSizes'].toString())
+      isDefaultParams && _scheme == 'ckks'
+          ? _coeffMod.currentState!.didChange(defaultQSizes)
           : _coeffMod.currentState!.didChange('');
     });
     _plainMod.currentState?.setState(() {
-      isDefaultParams
+      isDefaultParams && _scheme != 'ckks'
           ? isBatchingEnabled
               ? _plainMod.currentState!
-                .didChange(ctx['ptModBit'].toString())
-              : _plainMod.currentState!
-                .didChange(ctx['ptMod'].toString())
+                  .didChange(defaults['ptModBit'].toString())
+              : _plainMod.currentState!.didChange(defaults['ptMod'].toString())
           : _plainMod.currentState!.didChange('');
     });
     _secLevel.currentState?.setState(() {
-      isDefaultParams
-          ? _secLevel.currentState!.didChange(ctx['secLevel'].toString())
+      isDefaultParams && _scheme != 'ckks'
+          ? _secLevel.currentState!.didChange(defaults['secLevel'].toString())
           : _secLevel.currentState!.didChange('');
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final session = Provider.of<SessionChanges>(context);
     // Build a Form widget using the _formKey created above.
     return Form(
       key: _formKey,
@@ -124,7 +146,7 @@ class ParameterForm extends State<ContextForm> {
           SizedBox(
             width: WIDTH, // Set the desired width value
             child: DropdownButtonFormField(
-              value: globalSession.scheme,
+              value: _scheme,
               items: const [
                 DropdownMenuItem(
                   value: 'bfv',
@@ -141,7 +163,7 @@ class ParameterForm extends State<ContextForm> {
               ],
               onChanged: (value) {
                 setState(() {
-                  globalSession.setScheme(value!);
+                  _scheme = value.toString();
                   isDefaultParams = false;
                   defaultContext();
                 });
@@ -149,8 +171,7 @@ class ParameterForm extends State<ContextForm> {
             ),
           ),
           Visibility(
-            visible:
-                globalSession.scheme == 'bfv' || globalSession.scheme == 'bgv',
+            visible: _scheme == 'bfv' || _scheme == 'bgv',
             child: SizedBox(
               width: WIDTH,
               child: CheckboxListTile(
@@ -174,19 +195,14 @@ class ParameterForm extends State<ContextForm> {
                   const InputDecoration(hintText: "Poly Modulus Degree"),
               validator: (value) {
                 if (isDefaultParams) return null;
-                try {
-                  int.parse(value!);
-                } catch (e) {
-                  return 'Invalid number';
-                }
-                return null;
+                return validateUnsafeInt(value!);
               },
               onSaved: (newValue) =>
-                  globalSession.ctx['polyModDegree'] = int.parse(newValue!),
+                  _context['polyModDegree'] = int.parse(newValue!),
             ),
           ),
           Visibility(
-            visible: globalSession.scheme == 'ckks',
+            visible: _scheme == 'ckks',
             child: SizedBox(
               width: WIDTH, // Set the desired width value
               child: TextFormField(
@@ -196,20 +212,15 @@ class ParameterForm extends State<ContextForm> {
                     hintText: 'Encoder Scalar', prefixText: '2^'),
                 validator: (value) {
                   if (isDefaultParams) return null;
-                  try {
-                    int.parse(value!);
-                  } catch (e) {
-                    return 'Invalid number';
-                  }
-                  return null;
+                  return validateUnsafeInt(value!);
                 },
-                onSaved: (newValue) => globalSession.ctx['encodeScalar'] =
-                    pow(2, int.parse(newValue!)),
+                onSaved: (newValue) =>
+                    _context['encodeScalar'] = pow(2, int.parse(newValue!)),
               ),
             ),
           ),
           Visibility(
-            visible: globalSession.scheme == 'ckks',
+            visible: _scheme == 'ckks',
             child: SizedBox(
               width: WIDTH, // Set the desired width value
               child: TextFormField(
@@ -220,21 +231,15 @@ class ParameterForm extends State<ContextForm> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (isDefaultParams) return null;
-                  try {
-                    value!.split(',').map(int.parse).toList();
-                  } catch (e) {
-                    return 'Invalid list';
-                  }
-                  return null;
+                  return validateUnsafeListInt(value!);
                 },
-                onSaved: (value) => globalSession.ctx['qSizes'] =
+                onSaved: (value) => _context['qSizes'] =
                     value!.split(',').map(int.parse).toList(),
               ),
             ),
           ),
           Visibility(
-            visible:
-                globalSession.scheme == 'bfv' || globalSession.scheme == 'bgv',
+            visible: _scheme == 'bfv' || _scheme == 'bgv',
             child: SizedBox(
               width: WIDTH, // Set the desired width value
               child: TextFormField(
@@ -249,26 +254,20 @@ class ParameterForm extends State<ContextForm> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (!isDefaultParams) return null;
-                  try {
-                    int.parse(value!);
-                  } catch (e) {
-                    return 'Invalid number';
-                  }
-                  return null;
+                  return validateUnsafeInt(value!);
                 },
                 onSaved: (value) {
                   if (isBatchingEnabled) {
-                    globalSession.ctx['ptModBit'] = int.parse(value!);
+                    _context['ptModBit'] = int.parse(value!);
                   } else {
-                    globalSession.ctx['ptMod'] = int.parse(value!);
+                    _context['ptMod'] = int.parse(value!);
                   }
                 },
               ),
             ),
           ),
           Visibility(
-            visible:
-                globalSession.scheme == 'bfv' || globalSession.scheme == 'bgv',
+            visible: _scheme == 'bfv' || _scheme == 'bgv',
             child: SizedBox(
               width: WIDTH, // Set the desired width value
               child: TextFormField(
@@ -281,15 +280,10 @@ class ParameterForm extends State<ContextForm> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (isDefaultParams) return null;
-                  try {
-                    int.parse(value!);
-                  } catch (e) {
-                    return 'Invalid number';
-                  }
-                  return null;
+                  return validateUnsafeInt(value!);
                 },
                 onSaved: (value) {
-                  globalSession.ctx['secLevel'] = int.parse(value!);
+                  _context['secLevel'] = int.parse(value!);
                 },
               ),
             ),
@@ -302,10 +296,12 @@ class ParameterForm extends State<ContextForm> {
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.
-                  globalSession =
-                      Session(globalSession.scheme, globalSession.ctx);
+                  _formKey.currentState!.save();
+                  // Update session
+                  session.validate(_scheme, _context);
+
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(globalSession.ctxStatus)),
+                    SnackBar(content: Text(session.status)),
                   );
                 }
               },
@@ -333,6 +329,7 @@ class KeyDerivation extends StatefulWidget {
 class KeyDerivationState extends State<KeyDerivation> {
   @override
   Widget build(BuildContext context) {
+    final session = Provider.of<SessionChanges>(context);
     return SizedBox(
       width: WIDTH,
       child: Column(
@@ -343,23 +340,23 @@ class KeyDerivationState extends State<KeyDerivation> {
             children: [
               ListTile(
                 title: const Text('Public Key'),
-                subtitle: Text(globalSession.publicKey),
+                subtitle: Text(session.publicKey),
               ),
               ListTile(
                 title: const Text('Secret Key'),
-                subtitle: Text(globalSession.secretKey),
+                subtitle: Text(session.secretKey),
               ),
               ListTile(
                 title: const Text('Relin Keys'),
-                subtitle: Text(globalSession.relinKeys),
+                subtitle: Text(session.relinKeys),
               ),
             ],
           ),
           ElevatedButton(
             onPressed: () {
               setState(() {
-                globalSession.fhe.genKeys();
-                globalSession.fhe.genRelinKeys();
+                session.fhe.genKeys();
+                session.fhe.genRelinKeys();
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Keys generated')),

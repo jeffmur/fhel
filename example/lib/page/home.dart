@@ -1,4 +1,9 @@
+import 'package:provider/provider.dart';
+import 'package:fhel_example/page/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:fhel_example/addition.dart';
+import 'package:fhel_example/globals.dart';
+import 'user_input.dart';
 import 'bottom_bar.dart';
 import 'settings.dart';
 
@@ -11,7 +16,7 @@ class HomePage extends StatelessWidget {
     return PersistentBottomBarScaffold(
       items: [
         PersistentTabItem(
-          tab: TabPage1(),
+          tab: HexadecimalAddition(),
           icon: Icons.home,
           title: 'Home',
           navigatorkey: _tab1navigatorKey,
@@ -27,129 +32,77 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class TabPage1 extends StatelessWidget {
-  const TabPage1({Key? key}) : super(key: key);
+class TestSelection extends StatelessWidget {
+  const TestSelection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    print('TabPage1 build');
-    return Scaffold(
-      appBar: AppBar(title: Text('Tab 1')),
-      body: Container(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Tab 1'),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => Page2('Tab1')));
-                },
-                child: Text('Go to page1'))
-          ],
-        ),
+    return Drawer(
+      child: ListView(
+        children: [
+          ListTile(
+            title: const Text('Hexadecimal Addition'),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => HexadecimalAddition(),
+              ));
+            },
+          ),
+        ],
       ),
     );
   }
 }
 
-class TabPage2 extends StatelessWidget {
+// Create a Form widget.
+class HexadecimalAddition extends StatefulWidget {
+  const HexadecimalAddition({super.key});
+
   @override
-  Widget build(BuildContext context) {
-    print('TabPage2 build');
-    return Scaffold(
-      appBar: AppBar(title: Text('Tab 2')),
-      body: Container(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Tab 2'),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => Page2('tab2')));
-                },
-                child: Text('Go to page2'))
-          ],
-        ),
-      ),
-    );
+  HexadecimalAdditionWidget createState() {
+    return HexadecimalAdditionWidget();
   }
 }
 
-class TabPage3 extends StatelessWidget {
+class HexadecimalAdditionWidget extends State<HexadecimalAddition> {
+  final _x = GlobalKey<FormFieldState>();
+  final _y = GlobalKey<FormFieldState>();
+
   @override
   Widget build(BuildContext context) {
-    print('TabPage3 build');
+    final session = Provider.of<SessionChanges>(context);
     return Scaffold(
-      appBar: AppBar(title: Text('Tab 3')),
-      body: Container(
-        width: double.infinity,
+      appBar: AppBar(title: const Text('Hexadecimal Addition')),
+      drawer: TestSelection(),
+      body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Tab 3'),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => Page2('tab3')));
-                },
-                child: Text('Go to page2'))
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class Page2 extends StatelessWidget {
-  final String inTab;
-
-  const Page2(this.inTab);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Page 2')),
-      body: Container(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('in $inTab Page 2'),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => Page3(inTab)));
-                },
-                child: Text('Go to page3'))
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class Page3 extends StatelessWidget {
-  final String inTab;
-
-  const Page3(this.inTab);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Page 3')),
-      body: Container(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('in $inTab Page 3'),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('Go back'))
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text('Addition of two hexadecimal numbers'),
+            ),
+            PromptNumber('x', _x),
+            PromptNumber('y', _y),
+            ButtonBar(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    final x = parseForUnsafeInt(_x.currentState?.value);
+                    final y = parseForUnsafeInt(_y.currentState?.value);
+                    final expected = x + y;
+                    final actual = addAsHex(session.fhe, x, y);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: int.tryParse(actual) == expected
+                            ? Text('Correct: $actual')
+                            : Text(actual),
+                      ),
+                    );
+                  },
+                  child: const Text('Add'),
+                ),
+              ],
+            ),
           ],
         ),
       ),

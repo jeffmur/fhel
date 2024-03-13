@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'page/home.dart';
+import 'page/settings.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+      ChangeNotifierProvider(
+        create: (context) => SessionChanges(), 
+        child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

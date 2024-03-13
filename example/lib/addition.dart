@@ -1,34 +1,43 @@
 import 'package:fhel/seal.dart' show Seal;
+import 'package:fhel_example/globals.dart';
 
-List<int> addVector(Map<String,int> ctx, List<int> x, List<int> add) {
-  final fhe = Seal('bfv');
-  fhe.genContext(ctx);
-  fhe.genKeys();
+/// Add two vectors
+List<int> addVector(List<int> x, List<int> add) {
+  final fhe = globalSession.fhe;
 
-  final pt_x = fhe.encodeVecInt(x);
-  final ct_x = fhe.encrypt(pt_x);
+  final plainX = fhe.encodeVecInt(x);
+  final cipherX = fhe.encrypt(plainX);
 
-  final pt_add = fhe.encodeVecInt(add);
-  final ct_add = fhe.encrypt(pt_add);
+  final plainAddend = fhe.encodeVecInt(add);
+  final cipherAddend = fhe.encrypt(plainX);
 
-  final ct_res = fhe.add(ct_x, ct_add);
-  final pt_res = fhe.decrypt(ct_res);
+  final cipherRes = fhe.add(cipherX, cipherAddend);
+  final plainRes = fhe.decrypt(cipherRes);
 
-  return fhe.decodeVecInt(pt_res, x.length);
+  return fhe.decodeVecInt(plainRes, x.length);
 }
 
-int addInt(Map<String, int> ctx, int x, int add) {
-  final fhe = Seal('bfv');
-  fhe.genContext(ctx);
-  fhe.genKeys();
-
+/// Add two integers
+///
+/// Encrypts, adds, and decrypts the result,
+/// Optionally, [addPlain] encrypts [x] and [add] as plain text
+String addAsHex(Seal fhe, int x, int add, {addPlain = false}) {
   // Convert to Hexidecimal
-  final pt_x = fhe.plain(x.toRadixString(16));
-  final ct_x = fhe.encrypt(pt_x);
-  final pt_add = fhe.plain(add.toRadixString(16));
-  final ct_add = fhe.encrypt(pt_add);
-  final ct_res = fhe.add(ct_x, ct_add);
-  final pt_res = fhe.decrypt(ct_res);
+  try {
+    final plainX = fhe.plain(x.toRadixString(16));
+    final cipherX = fhe.encrypt(plainX);
 
-  return int.parse(pt_res.text, radix: 16);
+    final plainAdd = fhe.plain(add.toRadixString(16));
+    final cipherAdd = fhe.encrypt(plainAdd);
+
+    final cipherResult = addPlain
+        ? fhe.addPlain(cipherX, plainAdd)
+        : fhe.add(cipherX, cipherAdd);
+
+    final plainResult = fhe.decrypt(cipherResult);
+
+    return int.parse(plainResult.text, radix: 16).toString();
+  } catch (e) {
+    return e.toString();
+  }
 }
