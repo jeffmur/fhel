@@ -32,6 +32,8 @@ class SettingsPage extends StatelessWidget {
 
 class SessionChanges extends ChangeNotifier {
   Session _session = globalSession;
+  List<String> _log = [];
+  List<String> get logs => _log;
 
   Map get context => _session.ctx;
   String get status => _session.ctxStatus;
@@ -43,6 +45,25 @@ class SessionChanges extends ChangeNotifier {
 
   void validate(String scheme, Map context) {
     _session = Session(scheme, context);
+    notifyListeners();
+  }
+
+  void log(String log) {
+    _log.add(log);
+    notifyListeners();
+  }
+
+  void clearLogs() {
+    _log.clear();
+    notifyListeners();
+  }
+
+  void logSession() {
+    _log.add('Scheme: ${_session.scheme}');
+    _log.add('Context: ${_session.ctx}');
+    _log.add('Public Key: ${_session.publicKey}');
+    _log.add('Secret Key: ${_session.secretKey}');
+    _log.add('Relin Keys: ${_session.relinKeys}');
     notifyListeners();
   }
 }
@@ -73,7 +94,7 @@ class ParameterForm extends State<ContextForm> {
   final _secLevel = GlobalKey<FormFieldState>();
 
   var _scheme = globalSession.scheme; // Copy initial scheme
-  var _context = globalSession.ctx; // Copy initial context
+  final _context = globalSession.ctx; // Copy initial context
 
   bool isBatchingEnabled = true;
   bool isDefaultParams = false;
@@ -253,7 +274,7 @@ class ParameterForm extends State<ContextForm> {
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (!isDefaultParams) return null;
+                  if (isDefaultParams) return null;
                   return validateUnsafeInt(value!);
                 },
                 onSaved: (value) {
