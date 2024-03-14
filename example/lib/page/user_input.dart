@@ -3,16 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:fhel_example/globals.dart';
 
 // Create a Form widget.
+// ignore: must_be_immutable
 class PromptNumber extends StatefulWidget {
+  bool showHex = false;
   String label = 'not set';
   var ref = GlobalKey<FormFieldState>();
 
   PromptNumber(this.label, this.ref, {super.key});
 
+  PromptNumber.hex(this.label, this.ref, {super.key}) {
+    showHex = true;
+  }
+
   @override
   PromptNumberRow createState() {
     // ignore: no_logic_in_create_state
-    return PromptNumberRow(ref, label);
+    return PromptNumberRow(ref, label, showHex);
   }
 
   int? get value => parseForUnsafeInt(ref.currentState?.value);
@@ -21,8 +27,9 @@ class PromptNumber extends StatefulWidget {
 class PromptNumberRow extends State<PromptNumber> {
   GlobalKey<FormFieldState> _key;
   String label;
+  bool showHex;
 
-  PromptNumberRow(this._key, this.label);
+  PromptNumberRow(this._key, this.label, this.showHex);
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +54,7 @@ class PromptNumberRow extends State<PromptNumber> {
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
-          _key.currentState != null
+          _key.currentState != null && showHex
               ? parseForUnsafeInt(_key.currentState?.value).toRadixString(16)
               : '',
         ),

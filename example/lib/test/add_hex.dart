@@ -6,9 +6,9 @@ import 'package:fhel_example/page/utils.dart';
 import 'package:fhel_example/page/log.dart';
 import 'package:fhel_example/page/settings.dart';
 
-SingleChildScrollView hexAdditionTest(BuildContext context) {
+SingleChildScrollView hexAdd(BuildContext context) {
   final session = Provider.of<SessionChanges>(context);
-  final xP= GlobalKey<FormFieldState>();
+  final xP = GlobalKey<FormFieldState>();
   final yP = GlobalKey<FormFieldState>();
 
   return SingleChildScrollView(
@@ -18,8 +18,8 @@ SingleChildScrollView hexAdditionTest(BuildContext context) {
           padding: EdgeInsets.all(8.0),
           child: Text('Encrypt and Add two integers'),
         ),
-        PromptNumber('x', xP),
-        PromptNumber('y', yP),
+        PromptNumber.hex('x', xP),
+        PromptNumber.hex('y', yP),
         Row(
           children: [
             Padding(

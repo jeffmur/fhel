@@ -3,7 +3,8 @@ import 'bottom_bar.dart';
 import 'settings.dart';
 
 // Test pages
-import 'package:fhel_example/test/hex_add.dart';
+import 'package:fhel_example/test/add_hex.dart';
+import 'package:fhel_example/test/add_list_int.dart';
 
 class HomePage extends StatelessWidget {
   final _tab1navigatorKey = GlobalKey<NavigatorState>();
@@ -48,6 +49,14 @@ class TestSelection extends StatelessWidget {
               ));
             },
           ),
+          ListTile(
+            title: const Text('List<int> Addition'),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const ListIntAddition(),
+              ));
+            },
+          ),
         ],
       ),
     );
@@ -69,7 +78,27 @@ class HexadecimalAdditionPage extends State<HexadecimalAddition> {
     return Scaffold(
       appBar: AppBar(title: const Text('Hexadecimal Addition')),
       drawer: const TestSelection(),
-      body: hexAdditionTest(context)
+      body: hexAdd(context)
+    );
+  }
+}
+
+class ListIntAddition extends StatefulWidget {
+  const ListIntAddition({super.key});
+
+  @override
+  ListIntAdditionPage createState() {
+    return ListIntAdditionPage();
+  }
+}
+
+class ListIntAdditionPage extends State<ListIntAddition> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('List<int> Addition')),
+      drawer: const TestSelection(),
+      body: listIntAdd(context)
     );
   }
 }

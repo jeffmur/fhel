@@ -27,3 +27,10 @@ String? validateUnsafeListInt(String value, {String delimeter = ","}) {
   }
 }
 
+List<int> parseForUnsafeListInt(String value, {String delimeter = ","}) {
+  try {
+    return value.split(delimeter).map((e) => int.parse(e)).toList();
+  } catch (e) {
+    return [];
+  }
+}
