@@ -1,6 +1,5 @@
 import 'package:fhel/seal.dart' show Seal;
 import 'package:fhel_example/page/settings.dart';
-import 'package:fhel_example/globals.dart';
 
 /// Add two integers
 ///
@@ -13,6 +12,7 @@ String addAsHex(SessionChanges s, int x, int add, {addPlain = false}) {
   try {
     s.logSession();
     s.log('Adding $x and $add');
+    final start = DateTime.now();
     final xRadix = x.toRadixString(16);
     final plainX = fhe.plain(xRadix);
     final cipherX = fhe.encrypt(plainX);
@@ -32,6 +32,7 @@ String addAsHex(SessionChanges s, int x, int add, {addPlain = false}) {
     final plainResult = fhe.decrypt(cipherResult);
     final result = int.parse(plainResult.text, radix: 16).toString();
     s.log('Result: $result');
+    s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
     return result.toString();
   } catch (e) {
     s.log(e.toString());
@@ -40,12 +41,14 @@ String addAsHex(SessionChanges s, int x, int add, {addPlain = false}) {
 }
 
 /// Add two vectors
-String addVector(SessionChanges s, List<int> x, List<int> add, {addPlain = false}) {
+String addVector(SessionChanges s, List<int> x, List<int> add,
+    {addPlain = false}) {
   Seal fhe = s.fhe;
 
   try {
     s.logSession();
     s.log('Adding $x and $add');
+    final start = DateTime.now();
     final plainX = fhe.encodeVecInt(x);
     final cipherX = fhe.encrypt(plainX);
 
@@ -61,6 +64,7 @@ String addVector(SessionChanges s, List<int> x, List<int> add, {addPlain = false
     final plainResult = fhe.decrypt(cipherResult);
     final result = fhe.decodeVecInt(plainResult, x.length);
     s.log('Result: $result');
+    s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
     return result.join(',');
   } catch (e) {
     s.log(e.toString());

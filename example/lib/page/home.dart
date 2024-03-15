@@ -1,3 +1,4 @@
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'bottom_bar.dart';
 import 'settings.dart';
@@ -38,12 +39,14 @@ class TestSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final session = Provider.of<SessionChanges>(context);
     return Drawer(
       child: ListView(
         children: [
           ListTile(
             title: const Text('Hexadecimal Addition'),
             onTap: () {
+              session.clearLogs();
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const HexadecimalAddition(),
               ));
@@ -52,6 +55,7 @@ class TestSelection extends StatelessWidget {
           ListTile(
             title: const Text('List<int> Addition'),
             onTap: () {
+              session.clearLogs();
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const ListIntAddition(),
               ));
@@ -76,10 +80,9 @@ class HexadecimalAdditionPage extends State<HexadecimalAddition> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Hexadecimal Addition')),
-      drawer: const TestSelection(),
-      body: hexAdd(context)
-    );
+        appBar: AppBar(title: const Text('Hexadecimal Addition')),
+        drawer: const TestSelection(),
+        body: hexAdd(context));
   }
 }
 
@@ -95,10 +98,10 @@ class ListIntAddition extends StatefulWidget {
 class ListIntAdditionPage extends State<ListIntAddition> {
   @override
   Widget build(BuildContext context) {
+    // final session = Provider.of<SessionChanges>(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('List<int> Addition')),
-      drawer: const TestSelection(),
-      body: listIntAdd(context)
-    );
+        appBar: AppBar(title: const Text('List<int> Addition')),
+        drawer: const TestSelection(),
+        body: listIntAdd(context));
   }
 }
