@@ -76,3 +76,36 @@ String addVectorInt(SessionChanges s, List<int> x, List<int> add, {addPlain = fa
 }
 
 /// Add two vectors<double>
+String addVectorDouble(SessionChanges s, List<double> x, List<double> add, {addPlain = false}) {
+  Seal fhe = s.fhe;
+
+  if (fhe.scheme.name != 'ckks') {
+    return '${fhe.scheme.name.toUpperCase()} does not support double addition';
+  }
+
+  try {
+    s.logSession();
+    s.log('Adding $x and $add');
+    final start = DateTime.now();
+    final plainX = fhe.encodeVecDouble(x);
+    final cipherX = fhe.encrypt(plainX);
+
+    final plainAdd = fhe.encodeVecDouble(add);
+    final cipherAdd = fhe.encrypt(plainAdd);
+
+    s.log('Ciphertext size: ${cipherX.size}');
+
+    final cipherResult = addPlain
+        ? fhe.addPlain(cipherX, plainAdd)
+        : fhe.add(cipherX, cipherAdd);
+
+    final plainResult = fhe.decrypt(cipherResult);
+    final result = fhe.decodeVecDouble(plainResult, x.length);
+    s.log('Result: $result');
+    s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
+    return result.join(',');
+  } catch (e) {
+    s.log(e.toString());
+    return e.toString();
+  }
+}

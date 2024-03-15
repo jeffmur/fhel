@@ -25,10 +25,26 @@ List<int> parseForUnsafeListInt(String value, {String delimeter = ","}) {
   }
 }
 
-/// Parse a string to a list of integers
 String? validateUnsafeListInt(String value, {String delimeter = ","}) {
   try {
     parseForUnsafeListInt(value, delimeter: delimeter);
+    return null;
+  } catch (e) {
+    return "Invalid list";
+  }
+}
+
+List<double> parseForUnsafeListDouble(String value, {String delimeter = ","}) {
+  try {
+    return value.split(delimeter).map((e) => double.parse(e)).toList();
+  } catch (e) {
+    return [];
+  }
+}
+
+String? validateUnsafeListDouble(String value, {String delimeter = ","}) {
+  try {
+    parseForUnsafeListDouble(value, delimeter: delimeter);
     return null;
   } catch (e) {
     return "Invalid list";
