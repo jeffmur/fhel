@@ -40,10 +40,13 @@ String addAsHex(SessionChanges s, int x, int add, {addPlain = false}) {
   }
 }
 
-/// Add two vectors
-String addVector(SessionChanges s, List<int> x, List<int> add,
-    {addPlain = false}) {
+/// Add two vectors<int>
+String addVectorInt(SessionChanges s, List<int> x, List<int> add, {addPlain = false}) {
   Seal fhe = s.fhe;
+
+  if (fhe.scheme.name == 'ckks') {
+    return 'CKKS does not support integer addition';
+  }
 
   try {
     s.logSession();
@@ -71,3 +74,5 @@ String addVector(SessionChanges s, List<int> x, List<int> add,
     return e.toString();
   }
 }
+
+/// Add two vectors<double>

@@ -21,73 +21,71 @@ Form listIntAdd(BuildContext context) {
         ),
         PromptList('x', xP),
         PromptList('y', yP),
-        Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(1.0),
-              child: ButtonBar(
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        session.clearLogs();
-                        final x = parseForUnsafeListInt(xP.currentState!.value);
-                        final y = parseForUnsafeListInt(yP.currentState!.value);
-                        List<int> expected = [];
-                        for (int i = 0; i < x.length; i++) {
-                          expected.add(x[i] + y[i]);
-                        }
-                        final actual = addVector(session, x, y);
-                        List<int> actualList = parseForUnsafeListInt(actual);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: actual == expected.join(',')
-                                ? Text('Correct: $actualList')
-                                : Text(actual),
-                          ),
-                        );
+        Row(children: [
+          Padding(
+            padding: const EdgeInsets.all(1.0),
+            child: ButtonBar(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      session.clearLogs();
+                      final x = parseForUnsafeListInt(xP.currentState!.value);
+                      final y = parseForUnsafeListInt(yP.currentState!.value);
+                      List<int> expected = [];
+                      for (int i = 0; i < x.length; i++) {
+                        expected.add(x[i] + y[i]);
                       }
-                    },
-                    child: const Text('Cipher(x) + Cipher(y)'),
-                  ),
-                ],
-              ),
+                      final actual = addVectorInt(session, x, y);
+                      List<int> actualList = parseForUnsafeListInt(actual);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: actual == expected.join(',')
+                              ? Text('Correct: $actualList')
+                              : Text(actual),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Cipher(x) + Cipher(y)'),
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(1.0),
-              child: ButtonBar(
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        session.clearLogs();
-                        final x = parseForUnsafeListInt(xP.currentState!.value);
-                        final y = parseForUnsafeListInt(yP.currentState!.value);
-                        List<int> expected = [];
-                        for (int i = 0; i < x.length; i++) {
-                          expected.add(x[i] + y[i]);
-                        }
-                        final actual = addVector(session, x, y, addPlain: true);
-                        List<int> actualList = parseForUnsafeListInt(actual);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: actual == expected.join(',')
-                                ? Text('Correct: $actualList')
-                                : Text(actual),
-                          ),
-                        );
+          ),
+          Padding(
+            padding: const EdgeInsets.all(1.0),
+            child: ButtonBar(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      session.clearLogs();
+                      final x = parseForUnsafeListInt(xP.currentState!.value);
+                      final y = parseForUnsafeListInt(yP.currentState!.value);
+                      List<int> expected = [];
+                      for (int i = 0; i < x.length; i++) {
+                        expected.add(x[i] + y[i]);
                       }
-                    },
-                    child: const Text('Cipher(x) + Plain(y)'),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
-        const Text('Logs'),
-        const LogScreen(),
-      ],
-    ),
-  ));
+                      final actual = addVectorInt(session, x, y, addPlain: true);
+                      List<int> actualList = parseForUnsafeListInt(actual);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: actual == expected.join(',')
+                              ? Text('Correct: $actualList')
+                              : Text(actual),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Cipher(x) + Plain(y)'),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+      const Text('Logs'),
+      const LogScreen(),
+    ],
+  )));
 }
