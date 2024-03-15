@@ -5,11 +5,16 @@ import 'package:fhel_example/globals.dart';
 // Create a Form widget.
 // ignore: must_be_immutable
 class PromptNumber extends StatefulWidget {
+  bool allowDouble = false;
   bool showHex = false;
   String label = 'not set';
   var ref = GlobalKey<FormFieldState>();
 
   PromptNumber(this.label, this.ref, {super.key});
+
+  PromptNumber.double(this.label, this.ref, {super.key}) {
+    allowDouble = true;
+  }
 
   PromptNumber.hex(this.label, this.ref, {super.key}) {
     showHex = true;
@@ -18,7 +23,7 @@ class PromptNumber extends StatefulWidget {
   @override
   PromptNumberRow createState() {
     // ignore: no_logic_in_create_state
-    return PromptNumberRow(ref, label, showHex);
+    return PromptNumberRow(ref, label, showHex, allowDouble);
   }
 }
 
@@ -26,8 +31,9 @@ class PromptNumberRow extends State<PromptNumber> {
   final GlobalKey<FormFieldState> _key;
   String label;
   bool showHex;
+  bool allowDouble;
 
-  PromptNumberRow(this._key, this.label, this.showHex);
+  PromptNumberRow(this._key, this.label, this.showHex, this.allowDouble);
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +51,9 @@ class PromptNumberRow extends State<PromptNumber> {
               labelText: 'Enter a number',
             ),
             validator: (value) {
-              return validateUnsafeInt(value!);
+              return allowDouble
+                  ? validateUnsafeDouble(value!)
+                  : validateUnsafeInt(value!);
             },
             onChanged: (value) => setState(() {}),
           )),
