@@ -1,28 +1,33 @@
+import 'package:fhel_example/subtraction.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fhel_example/addition.dart';
+import 'package:fhel_example/multiplication.dart';
 import 'package:fhel_example/page/user_input.dart';
 import 'package:fhel_example/page/utils.dart';
 import 'package:fhel_example/page/log.dart';
 import 'package:fhel_example/page/settings.dart';
 
-Form hexAdd(BuildContext context) {
+Form hexOp(BuildContext context) {
   final session = Provider.of<SessionChanges>(context);
   final xP = GlobalKey<FormFieldState>();
   final yP = GlobalKey<FormFieldState>();
-  final _formKey = GlobalKey<FormState>();
+  final xEncrypted = GlobalKey<FormFieldState>();
+  final yEncrypted = GlobalKey<FormFieldState>();
+
+  final formKey = GlobalKey<FormState>();
 
   return Form(
-    key: _formKey,
+    key: formKey,
     child: SingleChildScrollView(
       child: Column(
         children: [
           const Padding(
             padding: EdgeInsets.all(8.0),
-            child: Text('Encrypt and Add two integers'),
+            child: Text('Convert to Hexadecimal and Calculate.'),
           ),
-          PromptNumber.hex('x', xP),
-          PromptNumber.hex('y', yP),
+          PromptNumber.hex('X', xP, xEncrypted),
+          PromptNumber.hex('Y', yP, yEncrypted),
           Row(
             children: [
               Padding(
@@ -31,23 +36,25 @@ Form hexAdd(BuildContext context) {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        if (_formKey.currentState!.validate()) {
+                        if (formKey.currentState!.validate()) {
                           // Calculate the sum of the two integers
                           session.clearLogs();
                           final x = parseForUnsafeInt(xP.currentState!.value);
                           final y = parseForUnsafeInt(yP.currentState!.value);
                           final expected = x + y;
-                          final actual = addAsHex(session, x, y);
+                          final actual = addAsHex(session, x, y,
+                            xEncrypted.currentState!.value, 
+                            yEncrypted.currentState!.value);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: int.tryParse(actual) == expected
+                              content: actual == expected.toString()
                                   ? Text('Correct: $actual')
                                   : Text(actual),
                             ),
                           );
                         }
                       },
-                      child: const Text('Cipher(x) + Cipher(y)'),
+                      child: const Text('+'),
                     ),
                   ],
                 ),
@@ -58,23 +65,50 @@ Form hexAdd(BuildContext context) {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        if (_formKey.currentState!.validate()) {
+                        if (formKey.currentState!.validate()) {
                           // Calculate the sum of the two integers
                           session.clearLogs();
                           final x = parseForUnsafeInt(xP.currentState!.value);
                           final y = parseForUnsafeInt(yP.currentState!.value);
-                          final expected = x + y;
-                          final actual = addAsHex(session, x, y, addPlain: true);
+                          final expected = x * y;
+                          final actual = multiplyAsHex(session, x, y, xEncrypted.currentState!.value, yEncrypted.currentState!.value);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: int.tryParse(actual) == expected
+                              content: actual == expected.toString()
                                   ? Text('Correct: $actual')
                                   : Text(actual),
                             ),
                           );
                         }
                       },
-                      child: const Text('Cipher(x) + Plain(y)'),
+                      child: const Text('x'),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(1.0),
+                child: ButtonBar(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          // Calculate the sum of the two integers
+                          session.clearLogs();
+                          final x = parseForUnsafeInt(xP.currentState!.value);
+                          final y = parseForUnsafeInt(yP.currentState!.value);
+                          final expected = x - y;
+                          final actual = subtractAsHex(session, x, y, xEncrypted.currentState!.value, yEncrypted.currentState!.value);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: actual == expected.toString()
+                                  ? Text('Correct: $actual')
+                                  : Text(actual),
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('-', style: TextStyle(fontSize: 20)),
                     ),
                   ],
                 ),

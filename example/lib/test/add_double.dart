@@ -9,7 +9,9 @@ import 'package:fhel_example/page/settings.dart';
 Form doubleAdd(BuildContext context) {
   final session = Provider.of<SessionChanges>(context);
   final xP = GlobalKey<FormFieldState>();
+  var xEncrypted = GlobalKey<FormFieldState>();
   final yP = GlobalKey<FormFieldState>();
+  var yEncrypted = GlobalKey<FormFieldState>();
   final _formKey = GlobalKey<FormState>();
 
   return Form(
@@ -21,8 +23,8 @@ Form doubleAdd(BuildContext context) {
             padding: EdgeInsets.all(8.0),
             child: Text('Encrypt and Add two integers'),
           ),
-          PromptNumber.double('x', xP),
-          PromptNumber.double('y', yP),
+          PromptNumber.double('x', xP, xEncrypted),
+          PromptNumber.double('y', yP, yEncrypted),
           Row(
             children: [
               Padding(

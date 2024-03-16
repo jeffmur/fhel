@@ -4,7 +4,7 @@ import 'bottom_bar.dart';
 import 'settings.dart';
 
 // Test pages
-import 'package:fhel_example/test/add_hex.dart';
+import 'package:fhel_example/test/hex.dart';
 import 'package:fhel_example/test/add_double.dart';
 import 'package:fhel_example/test/add_list_int.dart';
 import 'package:fhel_example/test/add_list_double.dart';
@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
     return PersistentBottomBarScaffold(
       items: [
         PersistentTabItem(
-          tab: const HexadecimalAddition(),
+          tab: const Hexadecimal(),
           icon: Icons.home,
           title: 'Home',
           navigatorkey: _tab1navigatorKey,
@@ -45,12 +45,15 @@ class TestSelection extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
+          const DrawerHeader(
+            child: Text('Tests')
+          ),
           ListTile(
-            title: const Text('Hexadecimal Addition'),
+            title: const Text('Hexadecimal'),
             onTap: () {
               session.clearLogs();
               Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const HexadecimalAddition(),
+                builder: (context) => const Hexadecimal(),
               ));
             },
           ),
@@ -87,22 +90,22 @@ class TestSelection extends StatelessWidget {
   }
 }
 
-class HexadecimalAddition extends StatefulWidget {
-  const HexadecimalAddition({super.key});
+class Hexadecimal extends StatefulWidget {
+  const Hexadecimal({super.key});
 
   @override
-  HexadecimalAdditionPage createState() {
-    return HexadecimalAdditionPage();
+  HexidecimalOpPage createState() {
+    return HexidecimalOpPage();
   }
 }
 
-class HexadecimalAdditionPage extends State<HexadecimalAddition> {
+class HexidecimalOpPage extends State<Hexadecimal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Hexadecimal Addition')),
+      appBar: AppBar(title: const Text('Hexadecimal')),
       drawer: const TestSelection(),
-      body: hexAdd(context));
+      body: hexOp(context));
   }
 }
 

@@ -1,31 +1,44 @@
+import 'package:fhel/afhe.dart';
 import 'package:fhel/seal.dart' show Seal;
 import 'package:fhel_example/page/settings.dart';
 
 /// Add two integers
 ///
 /// Encrypts, adds, and decrypts the result,
-/// Optionally, [addPlain] encrypts [x] and [add] as plain text
-String addAsHex(SessionChanges s, int x, int add, {addPlain = false}) {
+String addAsHex(SessionChanges s, int x, int add, bool xEncrypted, bool addEncrypted) {
   Seal fhe = s.fhe;
 
   // Convert to Hexidecimal
   try {
     s.logSession();
-    s.log('Adding $x and $add');
     final start = DateTime.now();
     final xRadix = x.toRadixString(16);
+    s.log('Hex: $x -> $xRadix');
     final plainX = fhe.plain(xRadix);
     final cipherX = fhe.encrypt(plainX);
 
     final addRadix = add.toRadixString(16);
+    s.log('Hex: $add -> $addRadix');
     final plainAdd = fhe.plain(addRadix);
     final cipherAdd = fhe.encrypt(plainAdd);
 
-    s.log('$xRadix + $addRadix = ${(x + add).toRadixString(16)}');
+    Ciphertext cipherResult;
 
-    final cipherResult = addPlain
-        ? fhe.addPlain(cipherX, plainAdd)
-        : fhe.add(cipherX, cipherAdd);
+    if (xEncrypted && addEncrypted) {
+      s.log('Adding encrypt($x) + encrypt($add)');
+      cipherResult = fhe.add(cipherX, cipherAdd);
+    } else if (xEncrypted) {
+      s.log('Adding encrypt($x) + plain($add)');
+      cipherResult = fhe.addPlain(cipherX, plainAdd);
+    } else if (addEncrypted) {
+      s.log('Adding plain($x) + encrypt($add)');
+      cipherResult = fhe.addPlain(cipherAdd, plainX);
+    } else {
+      s.log('Adding $x and $add');
+      final result = (x + add).toString();
+      s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
+      return result;
+    }
 
     s.log('Ciphertext size: ${cipherResult.size}');
 
