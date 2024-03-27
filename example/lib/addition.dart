@@ -54,7 +54,7 @@ String addAsHex(SessionChanges s, int x, int add, bool xEncrypted, bool addEncry
 }
 
 /// Add two doubles
-String addDouble(SessionChanges s, double x, double add, {addPlain = false}) {
+String addDouble(SessionChanges s, double x, double add, bool xEncrypted, bool addEncrypted) {
   Seal fhe = s.fhe;
 
   if (fhe.scheme.name != 'ckks') {
@@ -63,7 +63,6 @@ String addDouble(SessionChanges s, double x, double add, {addPlain = false}) {
 
   try {
     s.logSession();
-    s.log('Adding $x and $add');
     final start = DateTime.now();
     final plainX = fhe.encodeDouble(x);
     final cipherX = fhe.encrypt(plainX);
@@ -73,9 +72,23 @@ String addDouble(SessionChanges s, double x, double add, {addPlain = false}) {
 
     s.log('Ciphertext size: ${cipherX.size}');
 
-    final cipherResult = addPlain
-        ? fhe.addPlain(cipherX, plainAdd)
-        : fhe.add(cipherX, cipherAdd);
+    Ciphertext cipherResult;
+
+    if (xEncrypted && addEncrypted) {
+      s.log('Adding encrypt($x) + encrypt($add)');
+      cipherResult = fhe.add(cipherX, cipherAdd);
+    } else if (xEncrypted) {
+      s.log('Adding encrypt($x) + plain($add)');
+      cipherResult = fhe.addPlain(cipherX, plainAdd);
+    } else if (addEncrypted) {
+      s.log('Adding plain($x) + encrypt($add)');
+      cipherResult = fhe.addPlain(cipherAdd, plainX);
+    } else {
+      s.log('Adding $x and $add');
+      final result = (x + add).toString();
+      s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
+      return result;
+    }
 
     final plainResult = fhe.decrypt(cipherResult);
     // Generates an array of doubles filled of size (slot count)

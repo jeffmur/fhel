@@ -5,7 +5,7 @@ import 'settings.dart';
 
 // Test pages
 import 'package:fhel_example/test/hex.dart';
-import 'package:fhel_example/test/add_double.dart';
+import 'package:fhel_example/test/double.dart';
 import 'package:fhel_example/test/add_list_int.dart';
 import 'package:fhel_example/test/add_list_double.dart';
 
@@ -58,7 +58,7 @@ class TestSelection extends StatelessWidget {
             },
           ),
           ListTile(
-            title: const Text('Double Addition'),
+            title: const Text('Double'),
             onTap: () {
               session.clearLogs();
               Navigator.of(context).push(MaterialPageRoute(
@@ -122,9 +122,9 @@ class DoubleAdditionPage extends State<DoubleAddition> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Double Addition')),
+      appBar: AppBar(title: const Text('Double')),
       drawer: const TestSelection(),
-      body: doubleAdd(context));
+      body: doubleOp(context));
   }
 }
 
