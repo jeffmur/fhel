@@ -40,6 +40,9 @@ Form listIntAdd(BuildContext context) {
                         xEncrypted.currentState!.value,
                         yEncrypted.currentState!.value);
                       List<int> actualList = parseForUnsafeListInt(actual);
+                      if (actual != expected.join(',')) {
+                        session.log('Failed: $actualList != $expected');
+                      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: actual == expected.join(',')
@@ -65,6 +68,9 @@ Form listIntAdd(BuildContext context) {
                         xEncrypted.currentState!.value,
                         yEncrypted.currentState!.value);
                       List<int> actualList = parseForUnsafeListInt(actual);
+                      if (actual != expected.join(',')) {
+                        session.log('Failed: $actualList != $expected');
+                      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: actual == expected.join(',')
@@ -90,6 +96,9 @@ Form listIntAdd(BuildContext context) {
                         xEncrypted.currentState!.value,
                         yEncrypted.currentState!.value);
                       List<int> actualList = parseForUnsafeListInt(actual);
+                      if (actual != expected.join(',')) {
+                        session.log('Failed: $actualList != $expected');
+                      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: actual == expected.join(',')
