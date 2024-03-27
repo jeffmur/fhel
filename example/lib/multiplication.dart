@@ -2,6 +2,33 @@ import 'package:fhel/afhe.dart';
 import 'package:fhel/seal.dart' show Seal;
 import 'package:fhel_example/page/settings.dart';
 
+/// Conditionally multiply two [Plaintext] objects
+/// 
+/// At least one of the two integers must be encrypted.
+Ciphertext multiplyCondition(SessionChanges s, Plaintext x, Plaintext mult, bool xEncrypted, bool multEncrypted) {
+  Seal fhe = s.fhe;
+  Ciphertext cipherResult;
+
+  if (xEncrypted && multEncrypted) {
+    s.log('Multiplying encrypt() x encrypt()');
+    cipherResult = fhe.multiply(fhe.encrypt(x), fhe.encrypt(mult));
+    s.log('Ciphertext size: ${cipherResult.size}');
+    cipherResult = fhe.relinearize(cipherResult);
+    s.log('Ciphertext size (after relinearization): ${cipherResult.size}');
+  } else if (xEncrypted) {
+    s.log('Multiplying encrypt() x plain()');
+    cipherResult = fhe.multiplyPlain(fhe.encrypt(x), mult);
+    s.log('Ciphertext size: ${cipherResult.size}');
+  } else if (multEncrypted) {
+    s.log('Multiplying plain() x encrypt()');
+    cipherResult = fhe.multiplyPlain(fhe.encrypt(mult), x);
+    s.log('Ciphertext size: ${cipherResult.size}');
+  } else {
+    throw 'Both x and mult cannot be plain'; // cannot return a Ciphertext
+  }
+  return cipherResult;
+}
+
 /// Multiply two integers
 /// 
 /// Encrypts, multiplies, and decrypts the result,
@@ -12,38 +39,22 @@ String multiplyAsHex(SessionChanges s, int x, int mult, bool xEncrypted, bool mu
   try {
     s.logSession();
     final start = DateTime.now();
-    final xRadix = x.toRadixString(16);
+    String xRadix = x.toRadixString(16);
     s.log('Hex: $x -> $xRadix');
-    final plainX = fhe.plain(xRadix);
-    final cipherX = fhe.encrypt(plainX);
+    Plaintext plainX = fhe.plain(xRadix);
 
-    final multRadix = mult.toRadixString(16);
+    String multRadix = mult.toRadixString(16);
     s.log('Hex: $mult -> $multRadix');
-    final plainMult = fhe.plain(multRadix);
-    final ciphermult = fhe.encrypt(plainMult);
+    Plaintext plainMult = fhe.plain(multRadix);
 
-    Ciphertext cipherResult;
-
-    if (xEncrypted && multEncrypted) {
-      s.log('Multiplying encrypt($x) + encrypt($mult)');
-      cipherResult = fhe.multiply(cipherX, ciphermult);
-      s.log('Ciphertext size: ${cipherResult.size}');
-      cipherResult = fhe.relinearize(cipherResult);
-      s.log('Ciphertext size (after relinearization): ${cipherResult.size}');
-    } else if (xEncrypted) {
-      s.log('Multiplying encrypt($x) + plain($mult)');
-      cipherResult = fhe.multiplyPlain(cipherX, plainMult);
-      s.log('Ciphertext size: ${cipherResult.size}');
-    } else if (multEncrypted) {
-      s.log('Multiplying plain($x) + encrypt($mult)');
-      cipherResult = fhe.multiplyPlain(ciphermult, plainX);
-      s.log('Ciphertext size: ${cipherResult.size}');
-    } else {
+    if (!xEncrypted && !multEncrypted) {
       s.log('Multiplying $x and $mult');
       final result = (x * mult).toString();
+      s.log('Result: $result');
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
       return result;
     }
+    Ciphertext cipherResult = multiplyCondition(s, plainX, plainMult, xEncrypted, multEncrypted);
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = int.parse(plainResult.text, radix: 16).toString();
@@ -62,38 +73,24 @@ String multiplyAsHex(SessionChanges s, int x, int mult, bool xEncrypted, bool mu
 String multiplyDouble(SessionChanges s, double x, double mult, bool xEncrypted, bool multEncrypted) {
   Seal fhe = s.fhe;
 
+  if (fhe.scheme.name != 'ckks') {
+    return '${fhe.scheme.name.toUpperCase()} does not support double multiplication';
+  }
+
   // Convert to Hexidecimal
   try {
     s.logSession();
     final start = DateTime.now();
-    final plainX = fhe.encodeDouble(x);
-    final cipherX = fhe.encrypt(plainX);
+    Plaintext plainX = fhe.encodeDouble(x);
+    Plaintext plainMult = fhe.encodeDouble(mult);
 
-    final plainMult = fhe.encodeDouble(mult);
-    final ciphermult = fhe.encrypt(plainMult);
-
-    Ciphertext cipherResult;
-
-    if (xEncrypted && multEncrypted) {
-      s.log('Multiplying encrypt($x) + encrypt($mult)');
-      cipherResult = fhe.multiply(cipherX, ciphermult);
-      s.log('Ciphertext size: ${cipherResult.size}');
-      cipherResult = fhe.relinearize(cipherResult);
-      s.log('Ciphertext size (after relinearization): ${cipherResult.size}');
-    } else if (xEncrypted) {
-      s.log('Multiplying encrypt($x) + plain($mult)');
-      cipherResult = fhe.multiplyPlain(cipherX, plainMult);
-      s.log('Ciphertext size: ${cipherResult.size}');
-    } else if (multEncrypted) {
-      s.log('Multiplying plain($x) + encrypt($mult)');
-      cipherResult = fhe.multiplyPlain(ciphermult, plainX);
-      s.log('Ciphertext size: ${cipherResult.size}');
-    } else {
+    if (!xEncrypted && !multEncrypted) {
       s.log('Multiplying $x and $mult');
       final result = (x * mult).toString();
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
       return result;
     }
+    Ciphertext cipherResult = multiplyCondition(s, plainX, plainMult, xEncrypted, multEncrypted);
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = fhe.decodeVecDouble(plainResult, 1)[0];
@@ -117,28 +114,9 @@ String multiplyVecInt(SessionChanges s, List<int> x, List<int> mult, bool xEncry
     s.logSession();
     final start = DateTime.now();
     final plainX = fhe.encodeVecInt(x);
-    final cipherX = fhe.encrypt(plainX);
-
     final plainMult = fhe.encodeVecInt(mult);
-    final ciphermult = fhe.encrypt(plainMult);
 
-    Ciphertext cipherResult;
-
-    if (xEncrypted && multEncrypted) {
-      s.log('Multiplying encrypt($x) x encrypt($mult)');
-      cipherResult = fhe.multiply(cipherX, ciphermult);
-      s.log('Ciphertext size: ${cipherResult.size}');
-      cipherResult = fhe.relinearize(cipherResult);
-      s.log('Ciphertext size (after relinearization): ${cipherResult.size}');
-    } else if (xEncrypted) {
-      s.log('Multiplying encrypt($x) x plain($mult)');
-      cipherResult = fhe.multiplyPlain(cipherX, plainMult);
-      s.log('Ciphertext size: ${cipherResult.size}');
-    } else if (multEncrypted) {
-      s.log('Multiplying plain($x) x encrypt($mult)');
-      cipherResult = fhe.multiplyPlain(ciphermult, plainX);
-      s.log('Ciphertext size: ${cipherResult.size}');
-    } else {
+    if (!xEncrypted && !multEncrypted) {
       s.log('Multiplying $x x $mult');
       final result = [];
       for (int i = 0; i < x.length; i++) {
@@ -147,6 +125,7 @@ String multiplyVecInt(SessionChanges s, List<int> x, List<int> mult, bool xEncry
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
       return result.join(',');
     }
+    Ciphertext cipherResult = multiplyCondition(s, plainX, plainMult, xEncrypted, multEncrypted);
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = fhe.decodeVecInt(plainResult, x.length);
@@ -165,33 +144,18 @@ String multiplyVecInt(SessionChanges s, List<int> x, List<int> mult, bool xEncry
 String multiplyVecDouble(SessionChanges s, List<double> x, List<double> mult, bool xEncrypted, bool multEncrypted) {
   Seal fhe = s.fhe;
 
+  if (fhe.scheme.name != 'ckks') {
+    return '${fhe.scheme.name.toUpperCase()} does not support double multiplication';
+  }
+
   // Convert to Hexidecimal
   try {
     s.logSession();
     final start = DateTime.now();
     final plainX = fhe.encodeVecDouble(x);
-    final cipherX = fhe.encrypt(plainX);
-
     final plainMult = fhe.encodeVecDouble(mult);
-    final ciphermult = fhe.encrypt(plainMult);
 
-    Ciphertext cipherResult;
-
-    if (xEncrypted && multEncrypted) {
-      s.log('Multiplying encrypt($x) x encrypt($mult)');
-      cipherResult = fhe.multiply(cipherX, ciphermult);
-      s.log('Ciphertext size: ${cipherResult.size}');
-      cipherResult = fhe.relinearize(cipherResult);
-      s.log('Ciphertext size (after relinearization): ${cipherResult.size}');
-    } else if (xEncrypted) {
-      s.log('Multiplying encrypt($x) x plain($mult)');
-      cipherResult = fhe.multiplyPlain(cipherX, plainMult);
-      s.log('Ciphertext size: ${cipherResult.size}');
-    } else if (multEncrypted) {
-      s.log('Multiplying plain($x) x encrypt($mult)');
-      cipherResult = fhe.multiplyPlain(ciphermult, plainX);
-      s.log('Ciphertext size: ${cipherResult.size}');
-    } else {
+    if (!xEncrypted && !multEncrypted) {
       s.log('Multiplying $x x $mult');
       final result = [];
       for (int i = 0; i < x.length; i++) {
@@ -200,6 +164,7 @@ String multiplyVecDouble(SessionChanges s, List<double> x, List<double> mult, bo
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
       return result.join(',');
     }
+    Ciphertext cipherResult = multiplyCondition(s, plainX, plainMult, xEncrypted, multEncrypted);
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = fhe.decodeVecDouble(plainResult, x.length);

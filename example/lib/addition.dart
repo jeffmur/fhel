@@ -2,6 +2,28 @@ import 'package:fhel/afhe.dart';
 import 'package:fhel/seal.dart' show Seal;
 import 'package:fhel_example/page/settings.dart';
 
+/// Conditionally add two [Plaintext] objects
+/// 
+/// At least one of the two integers must be encrypted.
+Ciphertext addCondition(SessionChanges s, Plaintext x, Plaintext add, bool xEncrypted, bool addEncrypted) {
+  Seal fhe = s.fhe;
+  Ciphertext cipherResult;
+  
+  if (xEncrypted && addEncrypted) {
+    s.log('Adding encrypt() + encrypt()');
+    cipherResult = fhe.add(fhe.encrypt(x), fhe.encrypt(add));
+  } else if (xEncrypted) {
+    s.log('Adding encrypt() + plain()');
+    cipherResult = fhe.addPlain(fhe.encrypt(x), add);
+  } else if (addEncrypted) {
+    s.log('Adding plain() + encrypt()');
+    cipherResult = fhe.addPlain(fhe.encrypt(add), x);
+  } else {
+    throw 'Both x and add cannot be plain'; // cannot return a Ciphertext
+  }
+  return cipherResult;
+}
+
 /// Add two integers
 ///
 /// Encrypts, adds, and decrypts the result,
@@ -15,32 +37,19 @@ String addAsHex(SessionChanges s, int x, int add, bool xEncrypted, bool addEncry
     final xRadix = x.toRadixString(16);
     s.log('Hex: $x -> $xRadix');
     final plainX = fhe.plain(xRadix);
-    final cipherX = fhe.encrypt(plainX);
 
     final addRadix = add.toRadixString(16);
     s.log('Hex: $add -> $addRadix');
     final plainAdd = fhe.plain(addRadix);
-    final cipherAdd = fhe.encrypt(plainAdd);
 
-    Ciphertext cipherResult;
-
-    if (xEncrypted && addEncrypted) {
-      s.log('Adding encrypt($x) + encrypt($add)');
-      cipherResult = fhe.add(cipherX, cipherAdd);
-    } else if (xEncrypted) {
-      s.log('Adding encrypt($x) + plain($add)');
-      cipherResult = fhe.addPlain(cipherX, plainAdd);
-    } else if (addEncrypted) {
-      s.log('Adding plain($x) + encrypt($add)');
-      cipherResult = fhe.addPlain(cipherAdd, plainX);
-    } else {
+    if (!xEncrypted && !addEncrypted) {
       s.log('Adding $x and $add');
       final result = (x + add).toString();
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
       return result;
     }
-
-    s.log('Ciphertext size: ${cipherResult.size}');
+    Ciphertext cipherResult = addCondition(s, plainX, plainAdd, xEncrypted, addEncrypted);
+    s.log('Ciphertext result size: ${cipherResult.size}');
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = int.parse(plainResult.text, radix: 16).toString();
@@ -65,30 +74,16 @@ String addDouble(SessionChanges s, double x, double add, bool xEncrypted, bool a
     s.logSession();
     final start = DateTime.now();
     final plainX = fhe.encodeDouble(x);
-    final cipherX = fhe.encrypt(plainX);
-
     final plainAdd = fhe.encodeDouble(add);
-    final cipherAdd = fhe.encrypt(plainAdd);
 
-    s.log('Ciphertext size: ${cipherX.size}');
-
-    Ciphertext cipherResult;
-
-    if (xEncrypted && addEncrypted) {
-      s.log('Adding encrypt($x) + encrypt($add)');
-      cipherResult = fhe.add(cipherX, cipherAdd);
-    } else if (xEncrypted) {
-      s.log('Adding encrypt($x) + plain($add)');
-      cipherResult = fhe.addPlain(cipherX, plainAdd);
-    } else if (addEncrypted) {
-      s.log('Adding plain($x) + encrypt($add)');
-      cipherResult = fhe.addPlain(cipherAdd, plainX);
-    } else {
+    if (!xEncrypted && !addEncrypted) {
       s.log('Adding $x and $add');
       final result = (x + add).toString();
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
       return result;
     }
+    Ciphertext cipherResult = addCondition(s, plainX, plainAdd, xEncrypted, addEncrypted);
+    s.log('Ciphertext result size: ${cipherResult.size}');
 
     final plainResult = fhe.decrypt(cipherResult);
     // Generates an array of doubles filled of size (slot count)
@@ -114,30 +109,16 @@ String addVectorInt(SessionChanges s, List<int> x, List<int> add, bool xEncrypte
     s.logSession();
     final start = DateTime.now();
     final plainX = fhe.encodeVecInt(x);
-    final cipherX = fhe.encrypt(plainX);
-
     final plainAdd = fhe.encodeVecInt(add);
-    final cipherAdd = fhe.encrypt(plainAdd);
 
-    s.log('Ciphertext size: ${cipherX.size}');
-
-    Ciphertext cipherResult;
-
-    if (xEncrypted && addEncrypted) {
-      s.log('Adding encrypt($x) + encrypt($add)');
-      cipherResult = fhe.add(cipherX, cipherAdd);
-    } else if (xEncrypted) {
-      s.log('Adding encrypt($x) + plain($add)');
-      cipherResult = fhe.addPlain(cipherX, plainAdd);
-    } else if (addEncrypted) {
-      s.log('Adding plain($x) + encrypt($add)');
-      cipherResult = fhe.addPlain(cipherAdd, plainX);
-    } else {
+    if (!xEncrypted && !addEncrypted) {
       s.log('Adding $x and $add');
       final result = (x + add).toString();
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
       return result;
     }
+    Ciphertext cipherResult = addCondition(s, plainX, plainAdd, xEncrypted, addEncrypted);
+    s.log('Ciphertext result size: ${cipherResult.size}');
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = fhe.decodeVecInt(plainResult, x.length);
@@ -162,30 +143,19 @@ String addVectorDouble(SessionChanges s, List<double> x, List<double> add, bool 
     s.logSession();
     final start = DateTime.now();
     final plainX = fhe.encodeVecDouble(x);
-    final cipherX = fhe.encrypt(plainX);
-
     final plainAdd = fhe.encodeVecDouble(add);
-    final cipherAdd = fhe.encrypt(plainAdd);
 
-    s.log('Ciphertext size: ${cipherX.size}');
-
-    Ciphertext cipherResult;
-
-    if (xEncrypted && addEncrypted) {
-      s.log('Adding encrypt($x) + encrypt($add)');
-      cipherResult = fhe.add(cipherX, cipherAdd);
-    } else if (xEncrypted) {
-      s.log('Adding encrypt($x) + plain($add)');
-      cipherResult = fhe.addPlain(cipherX, plainAdd);
-    } else if (addEncrypted) {
-      s.log('Adding plain($x) + encrypt($add)');
-      cipherResult = fhe.addPlain(cipherAdd, plainX);
-    } else {
+    if (!xEncrypted && !addEncrypted) {
       s.log('Adding $x and $add');
-      final result = (x + add).toString();
+      final result = [];
+      for (int i = 0; i < x.length; i++) {
+        result.add(x[i] + add[i]);
+      }
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
-      return result;
+      return result.join(',');
     }
+    Ciphertext cipherResult = addCondition(s, plainX, plainAdd, xEncrypted, addEncrypted);
+    s.log('Ciphertext result size: ${cipherResult.size}');
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = fhe.decodeVecDouble(plainResult, x.length);
