@@ -152,3 +152,53 @@ String subtractVecInt(SessionChanges s, List<int> x, List<int> sub, bool xEncryp
     return e.toString();
   }
 }
+
+/// Subtract two vectors of doubles
+/// 
+/// Encrypts, subtract, and decrypts the result,
+String subtractVecDouble(SessionChanges s, List<double> x, List<double> sub, bool xEncrypted, bool subEncrypted) {
+  Seal fhe = s.fhe;
+
+  // Convert to Hexidecimal
+  try {
+    s.logSession();
+    final start = DateTime.now();
+    final plainX = fhe.encodeVecDouble(x);
+    final cipherX = fhe.encrypt(plainX);
+
+    final plainSub = fhe.encodeVecDouble(sub);
+    final cipherSub = fhe.encrypt(plainSub);
+
+    Ciphertext cipherResult;
+
+    if (xEncrypted && subEncrypted) {
+      s.log('Subtracts encrypt($x) - encrypt($sub)');
+      cipherResult = fhe.subtract(cipherX, cipherSub);
+    } else if (xEncrypted) {
+      s.log('Subtracts encrypt($x) - plain($sub)');
+      cipherResult = fhe.subtractPlain(cipherX, plainSub);
+    } else if (subEncrypted) {
+      s.log('Subtracts plain($x) - encrypt($sub)');
+      cipherResult = fhe.subtractPlain(cipherSub, plainX);
+    } else {
+      s.log('Subtracts $x and $sub');
+      final result = [];
+      for (int i = 0; i < x.length; i++) {
+        result.add(x[i] - sub[i]);
+      }
+      s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
+      return result.join(',');
+    }
+
+    s.log('Ciphertext size: ${cipherResult.size}');
+
+    final plainResult = fhe.decrypt(cipherResult);
+    final result = fhe.decodeVecDouble(plainResult, x.length);
+    s.log('Result: $result');
+    s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
+    return result.join(',');
+  } catch (e) {
+    s.log(e.toString());
+    return e.toString();
+  }
+}
