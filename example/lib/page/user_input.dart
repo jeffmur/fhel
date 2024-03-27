@@ -99,7 +99,7 @@ class PromptNumberRow extends State<PromptNumber> {
           Padding(
             padding: const EdgeInsets.all(1.0),
             child: SizedBox(
-              width: 160,
+              width: WIDTH * 0.8,
               child: BooleanFormField(
                 key: isEncrypted,
                 initialValue: true,

@@ -1,3 +1,5 @@
+import 'package:fhel_example/multiplication.dart';
+import 'package:fhel_example/subtraction.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fhel_example/addition.dart';
@@ -48,6 +50,56 @@ Form listIntAdd(BuildContext context) {
                     }
                   },
                   child: const Text('+'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      session.clearLogs();
+                      final x = parseForUnsafeListInt(xP.currentState!.value);
+                      final y = parseForUnsafeListInt(yP.currentState!.value);
+                      List<int> expected = [];
+                      for (int i = 0; i < x.length; i++) {
+                        expected.add(x[i] * y[i]);
+                      }
+                      final actual = multiplyVecInt(session, x, y,
+                        xEncrypted.currentState!.value,
+                        yEncrypted.currentState!.value);
+                      List<int> actualList = parseForUnsafeListInt(actual);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: actual == expected.join(',')
+                              ? Text('Correct: $actualList')
+                              : Text(actual),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('x'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      session.clearLogs();
+                      final x = parseForUnsafeListInt(xP.currentState!.value);
+                      final y = parseForUnsafeListInt(yP.currentState!.value);
+                      List<int> expected = [];
+                      for (int i = 0; i < x.length; i++) {
+                        expected.add(x[i] - y[i]);
+                      }
+                      final actual = subtractVecInt(session, x, y,
+                        xEncrypted.currentState!.value,
+                        yEncrypted.currentState!.value);
+                      List<int> actualList = parseForUnsafeListInt(actual);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: actual == expected.join(',')
+                              ? Text('Correct: $actualList')
+                              : Text(actual),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('-'),
                 ),
               ],
             ),

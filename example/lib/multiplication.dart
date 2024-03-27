@@ -105,3 +105,56 @@ String multiplyDouble(SessionChanges s, double x, double mult, bool xEncrypted, 
     return e.toString();
   }
 }
+
+/// Multiply two lists of integers
+/// 
+/// Encrypts, multiplies, and decrypts the result,
+String multiplyVecInt(SessionChanges s, List<int> x, List<int> mult, bool xEncrypted, bool multEncrypted) {
+  Seal fhe = s.fhe;
+
+  // Convert to Hexidecimal
+  try {
+    s.logSession();
+    final start = DateTime.now();
+    final plainX = fhe.encodeVecInt(x);
+    final cipherX = fhe.encrypt(plainX);
+
+    final plainMult = fhe.encodeVecInt(mult);
+    final ciphermult = fhe.encrypt(plainMult);
+
+    Ciphertext cipherResult;
+
+    if (xEncrypted && multEncrypted) {
+      s.log('Multiplying encrypt($x) x encrypt($mult)');
+      cipherResult = fhe.multiply(cipherX, ciphermult);
+      s.log('Ciphertext size: ${cipherResult.size}');
+      cipherResult = fhe.relinearize(cipherResult);
+      s.log('Ciphertext size (after relinearization): ${cipherResult.size}');
+    } else if (xEncrypted) {
+      s.log('Multiplying encrypt($x) x plain($mult)');
+      cipherResult = fhe.multiplyPlain(cipherX, plainMult);
+      s.log('Ciphertext size: ${cipherResult.size}');
+    } else if (multEncrypted) {
+      s.log('Multiplying plain($x) x encrypt($mult)');
+      cipherResult = fhe.multiplyPlain(ciphermult, plainX);
+      s.log('Ciphertext size: ${cipherResult.size}');
+    } else {
+      s.log('Multiplying $x x $mult');
+      final result = [];
+      for (int i = 0; i < x.length; i++) {
+        result.add(x[i] * mult[i]);
+      }
+      s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
+      return result.join(',');
+    }
+
+    final plainResult = fhe.decrypt(cipherResult);
+    final result = fhe.decodeVecInt(plainResult, x.length);
+    s.log('Result: $result');
+    s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
+    return result.join(',');
+  } catch (e) {
+    s.log(e.toString());
+    return e.toString();
+  }
+}
