@@ -10,13 +10,13 @@ Ciphertext addCondition(SessionChanges s, Plaintext x, Plaintext add, bool xEncr
   Ciphertext cipherResult;
   
   if (xEncrypted && addEncrypted) {
-    s.log('Adding encrypt() + encrypt()');
+    s.log('Adding Ciphertext + Ciphertext');
     cipherResult = fhe.add(fhe.encrypt(x), fhe.encrypt(add));
   } else if (xEncrypted) {
-    s.log('Adding encrypt() + plain()');
+    s.log('Adding Ciphertext + Plaintext');
     cipherResult = fhe.addPlain(fhe.encrypt(x), add);
   } else if (addEncrypted) {
-    s.log('Adding plain() + encrypt()');
+    s.log('Adding Plaintext + Ciphertext');
     cipherResult = fhe.addPlain(fhe.encrypt(add), x);
   } else {
     throw 'Both x and add cannot be plain'; // cannot return a Ciphertext

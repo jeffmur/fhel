@@ -41,6 +41,9 @@ Form hexOp(BuildContext context) {
                           final actual = addAsHex(session, x, y,
                             xEncrypted.currentState!.value, 
                             yEncrypted.currentState!.value);
+                          if (actual != expected.toString()) {
+                            session.log('Failed: $actual != $expected');
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: actual == expected.toString()
@@ -67,7 +70,12 @@ Form hexOp(BuildContext context) {
                           final x = parseForUnsafeInt(xP.currentState!.value);
                           final y = parseForUnsafeInt(yP.currentState!.value);
                           final expected = x * y;
-                          final actual = multiplyAsHex(session, x, y, xEncrypted.currentState!.value, yEncrypted.currentState!.value);
+                          final actual = multiplyAsHex(session, x, y, 
+                            xEncrypted.currentState!.value,
+                            yEncrypted.currentState!.value);
+                          if (actual != expected.toString()) {
+                            session.log('Failed: $actual != $expected');
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: actual == expected.toString()
@@ -94,7 +102,12 @@ Form hexOp(BuildContext context) {
                           final x = parseForUnsafeInt(xP.currentState!.value);
                           final y = parseForUnsafeInt(yP.currentState!.value);
                           final expected = x - y;
-                          final actual = subtractAsHex(session, x, y, xEncrypted.currentState!.value, yEncrypted.currentState!.value);
+                          final actual = subtractAsHex(session, x, y,
+                            xEncrypted.currentState!.value,
+                            yEncrypted.currentState!.value);
+                          if (actual != expected.toString()) {
+                            session.log('Failed: $actual != $expected');
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: actual == expected.toString()

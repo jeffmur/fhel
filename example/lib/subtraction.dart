@@ -10,7 +10,7 @@ Ciphertext subtractCondition(SessionChanges s, Plaintext x, Plaintext sub, bool 
   Ciphertext cipherResult;
   
   if (xEncrypted && subEncrypted) {
-    s.log('Subtracts Ciphertext - Plaintext');
+    s.log('Subtracts Ciphertext - Ciphertext');
     cipherResult = fhe.subtract(fhe.encrypt(x), fhe.encrypt(sub));
   } else if (xEncrypted) {
     s.log('Subtracts Ciphertext - Plaintext');

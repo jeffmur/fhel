@@ -23,7 +23,7 @@ class LogScreen extends StatefulWidget {
 }
 
 bool isException(String log) {
-  return log.contains('Exception');
+  return log.contains('Exception') || log.contains('Failed') || log.contains('Error');
 }
 
 class LogListScreen extends State<LogScreen> {

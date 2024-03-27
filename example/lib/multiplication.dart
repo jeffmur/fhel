@@ -10,17 +10,17 @@ Ciphertext multiplyCondition(SessionChanges s, Plaintext x, Plaintext mult, bool
   Ciphertext cipherResult;
 
   if (xEncrypted && multEncrypted) {
-    s.log('Multiplying encrypt() x encrypt()');
+    s.log('Multiplying Ciphertext x Ciphertext');
     cipherResult = fhe.multiply(fhe.encrypt(x), fhe.encrypt(mult));
     s.log('Ciphertext size: ${cipherResult.size}');
     cipherResult = fhe.relinearize(cipherResult);
     s.log('Ciphertext size (after relinearization): ${cipherResult.size}');
   } else if (xEncrypted) {
-    s.log('Multiplying encrypt() x plain()');
+    s.log('Multiplying Ciphertext x Plaintext');
     cipherResult = fhe.multiplyPlain(fhe.encrypt(x), mult);
     s.log('Ciphertext size: ${cipherResult.size}');
   } else if (multEncrypted) {
-    s.log('Multiplying plain() x encrypt()');
+    s.log('Multiplying Plaintext x Ciphertext');
     cipherResult = fhe.multiplyPlain(fhe.encrypt(mult), x);
     s.log('Ciphertext size: ${cipherResult.size}');
   } else {

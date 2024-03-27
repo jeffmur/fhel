@@ -41,13 +41,21 @@ Form doubleOp(BuildContext context) {
                           session.clearLogs();
                           final x = parseForUnsafeDouble(xP.currentState!.value);
                           final y = parseForUnsafeDouble(yP.currentState!.value);
-                          final expected = x + y;
                           final actual = addDouble(session, x, y,
                             xEncrypted.currentState!.value, 
                             yEncrypted.currentState!.value);
+                          // Calculate the expected result with the highest precision
+                          final xPrecise = x.toString().split('.').last.length;
+                          final yPrecise = y.toString().split('.').last.length;
+                          final precision = xPrecise > yPrecise ? xPrecise : yPrecise;
+                          final expected = (x + y).toStringAsFixed(precision);
+                          final roundActual = double.parse(actual).toStringAsFixed(precision);
+                          if (roundActual != expected) {
+                            session.log('Failed: $roundActual != $expected');
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: actual == expected.toString()
+                              content: roundActual == expected
                                   ? Text('Correct: $actual')
                                   : Text(actual),
                             ),
@@ -70,13 +78,21 @@ Form doubleOp(BuildContext context) {
                           session.clearLogs();
                           final x = parseForUnsafeDouble(xP.currentState!.value);
                           final y = parseForUnsafeDouble(yP.currentState!.value);
-                          final expected = x * y;
                           final actual = multiplyDouble(session, x, y, 
                             xEncrypted.currentState!.value, 
                             yEncrypted.currentState!.value);
+                          // Calculate the expected result with the highest precision
+                          final xPrecise = x.toString().split('.').last.length;
+                          final yPrecise = y.toString().split('.').last.length;
+                          final precision = xPrecise > yPrecise ? xPrecise : yPrecise;
+                          final expected = (x * y).toStringAsFixed(precision);
+                          final roundActual = double.parse(actual).toStringAsFixed(precision);
+                          if (roundActual != expected) {
+                            session.log('Failed: $roundActual != $expected');
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: actual == expected.toString()
+                              content: roundActual == expected
                                   ? Text('Correct: $actual')
                                   : Text(actual),
                             ),
@@ -99,13 +115,21 @@ Form doubleOp(BuildContext context) {
                           session.clearLogs();
                           final x = parseForUnsafeDouble(xP.currentState!.value);
                           final y = parseForUnsafeDouble(yP.currentState!.value);
-                          final expected = x - y;
                           final actual = subtractDouble(session, x, y, 
                             xEncrypted.currentState!.value, 
                             yEncrypted.currentState!.value);
+                          // Calculate the expected result with the highest precision
+                          final xPrecise = x.toString().split('.').last.length;
+                          final yPrecise = y.toString().split('.').last.length;
+                          final precision = xPrecise > yPrecise ? xPrecise : yPrecise;
+                          final expected = (x - y).toStringAsFixed(precision);
+                          final roundActual = double.parse(actual).toStringAsFixed(precision);
+                          if (roundActual != expected) {
+                            session.log('Failed: $roundActual != $expected');
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: actual == expected.toString()
+                              content: roundActual == expected
                                   ? Text('Correct: $actual')
                                   : Text(actual),
                             ),
