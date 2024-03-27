@@ -103,7 +103,7 @@ String addDouble(SessionChanges s, double x, double add, bool xEncrypted, bool a
 }
 
 /// Add two vectors<int>
-String addVectorInt(SessionChanges s, List<int> x, List<int> add, {addPlain = false}) {
+String addVectorInt(SessionChanges s, List<int> x, List<int> add, bool xEncrypted, bool addEncrypted) {
   Seal fhe = s.fhe;
 
   if (fhe.scheme.name == 'ckks') {
@@ -122,9 +122,23 @@ String addVectorInt(SessionChanges s, List<int> x, List<int> add, {addPlain = fa
 
     s.log('Ciphertext size: ${cipherX.size}');
 
-    final cipherResult = addPlain
-        ? fhe.addPlain(cipherX, plainAdd)
-        : fhe.add(cipherX, cipherAdd);
+    Ciphertext cipherResult;
+
+    if (xEncrypted && addEncrypted) {
+      s.log('Adding encrypt($x) + encrypt($add)');
+      cipherResult = fhe.add(cipherX, cipherAdd);
+    } else if (xEncrypted) {
+      s.log('Adding encrypt($x) + plain($add)');
+      cipherResult = fhe.addPlain(cipherX, plainAdd);
+    } else if (addEncrypted) {
+      s.log('Adding plain($x) + encrypt($add)');
+      cipherResult = fhe.addPlain(cipherAdd, plainX);
+    } else {
+      s.log('Adding $x and $add');
+      final result = (x + add).toString();
+      s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
+      return result;
+    }
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = fhe.decodeVecInt(plainResult, x.length);

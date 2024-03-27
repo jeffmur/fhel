@@ -126,21 +126,29 @@ class PromptNumberRow extends State<PromptNumber> {
 class PromptList extends StatefulWidget {
   String label = 'not set';
   var ref = GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> isEncrypted;
+  bool isDouble = false;
 
-  PromptList(this.label, this.ref, {super.key});
+  PromptList(this.label, this.ref, this.isEncrypted, {super.key});
+
+  PromptList.double(this.label, this.ref, this.isEncrypted, {super.key}) {
+    isDouble = true;
+  }
 
   @override
   PromptListRow createState() {
     // ignore: no_logic_in_create_state
-    return PromptListRow(ref, label);
+    return PromptListRow(ref, label, isEncrypted, isDouble);
   }
 }
 
 class PromptListRow extends State<PromptList> {
   final GlobalKey<FormFieldState> _key;
+  final GlobalKey<FormFieldState> isEncrypted;
   String label;
+  bool isDouble;
 
-  PromptListRow(this._key, this.label);
+  PromptListRow(this._key, this.label, this.isEncrypted, this.isDouble);
 
   @override
   Widget build(BuildContext context) {
@@ -150,26 +158,32 @@ class PromptListRow extends State<PromptList> {
         child: Text('$label: '),
       ),
       SizedBox(
-          width: WIDTH * 1.75,
+          width: WIDTH,
           child: TextFormField(
             key: _key,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Enter a comma-delimited list of integers',
+            decoration: InputDecoration(
+              labelText: 'Comma-delimited list of ${isDouble ? 'doubles' : 'integers'}',
             ),
             validator: (value) {
-              return validateUnsafeListInt(value!);
+              return isDouble
+                ? validateUnsafeListDouble(value!)
+                : validateUnsafeListInt(value!);
             },
             onChanged: (value) => setState(() {}),
           )),
-      // Padding(
-      //   padding: const EdgeInsets.all(8.0),
-      //   child: Text(
-      //     _key.currentState != null
-      //         ? parseForUnsafeListInt(_key.currentState!.value).toString()
-      //         : '',
-      //   ),
-      // )
+          Padding(
+            padding: const EdgeInsets.all(1.0),
+            child: SizedBox(
+              width: 160,
+              child: BooleanFormField(
+                key: isEncrypted,
+                initialValue: true,
+                labelText: 'Encrypt',
+                onSaved: (value) => setState(() {}), 
+              )
+            )
+          ),
     ]);
   }
 }

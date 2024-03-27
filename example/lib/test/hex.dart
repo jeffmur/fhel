@@ -22,10 +22,6 @@ Form hexOp(BuildContext context) {
     child: SingleChildScrollView(
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text('Convert to Hexadecimal and Calculate.'),
-          ),
           PromptNumber.hex('X', xP, xEncrypted),
           PromptNumber.hex('Y', yP, yEncrypted),
           Row(

@@ -1,3 +1,5 @@
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'bottom_bar.dart';
@@ -6,7 +8,7 @@ import 'settings.dart';
 // Test pages
 import 'package:fhel_example/test/hex.dart';
 import 'package:fhel_example/test/double.dart';
-import 'package:fhel_example/test/add_list_int.dart';
+import 'package:fhel_example/test/list_int.dart';
 import 'package:fhel_example/test/add_list_double.dart';
 
 class HomePage extends StatelessWidget {
@@ -46,7 +48,7 @@ class TestSelection extends StatelessWidget {
       child: ListView(
         children: [
           const DrawerHeader(
-            child: Text('Tests')
+            child: Text('Data Types'),
           ),
           ListTile(
             title: const Text('Hexadecimal'),
@@ -67,7 +69,7 @@ class TestSelection extends StatelessWidget {
             },
           ),
           ListTile(
-            title: const Text('List<int> Addition'),
+            title: const Text('List<int>'),
             onTap: () {
               session.clearLogs();
               Navigator.of(context).push(MaterialPageRoute(
@@ -76,7 +78,7 @@ class TestSelection extends StatelessWidget {
             },
           ),
           ListTile(
-            title: const Text('List<double> Addition'),
+            title: const Text('List<double>'),
             onTap: () {
               session.clearLogs();
               Navigator.of(context).push(MaterialPageRoute(
@@ -142,7 +144,7 @@ class ListIntAdditionPage extends State<ListIntAddition> {
   Widget build(BuildContext context) {
     // final session = Provider.of<SessionChanges>(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('List<int> Addition')),
+      appBar: AppBar(title: const Text('List<int>')),
       drawer: const TestSelection(),
       body: listIntAdd(context));
   }
@@ -162,7 +164,7 @@ class ListDoubleAdditionPage extends State<ListDoubleAddition> {
   Widget build(BuildContext context) {
     // final session = Provider.of<SessionChanges>(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('List<double> Addition')),
+      appBar: AppBar(title: const Text('List<double>')),
       drawer: const TestSelection(),
       body: listDoubleAdd(context));
   }

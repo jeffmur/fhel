@@ -10,17 +10,15 @@ Form listDoubleAdd(BuildContext context) {
   final session = Provider.of<SessionChanges>(context);
   final xP = GlobalKey<FormFieldState>();
   final yP = GlobalKey<FormFieldState>();
-  final _formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
+  final xEncrypted = GlobalKey<FormFieldState>();
+  final yEncrypted = GlobalKey<FormFieldState>();
 
-  return Form(key: _formKey,
+  return Form(key: formKey,
     child: SingleChildScrollView(child: Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text('Encrypt and Add List of Doubles'),
-        ),
-        PromptList('x', xP),
-        PromptList('y', yP),
+        PromptList.double('x', xP, xEncrypted),
+        PromptList.double('y', yP, yEncrypted),
         Row(children: [
           Padding(
             padding: const EdgeInsets.all(1.0),
@@ -28,7 +26,7 @@ Form listDoubleAdd(BuildContext context) {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
+                    if (formKey.currentState!.validate()) {
                       session.clearLogs();
                       final x = parseForUnsafeListDouble(xP.currentState!.value);
                       final y = parseForUnsafeListDouble(yP.currentState!.value);
@@ -47,41 +45,11 @@ Form listDoubleAdd(BuildContext context) {
                       );
                     }
                   },
-                  child: const Text('Cipher(x) + Cipher(y)'),
+                  child: const Text('+'),
                 ),
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(1.0),
-            child: ButtonBar(
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      session.clearLogs();
-                      final x = parseForUnsafeListDouble(xP.currentState!.value);
-                      final y = parseForUnsafeListDouble(yP.currentState!.value);
-                      List<double> expected = [];
-                      for (int i = 0; i < x.length; i++) {
-                        expected.add(x[i] + y[i]);
-                      }
-                      final actual = addVectorDouble(session, x, y, addPlain: true);
-                      List<double> actualList = parseForUnsafeListDouble(actual);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: actual == expected.join(',')
-                              ? Text('Correct: $actualList')
-                              : Text(actual),
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text('Cipher(x) + Plain(y)'),
-                ),
-              ],
-            ),
-          )
         ],
       ),
       const Text('Logs'),
