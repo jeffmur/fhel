@@ -1,4 +1,4 @@
-package com.example.fhel_example
+package com.example.fhel_calculator
 
 import io.flutter.embedding.android.FlutterActivity
 

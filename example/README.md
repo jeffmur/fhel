@@ -1,8 +1,15 @@
-# fhel_example
+# Fully Homomorphic Encryption Calculator
 
 Demonstrates how to use the fhel plugin integrates into an Flutter Application.
 
-Supported OS Release: Android
+| Supported | Function
+| --- | ---
+| Platform | Android
+| Data Types | Hexadecimal, List[Int], Double, List[Double]
+| Schemes | BFV, BGV, CKKS
+| Mathematics | Add, Multiply, Subtract
+
+Note: Division has open [issue](https://github.com/jeffmur/fhel/issues/55)
 
 ## Getting Started
 
@@ -24,8 +31,17 @@ make build-cmake
 make apk
 ```
 
-## Artifacts
+## Demo
 
-In the provided code sample, [addition.dart](./lib/addition.dart), we expose `addInt` and `addVector`.
+To configure Microsoft SEAL, there are 3 supported schemes: BFV, BGV, and CKKS. If you'd like, there are default parameters available to get started.
 
-<img src="./res/bfv-addition.png" alt="BFV Addition Flutter App" width="50%">
+### Addition
+
+| Hexadecimal | Double | List[Int] | List[Double] |
+| --- | --- | --- | ---
+| ![](./res/HexadecimalAdd.gif) | ![](./res/DoubleAdd.gif) | ![](./res/HexadecimalAdd.gif) | ![](./res/DoubleAdd.gif) | 
+
+### Settings
+
+<img src="./res/SettingsPage.gif" alt="SettingsPage" width="50%">
+
