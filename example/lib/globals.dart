@@ -42,7 +42,11 @@ class Session {
     fhe = Seal(scheme);
     ctxStatus = fhe.genContext(ctx);
 
-    // Generate keys
+    if (ctxStatus != 'success: valid') {
+      throw Exception(ctxStatus);
+    }
+
+    // Generate Keys
     fhe.genKeys();
     fhe.genRelinKeys();
   }

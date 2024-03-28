@@ -24,8 +24,11 @@ make build-cmake
 make apk
 ```
 
-## Artifacts
+## Settings
 
-In the provided code sample, [addition.dart](./lib/addition.dart), we expose `addInt` and `addVector`.
+To configure Microsoft SEAL, there are 3 supported schemes: BFV, BGV, and CKKS. If you'd like, there are default parameters available to get started.
 
-<img src="./res/bfv-addition.png" alt="BFV Addition Flutter App" width="50%">
+
+<img src="./res/SettingsPage.gif" alt="SettingsPage" width="50%">
+
+

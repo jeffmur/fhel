@@ -1,3 +1,4 @@
+import 'package:fhel_example/page/log.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fhel/seal.dart';
@@ -44,8 +45,13 @@ class SessionChanges extends ChangeNotifier {
   String get relinKeys => _session.relinKeys;
 
   void validate(String scheme, Map context) {
-    _session = Session(scheme, context);
-    notifyListeners();
+    try {
+      _session = Session(scheme, context);
+      notifyListeners();
+    } catch (e) {
+      _session.ctxStatus = e.toString();
+      // _log.add(e.toString());
+    }
   }
 
   void log(String log) {
@@ -370,18 +376,16 @@ class ParameterForm extends State<ContextForm> {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.
                   _formKey.currentState!.save();
-                  // print("Before delete: $_context");
-                  // print("Before delete: $defaults");
-
                   dropUnusedDefaultKeys(_context);
-                  // print("After delete: $_context");
-                  // print("After delete: $defaults");
 
                   // Update session
                   session.validate(_scheme, _context);
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(session.status)),
+                    SnackBar(content: Text(session.status),
+                      backgroundColor: isException(session.status)
+                        ? const Color.fromARGB(255, 148, 0, 0)
+                        : const Color.fromARGB(255, 0, 84, 35)),
                   );
                 }
               },
