@@ -45,8 +45,17 @@ class TestSelection extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
-          const DrawerHeader(
-            child: Text('Data Types'),
+          DrawerHeader(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('FHE Calculator', style: TextStyle(fontSize: 20)),
+                const Padding(padding: EdgeInsets.all(5)),
+                const Text('Select a data type test to run using configured scheme.'),
+                const Padding(padding: EdgeInsets.all(5)),
+                Text('Current Scheme: ${session.fhe.scheme.name.toUpperCase()}'),
+              ],
+            )
           ),
           ListTile(
             title: const Text('Hexadecimal'),

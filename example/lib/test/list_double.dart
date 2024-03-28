@@ -50,13 +50,13 @@ Form listDoubleAdd(BuildContext context) {
                       final y = parseForUnsafeListDouble(yP.currentState!.value);
                       List<double> expected = [];
                       int prec = precision(x, y);
-                      session.log("Precision: $prec");
                       for (int i = 0; i < x.length; i++) {
                         expected.add(x[i] + y[i]);
                       }
                       final actual = addVectorDouble(session, x, y,
                         xEncrypted.currentState!.value, 
                         yEncrypted.currentState!.value);
+                      session.log("Precision: $prec");
                       List<double> actualList = parseForUnsafeListDouble(actual);
                       // round all elements to the largest precision
                       for (int i = 0; i < actualList.length; i++) {
@@ -65,7 +65,6 @@ Form listDoubleAdd(BuildContext context) {
                       
                       if (actualList.join(',') != expected.join(',')) {
                         session.log('Failed: $actualList != $expected');
-                        session.log(expected.join(','));
                       }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -89,10 +88,10 @@ Form listDoubleAdd(BuildContext context) {
                         expected.add(x[i] * y[i]);
                       }
                       int prec = precision(x, y);
-                      session.log("Precision: $prec");
                       final actual = multiplyVecDouble(session, x, y,
                         xEncrypted.currentState!.value,
                         yEncrypted.currentState!.value);
+                      session.log("Precision: $prec");
                       List<double> actualList = parseForUnsafeListDouble(actual);
                       // round all elements to the largest precision
                       for (int i = 0; i < actualList.length; i++) {
@@ -100,7 +99,6 @@ Form listDoubleAdd(BuildContext context) {
                       }
                       if (actualList.join(',') != expected.join(',')) {
                         session.log('Failed: $actualList != $expected');
-                        session.log(expected.join(','));
                       }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -124,10 +122,10 @@ Form listDoubleAdd(BuildContext context) {
                         expected.add(x[i] - y[i]);
                       }
                       int prec = precision(x, y);
-                      session.log("Precision: $prec");
                       final actual = subtractVecDouble(session, x, y,
                         xEncrypted.currentState!.value,
                         yEncrypted.currentState!.value);
+                      session.log("Precision: $prec");
                       List<double> actualList = parseForUnsafeListDouble(actual);
                       // round all elements to the largest precision
                       for (int i = 0; i < actualList.length; i++) {
@@ -135,7 +133,6 @@ Form listDoubleAdd(BuildContext context) {
                       }
                       if (actualList.join(',') != expected.join(',')) {
                         session.log('Failed: $actualList != $expected');
-                        session.log(expected.join(','));
                       }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

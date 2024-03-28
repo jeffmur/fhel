@@ -5,17 +5,25 @@ import 'package:fhel/seal.dart';
 const double WIDTH = 200;
 
 // Default context based on scheme
-Map ckks = {
+final Map ckks = {
   'polyModDegree': 8192,
   'encodeScalar': pow(2, 40),
   'qSizes': [60, 40, 40, 60]
 };
 
 // BFV / BGV with batching enabled
-Map batching = {'polyModDegree': 4096, 'ptModBit': 20, 'secLevel': 128};
+final Map batchingBV = {
+  'polyModDegree': 4096,
+  'ptModBit': 20,
+  'secLevel': 128
+};
 
 // BFV / BGV with batching disabled
-Map plainModulus = {'polyModDegree': 4096, 'ptMod': 4096, 'secLevel': 128};
+final Map noBatchingBV = {
+  'polyModDegree': 4096,
+  'ptMod': 4096,
+  'secLevel': 128
+};
 
 // Store the parameters that are used within the session
 
@@ -32,7 +40,6 @@ class Session {
   /// When [ctx] is empty, use default parameters based on the [scheme]
   Session(this.scheme, this.ctx) {
     fhe = Seal(scheme);
-    print("Set $ctx");
     ctxStatus = fhe.genContext(ctx);
 
     // Generate keys
@@ -51,4 +58,4 @@ class Session {
 }
 
 /// Global session
-Session globalSession = Session('bfv', batching);
+Session globalSession = Session('bfv', {'polyModDegree': 4096, 'ptModBit': 20, 'secLevel': 128});

@@ -99,48 +99,101 @@ class ParameterForm extends State<ContextForm> {
   bool isBatchingEnabled = true;
   bool isDefaultParams = false;
 
-  void defaultContext() {
-    Map defaults = switch (_scheme) {
+  Map get defaults {
+    return switch (_scheme) {
       'ckks' => ckks,
-      // BFV / BGV
-      _ => isBatchingEnabled ? batching : plainModulus
+      'bfv' => isBatchingEnabled ? batchingBV : noBatchingBV,
+      'bgv' => isBatchingEnabled ? batchingBV : noBatchingBV,
+      _ => throw Exception('Invalid scheme')
     };
+  }
 
-    print("$_scheme defaults? $defaults");
+  void dropUnusedDefaultKeys(Map map) {
+    if (_scheme == 'ckks') {
+      map.remove('ptMod');
+      map.remove('ptModBit');
+      map.remove('secLevel');
+    } else {
+      map.remove('encodeScalar');
+      map.remove('qSizes');
+    }
+  }
+
+  /// encoderScalar is only used for CKKS
+  void setDefaultScalar() {
+    int defaultScalar = log(defaults['encodeScalar']) ~/ log(2);
+  
+    _scalar.currentState?.setState(() {
+      if (isDefaultParams) {
+        _scalar.currentState!.didChange(defaultScalar.toString());
+      } else {
+        _scalar.currentState!.didChange('');
+      }
+    });
+  }
+
+  /// qSizes is only used for CKKS
+  void setDefaultQSizes() {
+    String defaultQSizes = defaults['qSizes']?.join(',');
+    _coeffMod.currentState?.setState(() {
+      if (isDefaultParams) {
+        _coeffMod.currentState!.didChange(defaultQSizes);
+      } else {
+        _coeffMod.currentState!.didChange('');
+      }
+    });
+  }
+
+  /// plainModulus/Bit is used for BFV and BGV
+  /// 
+  /// plainModulus is used when batching is disabled
+  /// plainModulusBit is used when batching is enabled
+  void setDefaultPlainModulus(bool isBatching) {
+    int defaultPlainModulus = isBatching
+        ? defaults['ptModBit']
+        : defaults['ptMod'];
+
+    _plainMod.currentState?.setState(() {
+      if (isDefaultParams) {
+        _plainMod.currentState!.didChange(defaultPlainModulus.toString());
+      } else {
+        _plainMod.currentState!.didChange('');
+      }
+    });
+  }
+
+  /// secLevel is used for BFV and BGV
+  void setDefaultSecLevel() {
+    _secLevel.currentState?.setState(() {
+      if (isDefaultParams && _scheme != 'ckks') {
+        _secLevel.currentState!.didChange(defaults['secLevel'].toString());
+      } else {
+        _secLevel.currentState!.didChange('');
+      }
+    });
+  }
+
+  void defaultContext() {
+    // print("$_scheme defaults? $defaults");
+    // print("-> context? $_context");
 
     _polyModDegree.currentState?.setState(() {
       isDefaultParams
-          ? _polyModDegree.currentState!
-              .didChange(defaults['polyModDegree'].toString())
-          : _polyModDegree.currentState!.didChange('');
+        ? _polyModDegree.currentState!.didChange(defaults['polyModDegree'].toString())
+        : _polyModDegree.currentState!.didChange('');
     });
-    int defaultScalar =
-        _scheme != 'ckks' ? -1 : log(defaults['encodeScalar']) ~/ log(2);
-    _scalar.currentState?.setState(() {
-      isDefaultParams && _scheme == 'ckks'
-          ? _scalar.currentState!.didChange(defaultScalar.toString())
-          : _scalar.currentState!.didChange('');
-    });
-    String defaultQSizes =
-        _scheme != 'ckks' ? '' : defaults['qSizes']?.join(',');
-    _coeffMod.currentState?.setState(() {
-      isDefaultParams && _scheme == 'ckks'
-          ? _coeffMod.currentState!.didChange(defaultQSizes)
-          : _coeffMod.currentState!.didChange('');
-    });
-    _plainMod.currentState?.setState(() {
-      isDefaultParams && _scheme != 'ckks'
-          ? isBatchingEnabled
-              ? _plainMod.currentState!
-                  .didChange(defaults['ptModBit'].toString())
-              : _plainMod.currentState!.didChange(defaults['ptMod'].toString())
-          : _plainMod.currentState!.didChange('');
-    });
-    _secLevel.currentState?.setState(() {
-      isDefaultParams && _scheme != 'ckks'
-          ? _secLevel.currentState!.didChange(defaults['secLevel'].toString())
-          : _secLevel.currentState!.didChange('');
-    });
+    
+    // CKKS
+    if (_scheme == 'ckks') {
+      setDefaultScalar();
+      setDefaultQSizes();
+    }
+
+    // BFV / BGV
+    if (_scheme == 'bfv' || _scheme == 'bgv') {
+      setDefaultPlainModulus(isBatchingEnabled);
+      setDefaultSecLevel();
+    }
   }
 
   @override
@@ -186,7 +239,7 @@ class ParameterForm extends State<ContextForm> {
                 setState(() {
                   _scheme = value.toString();
                   isDefaultParams = false;
-                  defaultContext();
+                  // defaultContext();
                 });
               },
             ),
@@ -218,8 +271,8 @@ class ParameterForm extends State<ContextForm> {
                 if (isDefaultParams) return null;
                 return validateUnsafeInt(value!);
               },
-              onSaved: (newValue) =>
-                  _context['polyModDegree'] = int.parse(newValue!),
+              onSaved: (newValue) => 
+                _context['polyModDegree'] = int.parse(newValue!),
             ),
           ),
           Visibility(
@@ -236,7 +289,7 @@ class ParameterForm extends State<ContextForm> {
                   return validateUnsafeInt(value!);
                 },
                 onSaved: (newValue) =>
-                    _context['encodeScalar'] = pow(2, int.parse(newValue!)),
+                  _context['encodeScalar'] = pow(2, int.parse(newValue!))
               ),
             ),
           ),
@@ -254,8 +307,8 @@ class ParameterForm extends State<ContextForm> {
                   if (isDefaultParams) return null;
                   return validateUnsafeListInt(value!);
                 },
-                onSaved: (value) => _context['qSizes'] =
-                    value!.split(',').map(int.parse).toList(),
+                onSaved: (value) =>
+                  _context['qSizes'] = value!.split(',').map(int.parse).toList()
               ),
             ),
           ),
@@ -303,9 +356,8 @@ class ParameterForm extends State<ContextForm> {
                   if (isDefaultParams) return null;
                   return validateUnsafeInt(value!);
                 },
-                onSaved: (value) {
-                  _context['secLevel'] = int.parse(value!);
-                },
+                onSaved: (value) =>
+                  _context['secLevel'] = int.parse(value!),
               ),
             ),
           ),
@@ -318,6 +370,13 @@ class ParameterForm extends State<ContextForm> {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.
                   _formKey.currentState!.save();
+                  // print("Before delete: $_context");
+                  // print("Before delete: $defaults");
+
+                  dropUnusedDefaultKeys(_context);
+                  // print("After delete: $_context");
+                  // print("After delete: $defaults");
+
                   // Update session
                   session.validate(_scheme, _context);
 
