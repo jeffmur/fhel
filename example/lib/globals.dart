@@ -1,8 +1,14 @@
 import 'dart:math';
 import 'package:fhel/seal.dart';
+import 'package:fhel_example/page/settings.dart';
+import 'package:flutter/material.dart';
 
 // ignore: constant_identifier_names
 const double WIDTH = 200;
+
+const Color successColor = Color.fromARGB(255, 0, 84, 35);
+
+const Color errorColor = Color.fromARGB(255, 148, 0, 0);
 
 // Default context based on scheme
 final Map ckks = {
@@ -24,6 +30,26 @@ final Map noBatchingBV = {
   'ptMod': 4096,
   'secLevel': 128
 };
+
+/// Display a status banner and log [onFailure] message
+/// 
+/// If the operation is correct, display the actual result.
+/// Otherwise, display the failure message.
+ScaffoldFeatureController statusBanner(BuildContext context, SessionChanges session, bool isCorrect, String onSuccess, String onFailure) {
+  if (!isCorrect) {
+    session.log(onFailure);
+  }
+  return ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: isCorrect
+        ? Text(onSuccess)
+        : Text(onFailure),
+      backgroundColor: isCorrect
+        ? successColor
+        : errorColor,
+    )
+  );
+}
 
 // Store the parameters that are used within the session
 

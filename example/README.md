@@ -31,4 +31,3 @@ To configure Microsoft SEAL, there are 3 supported schemes: BFV, BGV, and CKKS. 
 
 <img src="./res/SettingsPage.gif" alt="SettingsPage" width="50%">
 
-

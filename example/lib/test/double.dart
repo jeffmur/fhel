@@ -1,8 +1,9 @@
-import 'package:fhel_example/subtraction.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fhel_example/globals.dart';
 import 'package:fhel_example/addition.dart';
 import 'package:fhel_example/multiplication.dart';
+import 'package:fhel_example/subtraction.dart';
 import 'package:fhel_example/page/user_input.dart';
 import 'package:fhel_example/page/utils.dart';
 import 'package:fhel_example/page/log.dart';
@@ -50,16 +51,8 @@ Form doubleOp(BuildContext context) {
                           final precision = xPrecise > yPrecise ? xPrecise : yPrecise;
                           final expected = (x + y).toStringAsFixed(precision);
                           final roundActual = double.parse(actual).toStringAsFixed(precision);
-                          if (roundActual != expected) {
-                            session.log('Failed: $roundActual != $expected');
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: roundActual == expected
-                                  ? Text('Correct: $actual')
-                                  : Text(actual),
-                            ),
-                          );
+                          statusBanner(context, session, roundActual == expected, 
+                            'Correct: $expected', 'Failed: $roundActual != $expected');
                         }
                       },
                       child: const Text('+'),
@@ -87,16 +80,8 @@ Form doubleOp(BuildContext context) {
                           final precision = xPrecise > yPrecise ? xPrecise : yPrecise;
                           final expected = (x * y).toStringAsFixed(precision);
                           final roundActual = double.parse(actual).toStringAsFixed(precision);
-                          if (roundActual != expected) {
-                            session.log('Failed: $roundActual != $expected');
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: roundActual == expected
-                                  ? Text('Correct: $actual')
-                                  : Text(actual),
-                            ),
-                          );
+                          statusBanner(context, session, roundActual == expected, 
+                            'Correct: $expected', 'Failed: $roundActual != $expected');
                         }
                       },
                       child: const Text('x'),
@@ -124,16 +109,8 @@ Form doubleOp(BuildContext context) {
                           final precision = xPrecise > yPrecise ? xPrecise : yPrecise;
                           final expected = (x - y).toStringAsFixed(precision);
                           final roundActual = double.parse(actual).toStringAsFixed(precision);
-                          if (roundActual != expected) {
-                            session.log('Failed: $roundActual != $expected');
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: roundActual == expected
-                                  ? Text('Correct: $actual')
-                                  : Text(actual),
-                            ),
-                          );
+                          statusBanner(context, session, roundActual == expected, 
+                            'Correct: $expected', 'Failed: $roundActual != $expected');
                         }
                       },
                       child: const Text('-', style: TextStyle(fontSize: 20)),

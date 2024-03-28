@@ -1,6 +1,7 @@
 import 'package:fhel_example/subtraction.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fhel_example/globals.dart';
 import 'package:fhel_example/addition.dart';
 import 'package:fhel_example/multiplication.dart';
 import 'package:fhel_example/page/user_input.dart';
@@ -41,16 +42,8 @@ Form hexOp(BuildContext context) {
                           final actual = addAsHex(session, x, y,
                             xEncrypted.currentState!.value, 
                             yEncrypted.currentState!.value);
-                          if (actual != expected.toString()) {
-                            session.log('Failed: $actual != $expected');
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: actual == expected.toString()
-                                  ? Text('Correct: $actual')
-                                  : Text(actual),
-                            ),
-                          );
+                          statusBanner(context, session, actual == expected.toString(), 
+                            'Correct: $expected', 'Failed: $actual != $expected');
                         }
                       },
                       child: const Text('+'),
@@ -73,16 +66,8 @@ Form hexOp(BuildContext context) {
                           final actual = multiplyAsHex(session, x, y, 
                             xEncrypted.currentState!.value,
                             yEncrypted.currentState!.value);
-                          if (actual != expected.toString()) {
-                            session.log('Failed: $actual != $expected');
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: actual == expected.toString()
-                                  ? Text('Correct: $actual')
-                                  : Text(actual),
-                            ),
-                          );
+                          statusBanner(context, session, actual == expected.toString(), 
+                            'Correct: $expected', 'Failed: $actual != $expected');
                         }
                       },
                       child: const Text('x'),
@@ -105,16 +90,8 @@ Form hexOp(BuildContext context) {
                           final actual = subtractAsHex(session, x, y,
                             xEncrypted.currentState!.value,
                             yEncrypted.currentState!.value);
-                          if (actual != expected.toString()) {
-                            session.log('Failed: $actual != $expected');
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: actual == expected.toString()
-                                  ? Text('Correct: $actual')
-                                  : Text(actual),
-                            ),
-                          );
+                          statusBanner(context, session, actual == expected.toString(), 
+                            'Correct: $expected', 'Failed: $actual != $expected');
                         }
                       },
                       child: const Text('-', style: TextStyle(fontSize: 20)),

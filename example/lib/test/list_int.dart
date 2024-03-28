@@ -1,3 +1,4 @@
+import 'package:fhel_example/globals.dart';
 import 'package:fhel_example/multiplication.dart';
 import 'package:fhel_example/subtraction.dart';
 import 'package:flutter/material.dart';
@@ -40,16 +41,8 @@ Form listIntAdd(BuildContext context) {
                         xEncrypted.currentState!.value,
                         yEncrypted.currentState!.value);
                       List<int> actualList = parseForUnsafeListInt(actual);
-                      if (actual != expected.join(',')) {
-                        session.log('Failed: $actualList != $expected');
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: actual == expected.join(',')
-                              ? Text('Correct: $actualList')
-                              : Text(actual),
-                        ),
-                      );
+                      statusBanner(context, session, actual == expected.join(','), 
+                        'Correct: $actualList', 'Failed: $actualList != $expected');
                     }
                   },
                   child: const Text('+'),
@@ -68,16 +61,8 @@ Form listIntAdd(BuildContext context) {
                         xEncrypted.currentState!.value,
                         yEncrypted.currentState!.value);
                       List<int> actualList = parseForUnsafeListInt(actual);
-                      if (actual != expected.join(',')) {
-                        session.log('Failed: $actualList != $expected');
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: actual == expected.join(',')
-                              ? Text('Correct: $actualList')
-                              : Text(actual),
-                        ),
-                      );
+                      statusBanner(context, session, actual == expected.join(','), 
+                        'Correct: $actualList', 'Failed: $actualList != $expected');
                     }
                   },
                   child: const Text('x'),
@@ -96,16 +81,8 @@ Form listIntAdd(BuildContext context) {
                         xEncrypted.currentState!.value,
                         yEncrypted.currentState!.value);
                       List<int> actualList = parseForUnsafeListInt(actual);
-                      if (actual != expected.join(',')) {
-                        session.log('Failed: $actualList != $expected');
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: actual == expected.join(',')
-                              ? Text('Correct: $actualList')
-                              : Text(actual),
-                        ),
-                      );
+                      statusBanner(context, session, actual == expected.join(','), 
+                        'Correct: $actualList', 'Failed: $actualList != $expected');
                     }
                   },
                   child: const Text('-'),

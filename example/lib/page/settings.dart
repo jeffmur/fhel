@@ -384,8 +384,8 @@ class ParameterForm extends State<ContextForm> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(session.status),
                       backgroundColor: isException(session.status)
-                        ? const Color.fromARGB(255, 148, 0, 0)
-                        : const Color.fromARGB(255, 0, 84, 35)),
+                        ? errorColor
+                        : successColor),
                   );
                 }
               },
