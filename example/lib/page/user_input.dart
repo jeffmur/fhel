@@ -1,6 +1,6 @@
-import 'package:fhel_example/page/utils.dart';
+import 'package:fhel_calculator/page/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:fhel_example/globals.dart';
+import 'package:fhel_calculator/globals.dart';
 
 
 class BooleanFormField extends FormField<bool> {

@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:fhel/seal.dart';
-import 'package:fhel_example/page/settings.dart';
+import 'package:fhel_calculator/page/settings.dart';
 import 'package:flutter/material.dart';
 
 // ignore: constant_identifier_names

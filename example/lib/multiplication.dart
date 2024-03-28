@@ -1,6 +1,6 @@
 import 'package:fhel/afhe.dart';
 import 'package:fhel/seal.dart' show Seal;
-import 'package:fhel_example/page/settings.dart';
+import 'package:fhel_calculator/page/settings.dart';
 
 /// Conditionally multiply two [Plaintext] objects
 /// 

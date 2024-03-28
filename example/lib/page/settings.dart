@@ -1,10 +1,10 @@
-import 'package:fhel_example/page/log.dart';
+import 'package:fhel_calculator/page/log.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fhel/seal.dart';
 import 'dart:math';
-import 'package:fhel_example/page/utils.dart';
-import 'package:fhel_example/globals.dart';
+import 'package:fhel_calculator/page/utils.dart';
+import 'package:fhel_calculator/globals.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);

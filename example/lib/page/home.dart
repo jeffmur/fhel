@@ -4,10 +4,10 @@ import 'bottom_bar.dart';
 import 'settings.dart';
 
 // Test pages
-import 'package:fhel_example/test/hex.dart';
-import 'package:fhel_example/test/double.dart';
-import 'package:fhel_example/test/list_int.dart';
-import 'package:fhel_example/test/list_double.dart';
+import 'package:fhel_calculator/test/hex.dart';
+import 'package:fhel_calculator/test/double.dart';
+import 'package:fhel_calculator/test/list_int.dart';
+import 'package:fhel_calculator/test/list_double.dart';
 
 class HomePage extends StatelessWidget {
   final _tab1navigatorKey = GlobalKey<NavigatorState>();

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fhel_example/globals.dart';
-import 'package:fhel_example/addition.dart';
-import 'package:fhel_example/subtraction.dart';
-import 'package:fhel_example/multiplication.dart';
-import 'package:fhel_example/page/user_input.dart';
-import 'package:fhel_example/page/utils.dart';
-import 'package:fhel_example/page/log.dart';
-import 'package:fhel_example/page/settings.dart';
+import 'package:fhel_calculator/globals.dart';
+import 'package:fhel_calculator/addition.dart';
+import 'package:fhel_calculator/subtraction.dart';
+import 'package:fhel_calculator/multiplication.dart';
+import 'package:fhel_calculator/page/user_input.dart';
+import 'package:fhel_calculator/page/utils.dart';
+import 'package:fhel_calculator/page/log.dart';
+import 'package:fhel_calculator/page/settings.dart';
 
 int precision(List<double> x, List<double> y) {
   int precision = 0;
