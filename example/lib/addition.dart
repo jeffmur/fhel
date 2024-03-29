@@ -35,16 +35,17 @@ String addAsHex(SessionChanges s, int x, int add, bool xEncrypted, bool addEncry
     s.logSession();
     final start = DateTime.now();
     final xRadix = x.toRadixString(16);
-    s.log('Hex: $x -> $xRadix');
+    s.log('$x.toRadixString(16) => $xRadix');
     final plainX = fhe.plain(xRadix);
 
     final addRadix = add.toRadixString(16);
-    s.log('Hex: $add -> $addRadix');
+    s.log('$add.toRadixString(16) => $addRadix');
     final plainAdd = fhe.plain(addRadix);
 
     if (!xEncrypted && !addEncrypted) {
-      s.log('Adding $x and $add');
+      s.log('Adding Plaintext + Plaintext');
       final result = (x + add).toString();
+      s.log('Result: $result');
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
       return result;
     }
@@ -53,7 +54,7 @@ String addAsHex(SessionChanges s, int x, int add, bool xEncrypted, bool addEncry
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = int.parse(plainResult.text, radix: 16).toString();
-    s.log('Result: $result');
+    s.log('Decrypted result: $result');
     s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
     return result.toString();
   } catch (e) {
@@ -77,8 +78,9 @@ String addDouble(SessionChanges s, double x, double add, bool xEncrypted, bool a
     final plainAdd = fhe.encodeDouble(add);
 
     if (!xEncrypted && !addEncrypted) {
-      s.log('Adding $x and $add');
+      s.log('Adding Plaintext + Plaintext');
       final result = (x + add).toString();
+      s.log('Result: $result');
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
       return result;
     }
@@ -88,7 +90,7 @@ String addDouble(SessionChanges s, double x, double add, bool xEncrypted, bool a
     final plainResult = fhe.decrypt(cipherResult);
     // Generates an array of doubles filled of size (slot count)
     final result = fhe.decodeVecDouble(plainResult, 1).first;
-    s.log('Result: $result');
+    s.log('Decrypted result: $result');
     s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
     return result.toString();
   } catch (e) {
@@ -112,17 +114,21 @@ String addVectorInt(SessionChanges s, List<int> x, List<int> add, bool xEncrypte
     final plainAdd = fhe.encodeVecInt(add);
 
     if (!xEncrypted && !addEncrypted) {
-      s.log('Adding $x and $add');
-      final result = (x + add).toString();
+      final result = [];
+      s.log('Adding Plaintext + Plaintext');
+      for (int i = 0; i < x.length; i++) {
+        result.add(x[i] + add[i]);
+      }
+      s.log('Result: $result');
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
-      return result;
+      return result.join(',');
     }
     Ciphertext cipherResult = addCondition(s, plainX, plainAdd, xEncrypted, addEncrypted);
     s.log('Ciphertext result size: ${cipherResult.size}');
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = fhe.decodeVecInt(plainResult, x.length);
-    s.log('Result: $result');
+    s.log('Decrypted result: $result');
     s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
     return result.join(',');
   } catch (e) {
@@ -146,11 +152,12 @@ String addVectorDouble(SessionChanges s, List<double> x, List<double> add, bool 
     final plainAdd = fhe.encodeVecDouble(add);
 
     if (!xEncrypted && !addEncrypted) {
-      s.log('Adding $x and $add');
+      s.log('Adding Plaintext + Plaintext');
       final result = [];
       for (int i = 0; i < x.length; i++) {
         result.add(x[i] + add[i]);
       }
+      s.log('Result: $result');
       s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
       return result.join(',');
     }
@@ -159,7 +166,7 @@ String addVectorDouble(SessionChanges s, List<double> x, List<double> add, bool 
 
     final plainResult = fhe.decrypt(cipherResult);
     final result = fhe.decodeVecDouble(plainResult, x.length);
-    s.log('Result: $result');
+    s.log('Decrypted result: $result');
     s.log('Elapsed: ${DateTime.now().difference(start).inMilliseconds} ms');
     return result.join(',');
   } catch (e) {

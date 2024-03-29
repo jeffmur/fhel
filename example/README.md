@@ -37,10 +37,10 @@ make apk
 ### Addition
 
 <p float="center">
-  <img src="./res/add/HexadecimalAdd.gif" width="24%" />
-  <img src="./res/add/DoubleAdd.gif" width="24%" /> 
-  <img src="./res/add/ListIntAdd.gif" width="24%" />
-  <img src="./res/add/ListDoubleAdd.gif" width="24%" />
+  <img src="./res/add/Hexadecimal.gif" width="24%" />
+  <img src="./res/add/Double.gif" width="24%" /> 
+  <img src="./res/add/ListInt.gif" width="24%" />
+  <img src="./res/add/ListDouble.gif" width="24%" />
 </p>
 
 ### Multiplication
