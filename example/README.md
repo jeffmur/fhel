@@ -33,6 +33,7 @@ make apk
 
 ## Demo
 
+FHE Calculator aims to demonstrate how the basic mathematical operations behave with various supported data types. Using the Encrypt toggle, the input value may be handled as Plaintext / Ciphertext.
 
 ### Addition
 
