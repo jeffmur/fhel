@@ -33,15 +33,41 @@ make apk
 
 ## Demo
 
-To configure Microsoft SEAL, there are 3 supported schemes: BFV, BGV, and CKKS. If you'd like, there are default parameters available to get started.
 
 ### Addition
 
-| Hexadecimal | Double | List[Int] | List[Double] |
-| --- | --- | --- | ---
-| ![](./res/HexadecimalAdd.gif) | ![](./res/DoubleAdd.gif) | ![](./res/HexadecimalAdd.gif) | ![](./res/DoubleAdd.gif) | 
+<p float="center">
+  <img src="./res/add/HexadecimalAdd.gif" width="24%" />
+  <img src="./res/add/DoubleAdd.gif" width="24%" /> 
+  <img src="./res/add/ListIntAdd.gif" width="24%" />
+  <img src="./res/add/ListDoubleAdd.gif" width="24%" />
+</p>
+
+### Multiplication
+
+<p float="center">
+  <img src="./res/add/HexadecimalAdd.gif" width="24%" />
+  <img src="./res/add/DoubleAdd.gif" width="24%" /> 
+  <img src="./res/add/ListIntAdd.gif" width="24%" />
+  <img src="./res/add/ListDoubleAdd.gif" width="24%" />
+</p>
+
+### Subtraction
+
+<p float="center">
+  <img src="./res/add/HexadecimalAdd.gif" width="24%" />
+  <img src="./res/add/DoubleAdd.gif" width="24%" /> 
+  <img src="./res/add/ListIntAdd.gif" width="24%" />
+  <img src="./res/add/ListDoubleAdd.gif" width="24%" />
+</p>
+
 
 ### Settings
 
-<img src="./res/SettingsPage.gif" alt="SettingsPage" width="50%">
+To configure Microsoft SEAL, there are 3 supported schemes: BFV, BGV, and CKKS. If you'd like, there are default parameters available to get started. Toggling Default Parameters, will autofill default parameters. Once Validate is clicked, the parameters will be verified and keys will be generated.
+
+On success, a green banner will appear with 'success: valid'
+On failure, a red banner will appear with the corresponding error.
+
+<img src="./res/SettingsPage.gif" alt="SettingsPage" width="25%">
 
