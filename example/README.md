@@ -46,19 +46,19 @@ make apk
 ### Multiplication
 
 <p float="center">
-  <img src="./res/add/HexadecimalAdd.gif" width="24%" />
-  <img src="./res/add/DoubleAdd.gif" width="24%" /> 
-  <img src="./res/add/ListIntAdd.gif" width="24%" />
-  <img src="./res/add/ListDoubleAdd.gif" width="24%" />
+  <img src="./res/mul/Hexadecimal.gif" width="24%" />
+  <img src="./res/mul/ListInt.gif" width="24%" />
+  <img src="./res/mul/Double.gif" width="24%" /> 
+  <img src="./res/mul/ListDouble.gif" width="24%" />
 </p>
 
 ### Subtraction
 
 <p float="center">
-  <img src="./res/add/HexadecimalAdd.gif" width="24%" />
-  <img src="./res/add/DoubleAdd.gif" width="24%" /> 
-  <img src="./res/add/ListIntAdd.gif" width="24%" />
-  <img src="./res/add/ListDoubleAdd.gif" width="24%" />
+  <img src="./res/sub/Hexadecimal.gif" width="24%" />
+  <img src="./res/sub/ListInt.gif" width="24%" />
+  <img src="./res/sub/Double.gif" width="24%" /> 
+  <img src="./res/sub/ListDouble.gif" width="24%" />
 </p>
 
 
