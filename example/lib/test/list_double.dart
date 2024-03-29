@@ -25,13 +25,10 @@ int precision(List<double> x, List<double> y) {
   return precision;
 }
 
-Form listDoubleAdd(BuildContext context) {
+Form listDoubleAdd(BuildContext context, TextEditingController xP, TextEditingController yP,
+  GlobalKey<FormFieldState> xEncrypted, GlobalKey<FormFieldState> yEncrypted) {
   final session = Provider.of<SessionChanges>(context);
-  final xP = GlobalKey<FormFieldState>();
-  final yP = GlobalKey<FormFieldState>();
   final formKey = GlobalKey<FormState>();
-  final xEncrypted = GlobalKey<FormFieldState>();
-  final yEncrypted = GlobalKey<FormFieldState>();
 
   return Form(key: formKey,
     child: SingleChildScrollView(child: Column(
@@ -47,8 +44,8 @@ Form listDoubleAdd(BuildContext context) {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       session.clearLogs();
-                      final x = parseForUnsafeListDouble(xP.currentState!.value);
-                      final y = parseForUnsafeListDouble(yP.currentState!.value);
+                      final x = parseForUnsafeListDouble(xP.value.text);
+                      final y = parseForUnsafeListDouble(yP.value.text);
                       List<double> expected = [];
                       int prec = precision(x, y);
                       for (int i = 0; i < x.length; i++) {
@@ -74,8 +71,8 @@ Form listDoubleAdd(BuildContext context) {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       session.clearLogs();
-                      final x = parseForUnsafeListDouble(xP.currentState!.value);
-                      final y = parseForUnsafeListDouble(yP.currentState!.value);
+                      final x = parseForUnsafeListDouble(xP.value.text);
+                      final y = parseForUnsafeListDouble(yP.value.text);
                       List<double> expected = [];
                       int prec = precision(x, y);
                       for (int i = 0; i < x.length; i++) {
@@ -101,8 +98,8 @@ Form listDoubleAdd(BuildContext context) {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       session.clearLogs();
-                      final x = parseForUnsafeListDouble(xP.currentState!.value);
-                      final y = parseForUnsafeListDouble(yP.currentState!.value);
+                      final x = parseForUnsafeListDouble(xP.value.text);
+                      final y = parseForUnsafeListDouble(yP.value.text);
                       List<double> expected = [];
                       int prec = precision(x, y);
                       for (int i = 0; i < x.length; i++) {

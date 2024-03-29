@@ -9,13 +9,9 @@ import 'package:fhel_calculator/page/utils.dart';
 import 'package:fhel_calculator/page/log.dart';
 import 'package:fhel_calculator/page/settings.dart';
 
-Form doubleOp(BuildContext context) {
+Form doubleOp(BuildContext context, TextEditingController xP, TextEditingController yP,
+  GlobalKey<FormFieldState> xEncrypted, GlobalKey<FormFieldState> yEncrypted) {
   final session = Provider.of<SessionChanges>(context);
-  final xP = GlobalKey<FormFieldState>();
-  final yP = GlobalKey<FormFieldState>();
-  final xEncrypted = GlobalKey<FormFieldState>();
-  final yEncrypted = GlobalKey<FormFieldState>();
-
   final formKey = GlobalKey<FormState>();
 
   return Form(
@@ -40,8 +36,8 @@ Form doubleOp(BuildContext context) {
                         if (formKey.currentState!.validate()) {
                           // Calculate the sum of the two integers
                           session.clearLogs();
-                          final x = parseForUnsafeDouble(xP.currentState!.value);
-                          final y = parseForUnsafeDouble(yP.currentState!.value);
+                          final x = parseForUnsafeDouble(xP.value.text);
+                          final y = parseForUnsafeDouble(yP.value.text);
                           final actual = addDouble(session, x, y,
                             xEncrypted.currentState!.value, 
                             yEncrypted.currentState!.value);
@@ -69,8 +65,8 @@ Form doubleOp(BuildContext context) {
                         if (formKey.currentState!.validate()) {
                           // Calculate the sum of the two integers
                           session.clearLogs();
-                          final x = parseForUnsafeDouble(xP.currentState!.value);
-                          final y = parseForUnsafeDouble(yP.currentState!.value);
+                          final x = parseForUnsafeDouble(xP.value.text);
+                          final y = parseForUnsafeDouble(yP.value.text);
                           final actual = multiplyDouble(session, x, y, 
                             xEncrypted.currentState!.value, 
                             yEncrypted.currentState!.value);
@@ -98,8 +94,8 @@ Form doubleOp(BuildContext context) {
                         if (formKey.currentState!.validate()) {
                           // Calculate the sum of the two integers
                           session.clearLogs();
-                          final x = parseForUnsafeDouble(xP.currentState!.value);
-                          final y = parseForUnsafeDouble(yP.currentState!.value);
+                          final x = parseForUnsafeDouble(xP.value.text);
+                          final y = parseForUnsafeDouble(yP.value.text);
                           final actual = subtractDouble(session, x, y, 
                             xEncrypted.currentState!.value, 
                             yEncrypted.currentState!.value);

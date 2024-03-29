@@ -10,23 +10,23 @@ class BooleanFormField extends FormField<bool> {
     bool super.initialValue = false,
     String labelText = "Checkbox",
   }) : super(
-          autovalidateMode: AutovalidateMode.always,
-          builder: (FormFieldState<bool> state) {
-            return CheckboxListTile(
-              value: state.value,
-              onChanged: state.didChange,
-              subtitle: state.hasError
-                  ? Builder(
-                      builder: (BuildContext context) => Text(
-                        state.errorText!,
-                        style: TextStyle(color: Theme.of(context).errorColor),
-                      ),
-                    )
-                  : null,
-                title: Text(labelText),
-            );
-          },
-        );
+    autovalidateMode: AutovalidateMode.always,
+    builder: (FormFieldState<bool> state) {
+      return CheckboxListTile(
+        value: state.value,
+        onChanged: state.didChange,
+        subtitle: state.hasError
+            ? Builder(
+                builder: (BuildContext context) => Text(
+                  state.errorText!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              )
+            : null,
+          title: Text(labelText),
+      );
+    },
+  );
 }
 
 // Create a Form widget.
@@ -35,7 +35,7 @@ class PromptNumber extends StatefulWidget {
   bool allowDouble = false;
   bool showHex = false;
   String label = 'not set';
-  var ref = GlobalKey<FormFieldState>();
+  var ref = TextEditingController();
   var isEncrypted = GlobalKey<FormFieldState>();
 
   PromptNumber(this.label, this.ref, this.isEncrypted, {super.key});
@@ -56,13 +56,14 @@ class PromptNumber extends StatefulWidget {
 }
 
 class PromptNumberRow extends State<PromptNumber> {
-  final GlobalKey<FormFieldState> _key;
+  final TextEditingController controller;
   final GlobalKey<FormFieldState> isEncrypted;
   String label;
   bool showHex;
   bool allowDouble;
+  final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
 
-  PromptNumberRow(this.label, this._key, this.isEncrypted, this.showHex, this.allowDouble);
+  PromptNumberRow(this.label, this.controller, this.isEncrypted, this.showHex, this.allowDouble);
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +76,7 @@ class PromptNumberRow extends State<PromptNumber> {
           width: WIDTH,
           child: TextFormField(
             key: _key,
+            controller: controller,
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(
               labelText: 'Enter a number',
@@ -125,7 +127,7 @@ class PromptNumberRow extends State<PromptNumber> {
 // ignore: must_be_immutable
 class PromptList extends StatefulWidget {
   String label = 'not set';
-  var ref = GlobalKey<FormFieldState>();
+  var ref = TextEditingController();
   final GlobalKey<FormFieldState> isEncrypted;
   bool isDouble = false;
 
@@ -143,12 +145,12 @@ class PromptList extends StatefulWidget {
 }
 
 class PromptListRow extends State<PromptList> {
-  final GlobalKey<FormFieldState> _key;
+  final TextEditingController controller;
   final GlobalKey<FormFieldState> isEncrypted;
   String label;
   bool isDouble;
 
-  PromptListRow(this._key, this.label, this.isEncrypted, this.isDouble);
+  PromptListRow(this.controller, this.label, this.isEncrypted, this.isDouble);
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +162,7 @@ class PromptListRow extends State<PromptList> {
       SizedBox(
           width: WIDTH,
           child: TextFormField(
-            key: _key,
+            controller: controller,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               labelText: 'Comma-delimited list of ${isDouble ? 'doubles' : 'integers'}',

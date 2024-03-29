@@ -109,12 +109,24 @@ class Hexadecimal extends StatefulWidget {
 }
 
 class HexidecimalOpPage extends State<Hexadecimal> {
+  final xP = TextEditingController();
+  final yP = TextEditingController();
+  final xEncrypted = GlobalKey<FormFieldState>();
+  final yEncrypted = GlobalKey<FormFieldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Hexadecimal')),
       drawer: const TestSelection(),
-      body: hexOp(context));
+      body: hexOp(context, xP, yP, xEncrypted, yEncrypted));
+  }
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    xP.dispose();
+    yP.dispose();
+    super.dispose();
   }
 }
 
@@ -128,12 +140,24 @@ class DoubleAddition extends StatefulWidget {
 }
 
 class DoubleAdditionPage extends State<DoubleAddition> {
+  final xP = TextEditingController();
+  final yP = TextEditingController();
+  final xEncrypted = GlobalKey<FormFieldState>();
+  final yEncrypted = GlobalKey<FormFieldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Double')),
       drawer: const TestSelection(),
-      body: doubleOp(context));
+      body: doubleOp(context, xP, yP, xEncrypted, yEncrypted));
+  }
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    xP.dispose();
+    yP.dispose();
+    super.dispose();
   }
 }
 
@@ -147,13 +171,25 @@ class ListIntAddition extends StatefulWidget {
 }
 
 class ListIntAdditionPage extends State<ListIntAddition> {
+  final xP = TextEditingController();
+  final yP = TextEditingController();
+  final xEncrypted = GlobalKey<FormFieldState>();
+  final yEncrypted = GlobalKey<FormFieldState>();
+
   @override
   Widget build(BuildContext context) {
     // final session = Provider.of<SessionChanges>(context);
     return Scaffold(
       appBar: AppBar(title: const Text('List<int>')),
       drawer: const TestSelection(),
-      body: listIntAdd(context));
+      body: listIntAdd(context, xP, yP, xEncrypted, yEncrypted));
+  }
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    xP.dispose();
+    yP.dispose();
+    super.dispose();
   }
 }
 
@@ -167,12 +203,24 @@ class ListDoubleAddition extends StatefulWidget {
 }
 
 class ListDoubleAdditionPage extends State<ListDoubleAddition> {
+  final xP = TextEditingController();
+  final yP = TextEditingController();
+  final xEncrypted = GlobalKey<FormFieldState>();
+  final yEncrypted = GlobalKey<FormFieldState>();
+
   @override
   Widget build(BuildContext context) {
     // final session = Provider.of<SessionChanges>(context);
     return Scaffold(
       appBar: AppBar(title: const Text('List<double>')),
       drawer: const TestSelection(),
-      body: listDoubleAdd(context));
+      body: listDoubleAdd(context, xP, yP, xEncrypted, yEncrypted));
+  }
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    xP.dispose();
+    yP.dispose();
+    super.dispose();
   }
 }

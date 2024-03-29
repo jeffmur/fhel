@@ -9,13 +9,10 @@ import 'package:fhel_calculator/page/utils.dart';
 import 'package:fhel_calculator/page/log.dart';
 import 'package:fhel_calculator/page/settings.dart';
 
-Form listIntAdd(BuildContext context) {
+Form listIntAdd(BuildContext context, TextEditingController xP, TextEditingController yP,
+  GlobalKey<FormFieldState> xEncrypted, GlobalKey<FormFieldState> yEncrypted) {
   final session = Provider.of<SessionChanges>(context);
-  final xP = GlobalKey<FormFieldState>();
-  final yP = GlobalKey<FormFieldState>();
   final formKey = GlobalKey<FormState>();
-  final xEncrypted = GlobalKey<FormFieldState>();
-  final yEncrypted = GlobalKey<FormFieldState>();
 
   return Form(key: formKey,
     child: SingleChildScrollView(child: Column(
@@ -31,8 +28,8 @@ Form listIntAdd(BuildContext context) {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       session.clearLogs();
-                      final x = parseForUnsafeListInt(xP.currentState!.value);
-                      final y = parseForUnsafeListInt(yP.currentState!.value);
+                      final x = parseForUnsafeListInt(xP.value.text);
+                      final y = parseForUnsafeListInt(yP.value.text);
                       List<int> expected = [];
                       for (int i = 0; i < x.length; i++) {
                         expected.add(x[i] + y[i]);
@@ -51,8 +48,8 @@ Form listIntAdd(BuildContext context) {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       session.clearLogs();
-                      final x = parseForUnsafeListInt(xP.currentState!.value);
-                      final y = parseForUnsafeListInt(yP.currentState!.value);
+                      final x = parseForUnsafeListInt(xP.value.text);
+                      final y = parseForUnsafeListInt(yP.value.text);
                       List<int> expected = [];
                       for (int i = 0; i < x.length; i++) {
                         expected.add(x[i] * y[i]);
@@ -71,8 +68,8 @@ Form listIntAdd(BuildContext context) {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       session.clearLogs();
-                      final x = parseForUnsafeListInt(xP.currentState!.value);
-                      final y = parseForUnsafeListInt(yP.currentState!.value);
+                      final x = parseForUnsafeListInt(xP.value.text);
+                      final y = parseForUnsafeListInt(yP.value.text);
                       List<int> expected = [];
                       for (int i = 0; i < x.length; i++) {
                         expected.add(x[i] - y[i]);

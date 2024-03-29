@@ -9,13 +9,11 @@ import 'package:fhel_calculator/page/utils.dart';
 import 'package:fhel_calculator/page/log.dart';
 import 'package:fhel_calculator/page/settings.dart';
 
-Form hexOp(BuildContext context) {
-  final session = Provider.of<SessionChanges>(context);
-  final xP = GlobalKey<FormFieldState>();
-  final yP = GlobalKey<FormFieldState>();
-  final xEncrypted = GlobalKey<FormFieldState>();
-  final yEncrypted = GlobalKey<FormFieldState>();
 
+
+Form hexOp(BuildContext context, TextEditingController xP, TextEditingController yP,
+  GlobalKey<FormFieldState> xEncrypted, GlobalKey<FormFieldState> yEncrypted) {
+  final session = Provider.of<SessionChanges>(context);
   final formKey = GlobalKey<FormState>();
 
   return Form(
@@ -36,8 +34,8 @@ Form hexOp(BuildContext context) {
                         if (formKey.currentState!.validate()) {
                           // Calculate the sum of the two integers
                           session.clearLogs();
-                          final x = parseForUnsafeInt(xP.currentState!.value);
-                          final y = parseForUnsafeInt(yP.currentState!.value);
+                          final x = parseForUnsafeInt(xP.value.text);
+                          final y = parseForUnsafeInt(yP.value.text);
                           final expected = x + y;
                           final actual = addAsHex(session, x, y,
                             xEncrypted.currentState!.value, 
@@ -60,8 +58,8 @@ Form hexOp(BuildContext context) {
                         if (formKey.currentState!.validate()) {
                           // Calculate the sum of the two integers
                           session.clearLogs();
-                          final x = parseForUnsafeInt(xP.currentState!.value);
-                          final y = parseForUnsafeInt(yP.currentState!.value);
+                          final x = parseForUnsafeInt(xP.value.text);
+                          final y = parseForUnsafeInt(yP.value.text);
                           final expected = x * y;
                           final actual = multiplyAsHex(session, x, y, 
                             xEncrypted.currentState!.value,
@@ -84,8 +82,8 @@ Form hexOp(BuildContext context) {
                         if (formKey.currentState!.validate()) {
                           // Calculate the sum of the two integers
                           session.clearLogs();
-                          final x = parseForUnsafeInt(xP.currentState!.value);
-                          final y = parseForUnsafeInt(yP.currentState!.value);
+                          final x = parseForUnsafeInt(xP.value.text);
+                          final y = parseForUnsafeInt(yP.value.text);
                           final expected = x - y;
                           final actual = subtractAsHex(session, x, y,
                             xEncrypted.currentState!.value,
