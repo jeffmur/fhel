@@ -38,8 +38,8 @@ make apk
 
 <p float="center">
   <img src="./res/add/Hexadecimal.gif" width="24%" />
-  <img src="./res/add/Double.gif" width="24%" /> 
   <img src="./res/add/ListInt.gif" width="24%" />
+  <img src="./res/add/Double.gif" width="24%" /> 
   <img src="./res/add/ListDouble.gif" width="24%" />
 </p>
 
