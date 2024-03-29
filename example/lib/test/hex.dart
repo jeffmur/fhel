@@ -1,9 +1,8 @@
-import 'package:fhel_calculator/subtraction.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fhel_calculator/globals.dart';
 import 'package:fhel_calculator/addition.dart';
 import 'package:fhel_calculator/multiplication.dart';
+import 'package:fhel_calculator/subtraction.dart';
 import 'package:fhel_calculator/page/user_input.dart';
 import 'package:fhel_calculator/page/utils.dart';
 import 'package:fhel_calculator/page/log.dart';
@@ -41,7 +40,10 @@ Form hexOp(BuildContext context, TextEditingController xP, TextEditingController
                             xEncrypted.currentState!.value, 
                             yEncrypted.currentState!.value);
                           statusBanner(context, session, actual == expected.toString(), 
-                            'Correct: $expected', 'Failed: $actual != $expected');
+                            'Correct: $expected',
+                            isException(actual) 
+                              ? actual 
+                              : 'Failed: $actual != $expected');
                         }
                       },
                       child: const Text('+'),
@@ -65,7 +67,10 @@ Form hexOp(BuildContext context, TextEditingController xP, TextEditingController
                             xEncrypted.currentState!.value,
                             yEncrypted.currentState!.value);
                           statusBanner(context, session, actual == expected.toString(), 
-                            'Correct: $expected', 'Failed: $actual != $expected');
+                            'Correct: $expected',
+                            isException(actual) 
+                              ? actual 
+                              : 'Failed: $actual != $expected');
                         }
                       },
                       child: const Text('x'),
@@ -89,7 +94,10 @@ Form hexOp(BuildContext context, TextEditingController xP, TextEditingController
                             xEncrypted.currentState!.value,
                             yEncrypted.currentState!.value);
                           statusBanner(context, session, actual == expected.toString(), 
-                            'Correct: $expected', 'Failed: $actual != $expected');
+                            'Correct: $expected',
+                            isException(actual) 
+                              ? actual 
+                              : 'Failed: $actual != $expected');
                         }
                       },
                       child: const Text('-', style: TextStyle(fontSize: 20)),

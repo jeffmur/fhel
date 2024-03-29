@@ -55,6 +55,10 @@ FHE Calculator aims to demonstrate how the basic mathematical operations behave 
 
 ### Subtraction
 
+Limitations:
+* Integer result cannot be below zero, so the resulting operation becomes MAX int modulo modulusDegree.
+* Cannot subtract Plaintext by Ciphertext, invalid operation.
+
 <p float="center">
   <img src="./res/sub/Hexadecimal.gif" width="24%" />
   <img src="./res/sub/ListInt.gif" width="24%" />

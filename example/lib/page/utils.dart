@@ -1,3 +1,29 @@
+import 'package:fhel_calculator/page/log.dart';
+import 'package:flutter/material.dart';
+import 'package:fhel_calculator/globals.dart';
+import 'package:fhel_calculator/page/settings.dart';
+
+/// Display a status banner
+/// 
+/// If the operation is correct, display the actual result.
+/// Otherwise, display the failure message.
+ScaffoldFeatureController statusBanner(BuildContext context, SessionChanges session, bool isCorrect, String onSuccess, String onFailure) {
+  // Log the last exception once
+  if (!isCorrect && !isException(session.logs.last)) {
+    session.log(onFailure);
+  }
+  return ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: isCorrect
+        ? Text(onSuccess)
+        : Text(onFailure),
+      backgroundColor: isCorrect
+        ? successColor
+        : errorColor,
+    )
+  );
+}
+
 /// Parse a string to an integer
 int parseForUnsafeInt(String value) {
   try {

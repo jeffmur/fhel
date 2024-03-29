@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fhel_calculator/globals.dart';
 import 'package:fhel_calculator/addition.dart';
 import 'package:fhel_calculator/multiplication.dart';
 import 'package:fhel_calculator/subtraction.dart';
@@ -48,7 +47,10 @@ Form doubleOp(BuildContext context, TextEditingController xP, TextEditingControl
                           final expected = (x + y).toStringAsFixed(precision);
                           final roundActual = double.parse(actual).toStringAsFixed(precision);
                           statusBanner(context, session, roundActual == expected, 
-                            'Correct: $expected', 'Failed: $roundActual != $expected');
+                            'Correct: $expected',
+                            isException(actual) 
+                              ? actual 
+                              : 'Failed: $roundActual != $expected');
                         }
                       },
                       child: const Text('+'),
@@ -77,7 +79,10 @@ Form doubleOp(BuildContext context, TextEditingController xP, TextEditingControl
                           final expected = (x * y).toStringAsFixed(precision);
                           final roundActual = double.parse(actual).toStringAsFixed(precision);
                           statusBanner(context, session, roundActual == expected, 
-                            'Correct: $expected', 'Failed: $roundActual != $expected');
+                            'Correct: $expected',
+                            isException(actual) 
+                              ? actual 
+                              : 'Failed: $roundActual != $expected');
                         }
                       },
                       child: const Text('x'),
@@ -106,7 +111,10 @@ Form doubleOp(BuildContext context, TextEditingController xP, TextEditingControl
                           final expected = (x - y).toStringAsFixed(precision);
                           final roundActual = double.parse(actual).toStringAsFixed(precision);
                           statusBanner(context, session, roundActual == expected, 
-                            'Correct: $expected', 'Failed: $roundActual != $expected');
+                            'Correct: $expected',
+                            isException(actual) 
+                              ? actual 
+                              : 'Failed: $roundActual != $expected');
                         }
                       },
                       child: const Text('-', style: TextStyle(fontSize: 20)),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fhel_calculator/globals.dart';
 import 'package:fhel_calculator/addition.dart';
 import 'package:fhel_calculator/subtraction.dart';
 import 'package:fhel_calculator/multiplication.dart';
@@ -62,7 +61,10 @@ Form listDoubleAdd(BuildContext context, TextEditingController xP, TextEditingCo
                         actualList[i] = double.parse(actualList[i].toStringAsFixed(prec));
                       }
                       statusBanner(context, session, actualList.join(',') == expected.join(','), 
-                        'Correct: $expected', 'Failed: $actualList != $expected');
+                        'Correct: $expected',
+                        isException(actual) 
+                          ? actual 
+                          : 'Failed: $actualList != $expected');
                     }
                   },
                   child: const Text('+'),
@@ -89,7 +91,10 @@ Form listDoubleAdd(BuildContext context, TextEditingController xP, TextEditingCo
                         actualList[i] = double.parse(actualList[i].toStringAsFixed(prec));
                       }
                       statusBanner(context, session, actualList.join(',') == expected.join(','), 
-                        'Correct: $expected', 'Failed: $actualList != $expected');
+                        'Correct: $expected',
+                        isException(actual) 
+                          ? actual 
+                          : 'Failed: $actualList != $expected');
                     }
                   },
                   child: const Text('x'),
@@ -116,7 +121,10 @@ Form listDoubleAdd(BuildContext context, TextEditingController xP, TextEditingCo
                         actualList[i] = double.parse(actualList[i].toStringAsFixed(prec));
                       }
                       statusBanner(context, session, actualList.join(',') == expected.join(','), 
-                        'Correct: $expected', 'Failed: $actualList != $expected');
+                        'Correct: $expected',
+                        isException(actual) 
+                          ? actual 
+                          : 'Failed: $actualList != $expected');
                     }
                   },
                   child: const Text('-'),

@@ -1,9 +1,8 @@
-import 'package:fhel_calculator/globals.dart';
-import 'package:fhel_calculator/multiplication.dart';
-import 'package:fhel_calculator/subtraction.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fhel_calculator/addition.dart';
+import 'package:fhel_calculator/multiplication.dart';
+import 'package:fhel_calculator/subtraction.dart';
 import 'package:fhel_calculator/page/user_input.dart';
 import 'package:fhel_calculator/page/utils.dart';
 import 'package:fhel_calculator/page/log.dart';
@@ -39,7 +38,10 @@ Form listIntAdd(BuildContext context, TextEditingController xP, TextEditingContr
                         yEncrypted.currentState!.value);
                       List<int> actualList = parseForUnsafeListInt(actual);
                       statusBanner(context, session, actual == expected.join(','), 
-                        'Correct: $actualList', 'Failed: $actualList != $expected');
+                        'Correct: $actualList',
+                        isException(actual) 
+                          ? actual 
+                          : 'Failed: $actual != $expected');
                     }
                   },
                   child: const Text('+'),
@@ -59,7 +61,10 @@ Form listIntAdd(BuildContext context, TextEditingController xP, TextEditingContr
                         yEncrypted.currentState!.value);
                       List<int> actualList = parseForUnsafeListInt(actual);
                       statusBanner(context, session, actual == expected.join(','), 
-                        'Correct: $actualList', 'Failed: $actualList != $expected');
+                        'Correct: $actualList',
+                        isException(actual) 
+                          ? actual 
+                          : 'Failed: $actual != $expected');
                     }
                   },
                   child: const Text('x'),
@@ -79,7 +84,10 @@ Form listIntAdd(BuildContext context, TextEditingController xP, TextEditingContr
                         yEncrypted.currentState!.value);
                       List<int> actualList = parseForUnsafeListInt(actual);
                       statusBanner(context, session, actual == expected.join(','), 
-                        'Correct: $actualList', 'Failed: $actualList != $expected');
+                        'Correct: $actualList',
+                        isException(actual) 
+                          ? actual 
+                          : 'Failed: $actual != $expected');
                     }
                   },
                   child: const Text('-'),
