@@ -1,3 +1,7 @@
+## 0.0.4-linux
+
+Testing linux release
+
 ## 0.0.4
 
 CKKS Scheme

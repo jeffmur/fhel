@@ -14,6 +14,7 @@ Testing/
 
 # Dart
 pubspec.lock
+bin/
 
 # IntelliJ related
 *.iml
@@ -36,6 +37,7 @@ pubspec.lock
 
 # Library Compilation
 build/
+dist/
 
 # Testing
 examples/hello_seal
