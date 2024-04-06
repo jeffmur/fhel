@@ -19,6 +19,17 @@ A Fully Homomorphic Encryption Library (FHEL) interface that exposes the basic f
 
 To use this plugin, add `fhel` as a dependency in your pubspec.yaml
 
+### For Linux
+
+⚠️ Binary is not packaged for Linux distribution. The underlying C/C++ library must be compiled and stored in `bin/libfhel.so`. This only has to be done once.
+
+```bash
+$ dart pub get
+$ cd ~/.pub-cache/hosted/pub.dev/fhel-{VERSION}
+$ make dist
+$ cp dart/bin /path/to/working/directory
+```
+
 ```dart
 import 'package:fhel/seal.dart';
 
