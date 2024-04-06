@@ -7,7 +7,7 @@ library afhe;
 
 import 'dart:ffi';
 import 'package:ffi/ffi.dart'; // for Utf8
-import 'dart:io' show Directory, Platform;
+import 'dart:io' show Platform;
 import 'package:path/path.dart' as path;
 
 /// Components

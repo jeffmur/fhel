@@ -1,6 +1,6 @@
-## 0.0.4-linux
+## 0.0.5
 
-Testing linux release
+Target applications will need to compile Dynamic Library (libfhel.so / .dylib)
 
 ## 0.0.4
 
