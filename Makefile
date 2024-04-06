@@ -41,7 +41,7 @@ build-cmake: bin
 	@echo "Building project..."
 	@cmake -S . -B $(FHE_BUILD_DIR) -DUNIT_TEST=$(UNIT_TEST)
 	@cmake --build $(FHE_BUILD_DIR)
-	@mv $(FHE_BUILD_DIR)/libfhel* $(FHE_DIST)/
+	@cp $(FHE_BUILD_DIR)/libfhel* $(FHE_DIST)/
 
 # Install Dependencies and Build Project
 .PHONY: build
@@ -53,8 +53,7 @@ dist-cmake: bin
 	@echo "Creating a release from project..."
 	@cmake -S . -B $(FHE_RELEASE_DIR)
 	@cmake --build $(FHE_RELEASE_DIR)
-	@mv $(FHE_RELEASE_DIR)/libfhel* $(FHE_DIST)/
-
+	@cp $(FHE_RELEASE_DIR)/libfhel* $(FHE_DIST)/
 
 .PHONY: dist
 dist: dist-cmake
