@@ -24,6 +24,11 @@ trust-project:
 	@git config --global --add safe.directory $(PROJECT_ROOT)
 	@git submodule update --init --recursive
 
+.PHONY: bin
+bin:
+	@rm -rf $(FHE_DIST)
+	@mkdir $(FHE_DIST)
+
 # Install dependencies
 # .PHONY: install-deps
 # install-deps:
@@ -32,10 +37,11 @@ trust-project:
 # Build helper, e.g hello_world
 .PHONY: build-cmake
 build-cmake: UNIT_TEST ?= ON
-build-cmake:
+build-cmake: bin
 	@echo "Building project..."
 	@cmake -S . -B $(FHE_BUILD_DIR) -DUNIT_TEST=$(UNIT_TEST)
 	@cmake --build $(FHE_BUILD_DIR)
+	@mv $(FHE_BUILD_DIR)/libfhel* $(FHE_DIST)/
 
 # Install Dependencies and Build Project
 .PHONY: build
@@ -43,16 +49,15 @@ build: trust-project build-cmake
 
 # Release helper
 .PHONY: dist-cmake
-dist-cmake:
+dist-cmake: bin
 	@echo "Creating a release from project..."
 	@cmake -S . -B $(FHE_RELEASE_DIR)
 	@cmake --build $(FHE_RELEASE_DIR)
+	@mv $(FHE_RELEASE_DIR)/libfhel* $(FHE_DIST)/
+
 
 .PHONY: dist
 dist: dist-cmake
-	@rm -rf $(FHE_DIST)
-	@mkdir $(FHE_DIST)
-	@mv dist/lib* $(FHE_DIST)/
 
 # Generate html dart api docs
 .PHONY: docs

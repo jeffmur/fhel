@@ -4,14 +4,12 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project-level configuration.
-set(PROJECT_NAME "test")
+set(PROJECT_NAME "fhel")
 project(${PROJECT_NAME} LANGUAGES CXX)
-
-set(build_fhel_dir "${CMAKE_CURRENT_SOURCE_DIR}/../../build")
 
 # Invoke the build for native code shared with the other target platforms.
 # This can be changed to accommodate different builds.
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../src")
+target_link_libraries(${BINARY_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/../bin/libfhel.so")
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
