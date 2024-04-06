@@ -6,7 +6,7 @@
     * Used for building the Dart package
     * Enable GoogleTest if UNIT_TEST environment variable is set to ON
 ]]
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.10)
 
 # Set C++ standard, required by GoogleTest
 set(CMAKE_CXX_STANDARD 14)

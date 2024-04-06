@@ -2,7 +2,7 @@ name: fhel
 description: |-
   Natively supports Fully Homomorphic Encryption operations on sensitive data without revealing it. 
   Supports Key Derivation, Encryption, Decryption, and Mathematical operations.
-version: 0.0.4
+version: 0.0.4-linux
 repository: https://github.com/jeffmur/fhel
 
 environment:
@@ -27,6 +27,8 @@ flutter:
   plugin:
     platforms:
       android:
+        ffiPlugin: true
+      linux:
         ffiPlugin: true
   #
   # For details regarding assets in packages, see

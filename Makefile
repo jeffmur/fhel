@@ -1,16 +1,19 @@
 PROJECT_ROOT := $(shell pwd)
 DART_SRC ?= $(PROJECT_ROOT)/dart
+FHE_DIST ?= $(PROJECT_ROOT)/dart/bin
 FHE_LIB_SRC ?= $(PROJECT_ROOT)/src/backend
 FLUTTER_EXAMPLE ?= $(PROJECT_ROOT)/example
 
 # Abstraction Layer, e.g. hello_world
-AL_INSTALL_DIR ?= $(PROJECT_ROOT)/build
+FHE_BUILD_DIR ?= $(PROJECT_ROOT)/build
+FHE_RELEASE_DIR ?= $(PROJECT_ROOT)/dist
 
 # Clean up all artifacts for this project
 .PHONY: clean
 clean:
 	@echo "Cleaning project..."
-	@rm -rf $(AL_INSTALL_DIR)
+	@rm -rf $(FHE_BUILD_DIR)
+	@rm -rf $(FHE_RELEASE_DIR)
 	@echo "Cleaning dependencies..."
 	@cd $(FHE_LIB_SRC); $(MAKE) clean
 
@@ -21,6 +24,11 @@ trust-project:
 	@git config --global --add safe.directory $(PROJECT_ROOT)
 	@git submodule update --init --recursive
 
+.PHONY: bin
+bin:
+	@rm -rf $(FHE_DIST)
+	@mkdir $(FHE_DIST)
+
 # Install dependencies
 # .PHONY: install-deps
 # install-deps:
@@ -29,14 +37,26 @@ trust-project:
 # Build helper, e.g hello_world
 .PHONY: build-cmake
 build-cmake: UNIT_TEST ?= ON
-build-cmake:
+build-cmake: bin
 	@echo "Building project..."
-	@cmake -S . -B $(AL_INSTALL_DIR) -DUNIT_TEST=$(UNIT_TEST)
-	@cmake --build $(AL_INSTALL_DIR)
+	@cmake -S . -B $(FHE_BUILD_DIR) -DUNIT_TEST=$(UNIT_TEST)
+	@cmake --build $(FHE_BUILD_DIR)
+	@cp $(FHE_BUILD_DIR)/libfhel* $(FHE_DIST)/
 
 # Install Dependencies and Build Project
 .PHONY: build
 build: trust-project build-cmake
+
+# Release helper
+.PHONY: dist-cmake
+dist-cmake: bin
+	@echo "Creating a release from project..."
+	@cmake -S . -B $(FHE_RELEASE_DIR)
+	@cmake --build $(FHE_RELEASE_DIR)
+	@cp $(FHE_RELEASE_DIR)/libfhel* $(FHE_DIST)/
+
+.PHONY: dist
+dist: dist-cmake
 
 # Generate html dart api docs
 .PHONY: docs
@@ -52,19 +72,19 @@ publish:
 .PHONY: ctest
 ctest:
 	@echo "Testing cpp..."
-	@cd $(AL_INSTALL_DIR); ctest
+	@cd $(FHE_BUILD_DIR); ctest
 
 # Debug Abstract Layer (AFHEL)
 .PHONY: ctest-debug
 ctest-debug: build-cmake
 	@echo "Debugging cpp..."
-	@cd $(AL_INSTALL_DIR); ./seal_test
+	@cd $(FHE_BUILD_DIR); ./seal_test
 
 # SEAL Basics using the Abstraction Layer
 .PHONY: seal-basics
 seal-basics: build-cmake
 	@echo "SEAL basics..."
-	@cd $(AL_INSTALL_DIR); ./seal_basics
+	@cd $(FHE_BUILD_DIR); ./seal_basics
 
 # Test Implementation Layer (FHE)
 .PHONY: dtest
