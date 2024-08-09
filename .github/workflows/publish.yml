@@ -63,7 +63,7 @@ jobs:
         name: GitHub Release
         with:
           files: ${{ steps.dist.outputs.tar_gz_path }}
-          draft: false
+          draft: true
           prerelease: false
 
   # publish:

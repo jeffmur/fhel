@@ -209,7 +209,6 @@ class OS {
   static const windows = "windows";
   static const linux = "linux";
   static const android = "android";
-  static const fuchsia = "fuchsia";
   static const ios = "ios";
   static const macos = "macos";
 }

@@ -1,6 +1,5 @@
 PROJECT_ROOT := $(shell pwd)
 DART_SRC ?= $(PROJECT_ROOT)/dart
-FHE_DIST ?= $(PROJECT_ROOT)/dart/bin
 FHE_LIB_SRC ?= $(PROJECT_ROOT)/src/backend
 FLUTTER_EXAMPLE ?= $(PROJECT_ROOT)/example
 
@@ -24,24 +23,13 @@ trust-project:
 	@git config --global --add safe.directory $(PROJECT_ROOT)
 	@git submodule update --init --recursive
 
-.PHONY: bin
-bin:
-	@rm -rf $(FHE_DIST)
-	@mkdir $(FHE_DIST)
-
-# Install dependencies
-# .PHONY: install-deps
-# install-deps:
-# 	@cd $(FHE_LIB_SRC); BACKEND=seal $(MAKE) install
-
 # Build helper, e.g hello_world
 .PHONY: build-cmake
 build-cmake: UNIT_TEST ?= ON
-build-cmake: bin
+build-cmake:
 	@echo "Building project..."
 	@cmake -S . -B $(FHE_BUILD_DIR) -DUNIT_TEST=$(UNIT_TEST)
 	@cmake --build $(FHE_BUILD_DIR)
-	@cp $(FHE_BUILD_DIR)/libfhel* $(FHE_DIST)/
 
 # Install Dependencies and Build Project
 .PHONY: build
@@ -49,11 +37,8 @@ build: trust-project build-cmake
 
 # Release helper
 .PHONY: dist-cmake
-dist-cmake: bin
-	@echo "Creating a release from project..."
-	@cmake -S . -B $(FHE_RELEASE_DIR)
-	@cmake --build $(FHE_RELEASE_DIR)
-	# @cp $(FHE_RELEASE_DIR)/libfhel* $(FHE_DIST)/
+dist-cmake:
+	@make build-cmake UNIT_TEST=OFF
 
 .PHONY: dist
 dist: dist-cmake
@@ -62,7 +47,7 @@ dist: dist-cmake
 dist-ci: OUTPUT_FILE ?= libfhel-$(OS)-$(ARCH).tar.gz
 dist-ci: OUTPUT_PATH ?= $(FHE_RELEASE_DIR)/$(OUTPUT_FILE)
 dist-ci: dist-cmake
-	@tar -czvf $(OUTPUT_PATH) $(FHE_RELEASE_DIR)/libfhel*
+	@find $(FHE_RELEASE_DIR) -name 'libfhel*' -printf '%f\n' | tar -czvf $(OUTPUT_PATH) -C $(FHE_RELEASE_DIR) --files-from -
 	@echo "tar_gz_name=$(OUTPUT_FILE)" >> $(GITHUB_OUTPUT)
 	@echo "tar_gz_path=$(OUTPUT_PATH)" >> $(GITHUB_OUTPUT)
 
