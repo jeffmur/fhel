@@ -26,10 +26,11 @@ trust-project:
 # Build helper, e.g hello_world
 .PHONY: build-cmake
 build-cmake: UNIT_TEST ?= ON
+build-cmake: TARGET_DIR ?= $(FHE_BUILD_DIR)
 build-cmake:
 	@echo "Building project..."
-	@cmake -S . -B $(FHE_BUILD_DIR) -DUNIT_TEST=$(UNIT_TEST)
-	@cmake --build $(FHE_BUILD_DIR)
+	@cmake -S . -B $(TARGET_DIR) -DUNIT_TEST=$(UNIT_TEST)
+	@cmake --build $(TARGET_DIR)
 
 # Install Dependencies and Build Project
 .PHONY: build
@@ -37,8 +38,10 @@ build: trust-project build-cmake
 
 # Release helper
 .PHONY: dist-cmake
+dist-cmake: export UNIT_TEST ?= OFF
+dist-cmake: export TARGET_DIR ?= $(FHE_RELEASE_DIR)
 dist-cmake:
-	@make build-cmake UNIT_TEST=OFF
+	@make build-cmake
 
 .PHONY: dist
 dist: dist-cmake
