@@ -1,4 +1,12 @@
-## 0.0.4-linux
+## 0.0.6
+
+Added setup script to automate the process of setting up the library for the first time.
+
+```bash
+dart run fhel:setup <platform> --arch <architecture>
+```
+
+## 0.0.5
 
 Testing linux release
 

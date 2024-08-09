@@ -24,7 +24,7 @@ jobs:
             echo "Version mismatch: CMakeLists.txt: ${{ env.CMAKE_VER }} != dart/pubspec.yaml: ${{ env.PUB_VER }} != github.ref_name: ${{ github.ref_name }}"
             exit 1
           fi
-  compile:
+  binary:
     name: Binary
     needs: version
     strategy:
@@ -68,7 +68,7 @@ jobs:
 
   publish:
     name: pub.dev
-    needs: version
+    needs: [version, binary]
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/jeffmur/fhel:builder

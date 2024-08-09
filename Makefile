@@ -112,6 +112,6 @@ apk-ci: build-cmake
 
 # Publish dart package from github workflows
 .PHONY: publish-ci
-publish-ci: build-cmake
+publish-ci:
 	@git config --global --add safe.directory /tmp/flutter
 	@cd $(DART_SRC); $(MAKE) publish-force
