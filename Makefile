@@ -53,10 +53,19 @@ dist-cmake: bin
 	@echo "Creating a release from project..."
 	@cmake -S . -B $(FHE_RELEASE_DIR)
 	@cmake --build $(FHE_RELEASE_DIR)
-	@cp $(FHE_RELEASE_DIR)/libfhel* $(FHE_DIST)/
+	# @cp $(FHE_RELEASE_DIR)/libfhel* $(FHE_DIST)/
 
 .PHONY: dist
 dist: dist-cmake
+
+.PHONY: dist-ci
+dist-ci: OUTPUT_FILE ?= $(FHE_RELEASE_DIR)/libfhel-$(OS)-$(ARCH).tar.gz
+dist-ci: OUTPUT_PATH ?= $(FHE_RELEASE_DIR)/$(OUTPUT_FILE)
+dist-ci: dist-cmake
+    @tar -czvf $(OUTPUT_PATH) $(FHE_RELEASE_DIR)/libfhel*
+    @echo "name=$(OUTPUT_FILE)" >> $(GITHUB_OUTPUT)
+    @echo "path=$(OUTPUT_PATH)" >> $(GITHUB_OUTPUT)
+
 
 # Generate html dart api docs
 .PHONY: docs
