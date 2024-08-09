@@ -37,6 +37,7 @@ pubspec.lock
 # Library Compilation
 build/
 dist/
+libfhel*
 
 # Testing
 examples/hello_seal

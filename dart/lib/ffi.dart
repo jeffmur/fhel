@@ -1,20 +1,18 @@
 part of '../afhe.dart';
 
-const String _libName = 'fhel';
+const String _libraryName = 'fhel';
 
-/// Interop with the Abstract C FHE library via [dart:ffi](https://pub.dev/packages/ffi).
+// load native library
 final DynamicLibrary dylib = () {
-  // const pathPrefix = "bin";
-  if (Platform.isAndroid || Platform.isLinux) {
-    return DynamicLibrary.open('lib$_libName.so');
-    // return DynamicLibrary.open(path.absolute(pathPrefix, 'lib$_libName.so'));
-  }
-  if (Platform.isMacOS) {
-    return DynamicLibrary.open('lib$_libName.dylib');
-    // return DynamicLibrary.open(path.absolute(pathPrefix, 'lib$_libName.dylib'));
-  }
-  // if (Platform.isWindows) {
-  //   return DynamicLibrary.open('$_libName.dll');
-  // }
-  throw UnsupportedError('Unsupported platform: ${Platform.operatingSystem}');
+  if (Platform.isIOS) return DynamicLibrary.process();
+  final defaultLibPath = switch (Platform.operatingSystem) {
+    "windows" => "$_libraryName.dll",
+    "linux" || "android" => "lib$_libraryName.so",
+    "macos" => "lib$_libraryName.dylib",
+    _ => throw UnsupportedError(
+        "Platform ${Platform.operatingSystem} not supported",
+      )
+  };
+  final libPath = Platform.environment["FHEL_C_LIB_PATH"] ?? defaultLibPath;
+  return DynamicLibrary.open(libPath);
 }();
