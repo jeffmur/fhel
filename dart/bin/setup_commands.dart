@@ -31,8 +31,14 @@ abstract class BaseSetupCommand extends Command {
       [String? extractPath]) async {
     print(asInfo('Using package:$setupPkgName from $pkgRoot'));
 
-    final String version =
-        File(p.join(pkgRoot, "binary.version")).readAsStringSync();
+    // parse pubspec.yaml to get version
+    final String version = File(p.join(pkgRoot, "pubspec.yaml"))
+        .readAsStringSync()
+        .split("\n")
+        .firstWhere((line) => line.contains("version"))
+        .split(":")[1]
+        .trim()
+        .replaceAll("'", "");
     final libTarName = "lib$setupPkgName-$os-$downArch.tar.gz";
 
     extractPath ??= switch (os) {
