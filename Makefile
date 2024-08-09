@@ -62,9 +62,9 @@ dist: dist-cmake
 dist-ci: OUTPUT_FILE ?= $(FHE_RELEASE_DIR)/libfhel-$(OS)-$(ARCH).tar.gz
 dist-ci: OUTPUT_PATH ?= $(FHE_RELEASE_DIR)/$(OUTPUT_FILE)
 dist-ci: dist-cmake
-    @tar -czvf $(OUTPUT_PATH) $(FHE_RELEASE_DIR)/libfhel*
-    @echo "name=$(OUTPUT_FILE)" >> $(GITHUB_OUTPUT)
-    @echo "path=$(OUTPUT_PATH)" >> $(GITHUB_OUTPUT)
+	@tar -czvf $(OUTPUT_PATH) $(FHE_RELEASE_DIR)/libfhel*
+	@echo "name=$(OUTPUT_FILE)" >> $(GITHUB_OUTPUT)
+	@echo "path=$(OUTPUT_PATH)" >> $(GITHUB_OUTPUT)
 
 
 # Generate html dart api docs
