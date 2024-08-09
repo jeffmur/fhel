@@ -52,12 +52,18 @@ jobs:
           ARCH: ${{ matrix.dist.arch }}
         run: make dist-ci
       - uses: actions/upload-artifact@v4
-        name: upload
+        name: Upload Artifact
         with:
           path: ${{ steps.dist.outputs.tar_gz_path }}
           name: ${{ steps.dist.outputs.tar_gz_name }}
+      - uses: softprops/action-gh-release@v2
+        name: GitHub Release
+        with:
+          files: ${{ steps.dist.outputs.tar_gz_path }}
+          draft: false
+          prerelease: false
 
-  # dart:
+  # publish:
   #   name: pub.dev
   #   needs: version
   #   runs-on: ubuntu-latest
