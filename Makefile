@@ -86,7 +86,7 @@ seal-basics: build-cmake
 .PHONY: dtest
 dtest:
 	@echo "Testing dart..."
-	@cd $(DART_SRC); $(MAKE) test
+	@cd $(DART_SRC); $(MAKE) test FHEL_C_LIB_PREFIX=$(FHE_BUILD_DIR)
 
 # Build the flutter example
 .PHONY: apk

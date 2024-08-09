@@ -13,6 +13,7 @@ final DynamicLibrary dylib = () {
         "Platform ${Platform.operatingSystem} not supported",
       )
   };
-  final libPath = Platform.environment["FHEL_C_LIB_PATH"] ?? defaultLibPath;
+  final libPath = path.absolute(
+      Platform.environment["FHEL_C_LIB_PREFIX"] ?? '', defaultLibPath);
   return DynamicLibrary.open(libPath);
 }();
