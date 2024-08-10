@@ -44,7 +44,7 @@ final version = () {
   versions.sort(); // Sort versions in ascending order
 
   return versions.isEmpty
-      ? null
+      ? throw StateError('Package $_libraryName not found in $pubCachePath. Have you run `dart pub install $pubCachePath`?')
       : versions.last; // Handle the case where no matching versions are found
 }();
 
