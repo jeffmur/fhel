@@ -79,7 +79,7 @@ SUPPORT_ARCH.each { arch ->
 
 task extractLibs(dependsOn: downloadLibs) {
     println "Extracting ${LIB_NAME} binaries..."
-    ARCHS.each { arch ->
+    SUPPORT_ARCH.each { arch ->
         finalizedBy "${LIB_NAME}_extract_libs_${arch}"
     }
 }
