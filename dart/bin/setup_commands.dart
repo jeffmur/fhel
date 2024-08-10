@@ -9,6 +9,13 @@ import 'package:stack_trace/stack_trace.dart';
 
 const setupPkgName = "fhel";
 const baseUrl = "https://github.com/jeffmur/fhel/releases/download";
+const ARCH_OPT_MAP = {
+  "macos": ["arm64"],
+  "windows": ["x64"],
+  "linux": ["x64"],
+  "android": ["x86_64", "arm64-v8a", "armeabi-v7a"],
+  "ios": ["os64"],
+};
 
 abstract class BaseSetupCommand extends Command {
   @override
@@ -18,8 +25,18 @@ abstract class BaseSetupCommand extends Command {
   String get name => "base";
 
   String get arch {
-    final arch_ = argResults?["arch"] as String;
-    return ARCH_MAP[os]?[arch_] as String? ?? arch_;
+    return argResults?["arch"] as String;
+  }
+
+  BaseSetupCommand() {
+    argParser.addOption(
+      "arch",
+      abbr: "a",
+      allowed: ARCH_OPT_MAP[name],
+      defaultsTo: ARCH_OPT_MAP[name]!.first, // default to first arch
+      mandatory: false,
+    );
+    argParser.addFlag("force", abbr: "f", help: "Force download and extract");
   }
 
   String get pkgRoot => Frame.caller().uri.resolve("..").toFilePath();
@@ -119,16 +136,6 @@ class MacOsSetupCommand extends BaseSetupCommand {
 
   @override
   String get name => "macos";
-
-  MacOsSetupCommand() {
-    argParser.addOption(
-      "arch",
-      abbr: "a",
-      allowed: ["x86_64", "x64", "arm64"],
-      mandatory: true,
-    );
-    argParser.addFlag("force", abbr: "f", help: "Force download and extract");
-  }
 }
 
 class WindowsSetupCommand extends BaseSetupCommand {
@@ -137,12 +144,6 @@ class WindowsSetupCommand extends BaseSetupCommand {
 
   @override
   String get name => "windows";
-
-  WindowsSetupCommand() {
-    argParser.addOption("arch",
-        abbr: "a", allowed: ["x86_64", "x64"], mandatory: true);
-    argParser.addFlag("force", abbr: "f", help: "Force download and extract");
-  }
 }
 
 class LinuxSetupCommand extends BaseSetupCommand {
@@ -151,12 +152,6 @@ class LinuxSetupCommand extends BaseSetupCommand {
 
   @override
   String get name => "linux";
-
-  LinuxSetupCommand() {
-    argParser.addOption("arch",
-        abbr: "a", allowed: ["x86_64", "x64"], mandatory: true);
-    argParser.addFlag("force", abbr: "f", help: "Force download and extract");
-  }
 }
 
 class AndroidSetupCommand extends BaseSetupCommand {
@@ -165,16 +160,6 @@ class AndroidSetupCommand extends BaseSetupCommand {
 
   @override
   String get name => "android";
-
-  AndroidSetupCommand() {
-    argParser.addOption(
-      "arch",
-      abbr: "a",
-      allowed: ["x86_64", "arm64-v8a", "armeabi-v7a"],
-      mandatory: true,
-    );
-    argParser.addFlag("force", abbr: "f", help: "Force download and extract");
-  }
 }
 
 class IosSetupCommand extends BaseSetupCommand {
@@ -183,34 +168,7 @@ class IosSetupCommand extends BaseSetupCommand {
 
   @override
   String get name => "ios";
-
-  IosSetupCommand() {
-    argParser.addOption(
-      "arch",
-      abbr: "a",
-      allowed: ["os64"],
-      mandatory: false,
-      defaultsTo: "os64",
-    );
-    argParser.addFlag("force", abbr: "f", help: "Force download and extract");
-  }
 }
-
-const ARCH_MAP = {
-  OS.windows: {
-    "x86_64": "x64",
-  },
-  OS.linux: {
-    "x86_64": "x64",
-  },
-  OS.macos: {
-    "x86_64": "x64",
-  },
-  OS.ios: {
-    "x86_64": "x64",
-  },
-  OS.android: {},
-};
 
 class OS {
   static const windows = "windows";

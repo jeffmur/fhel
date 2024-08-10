@@ -44,7 +44,7 @@ final version = () {
   versions.sort(); // Sort versions in ascending order
 
   return versions.isEmpty
-      ? throw StateError('Package $_libraryName not found in $pubCachePath. Have you run `dart pub install $pubCachePath`?')
+      ? throw StateError('Package $_libraryName not found in $pubCachePath. Have you run `dart pub install $_libraryName`?')
       : versions.last; // Handle the case where no matching versions are found
 }();
 
@@ -62,6 +62,11 @@ final DynamicLibrary dylib = () {
   if (Platform.isAndroid) {
     return DynamicLibrary.open(libfhel);
   }
-  return DynamicLibrary.open(
-      '$desktopPubCachePath/$_libraryName-$version/${Platform.operatingSystem}/$libfhel');
+  // Production environment: .pub-cache
+  try {
+    return DynamicLibrary.open(
+        '$desktopPubCachePath/$_libraryName-$version/${Platform.operatingSystem}/$libfhel');
+  } catch (e) {
+    throw StateError('$e. Have you run `dart run fhel:setup --${Platform.operatingSystem}`?');
+  }
 }();
