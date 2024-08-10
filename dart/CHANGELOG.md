@@ -1,3 +1,7 @@
+## 0.0.8
+
+Auto-build Android binary in github releases
+
 ## 0.0.7
 
 Add support for macOS binary in github releases
