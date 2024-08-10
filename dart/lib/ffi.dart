@@ -52,7 +52,7 @@ final version = () {
 final DynamicLibrary dylib = () {
   // Continuous integration
   if (Platform.environment.containsKey('FHEL_C_LIB_PREFIX')) {
-    return DynamicLibrary.open(Platform.environment['FHEL_C_LIB_PREFIX']! + libfhel);
+    return DynamicLibrary.open("${Platform.environment['FHEL_C_LIB_PREFIX']}/$libfhel");
   }
   // Development environment
   if (Platform.environment.containsKey('FHEL_C_LIB_PATH')) {
