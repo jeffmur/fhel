@@ -16,6 +16,8 @@ buildscript {
     }
 }
 
+apply plugin: "de.undercouch.download"
+
 rootProject.allprojects {
     repositories {
         google()
