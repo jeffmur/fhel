@@ -59,8 +59,9 @@ abstract class BaseSetupCommand extends Command {
     final saveFile = File(cacheTarPath);
 
     if (force || !saveFile.existsSync()) {
-      if (!saveFile.parent.existsSync())
+      if (!saveFile.parent.existsSync()) {
         saveFile.parent.createSync(recursive: true);
+      }
 
       final String url = "$baseUrl/v$version/$libTarName";
       print(asInfo("Downloading $url"));

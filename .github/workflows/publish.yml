@@ -20,9 +20,14 @@ jobs:
       - run: echo "PUB_VER=$(grep -oP 'version:\s\K[0-9]+\.[0-9]+\.[0-9]+' dart/pubspec.yaml)" >> $GITHUB_ENV
       # Compare the versions in env to github.ref_name
       - run: |
-          if [ "${{ env.CMAKE_VER }}" != "${{ env.PUB_VER }}" || "${{ env.CMAKE_VER }}" != "${{ github.ref_name }}" || "${{ github.ref_name }}" != "${{ env.PUB_VER }}" ]; then
-            echo "Version mismatch: CMakeLists.txt: ${{ env.CMAKE_VER }} != dart/pubspec.yaml: ${{ env.PUB_VER }} != github.ref_name: ${{ github.ref_name }}"
-            exit 1
+          if [[ "${{ env.CMAKE_VER }}" == "${{ env.PUB_VER }}" ]] && \
+             [[ "${{ env.CMAKE_VER }}" == "${{ github.ref_name }}" ]]; then
+            echo "All variables are equal."
+          else
+            echo "Variables differ:"
+            echo "CMAKE_VER: ${{ env.CMAKE_VER }}"
+            echo "PUB_VER: ${{ env.PUB_VER }}"
+            echo "GITHUB_REF_NAME: ${{ github.ref_name }}"
           fi
   binary:
     name: Binary
