@@ -12,6 +12,7 @@ buildscript {
     dependencies {
         // The Android Gradle Plugin knows how to build native code with the NDK.
         classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath "de.undercouch:gradle-download-task:5.6.0"
     }
 }
 
