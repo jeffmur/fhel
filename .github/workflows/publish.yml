@@ -52,8 +52,6 @@ jobs:
             runner: macos-latest
 
     runs-on: ${{ matrix.dist.runner }}
-    container:
-      image: ghcr.io/jeffmur/fhel:builder
     steps:
       - uses: actions/checkout@v4
         with:
