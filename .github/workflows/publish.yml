@@ -42,6 +42,10 @@ jobs:
           - os: android
             arch: arm64-v8a
             runner: ubuntu-latest
+          - os: macos
+            arch: x64
+            runner: macos-latest
+
     runs-on: ${{ matrix.dist.runner }}
     container:
       image: ghcr.io/jeffmur/fhel:builder

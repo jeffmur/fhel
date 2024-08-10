@@ -32,6 +32,7 @@ dart run fhel:setup <platform> --arch <architecture>
 |----------|--------------|
 | Android  | `x86_64` `arm64-v8a` `armeabi-v7a` |
 | Linux    | `x64` |
+| MacOS    | `x64` |
 
 ```dart
 import 'package:fhel/seal.dart';
