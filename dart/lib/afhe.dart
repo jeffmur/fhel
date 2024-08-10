@@ -51,7 +51,7 @@ class Afhe {
   }
 
   /// Initializes the [Backend] without a [Scheme].
-  /// 
+  ///
   /// Typically used for loading parameters from a shared session.
   Afhe.noScheme(String backendName) {
     backend = Backend.set(backendName);
@@ -121,16 +121,17 @@ class Afhe {
   ///
   /// Used for generating a shared session.
   String genContextFromParameters(Map parameters) {
-    final ptr = _c_gen_context_from_str(library, parameters['header'], parameters['size']);
+    final ptr = _c_gen_context_from_str(
+        library, parameters['header'], parameters['size']);
     raiseForStatus();
     return ptr.toDartString();
   }
-  
+
   /// Returns the number of slots based on parameters.
   int get slotCount => _c_slot_count(library);
 
   /// Returns the string representation of FHE parameters.
-  /// 
+  ///
   /// Useful for saving to disk or sending over the network.
   /// The `header` is the string representation of the parameters.
   /// The `size` is the length of the string.
@@ -194,7 +195,7 @@ class Afhe {
   }
 
   /// Loads a [Ciphertext] from a non-human-readable format.
-  /// 
+  ///
   /// Useful for loading from disk or receiving over the network.
   /// The [size] is the length of the data.
   /// The [data] is a pointer to the memory address of the data.
@@ -206,7 +207,8 @@ class Afhe {
 
   /// Encodes a list of integers into a [Plaintext].
   Plaintext encodeVecInt(List<int> vec) {
-    Pointer ptr = _c_encode_vector_int(library, intListToUint64Array(vec), vec.length);
+    Pointer ptr =
+        _c_encode_vector_int(library, intListToUint64Array(vec), vec.length);
     raiseForStatus();
     return Plaintext.fromPointer(backend, ptr);
   }
@@ -228,7 +230,8 @@ class Afhe {
 
   /// Encodes a list of doubles into a [Plaintext].
   Plaintext encodeVecDouble(List<double> vec) {
-    Pointer ptr = _c_encode_vector_double(library, doubleListToArray(vec), vec.length);
+    Pointer ptr =
+        _c_encode_vector_double(library, doubleListToArray(vec), vec.length);
     raiseForStatus();
     // String cannot be extracted from C object for CKKS
     return Plaintext.fromPointer(backend, ptr, extractStr: false);
@@ -312,7 +315,7 @@ class Afhe {
   }
 
   /// Raises the [Ciphertext] to a [power].
-  /// 
+  ///
   /// Only supported for BFV/BGV [Scheme].
   /// The [power] must be a positive integer.
   /// Applies relinearization after each multiplication step.
