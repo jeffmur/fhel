@@ -77,14 +77,18 @@ task extractLibs(dependsOn: downloadLibs) {
     }
 }
 
-// Ensure the mergeReleaseJniLibFolders task depends on extractLibs
+// Ensure mergeReleaseJniLibFolders depends on extractLibs
 tasks.whenTaskAdded { task ->
     if (task.name == 'mergeReleaseJniLibFolders') {
         task.dependsOn extractLibs
+        SUPPORT_ARCH.each { arch ->
+            def extractTaskName = "${LIB_NAME}_extract_libs_${arch}"
+            task.dependsOn tasks.findByName(extractTaskName)
+        }
     }
 }
 
-def FHEL_DISABLE_AUTO_BUILD=System.env.FHEL_DISABLE_AUTO_BUILD ?: null
+def FHEL_DISABLE_AUTO_BUILD = System.getenv('FHEL_DISABLE_AUTO_BUILD') ?: null
 if (FHEL_DISABLE_AUTO_BUILD != null) {
     println "Found FHEL_DISABLE_AUTO_BUILD, skip auto build"
 } else {
