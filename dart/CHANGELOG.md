@@ -1,3 +1,14 @@
+## 0.0.8
+
+Auto-build Android binary in github releases
+
+## 0.0.7
+
+Add support for macOS binary in github releases
+* Setup script now supports macOS
+
+Binary is pulled from the latest release on Github, cached in .pub-cache for desktop platforms.
+
 ## 0.0.6
 
 Added setup script to automate the process of setting up the library for the first time.

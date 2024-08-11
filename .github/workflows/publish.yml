@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Extract the binary.version
+      - run: echo "BINARY_VER=$(cat binary.version)" >> $GITHUB_ENV
       # Extract the version from CMakeLists.txt
       - run: echo "CMAKE_VER=$(grep -oP 'VERSION\s\K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)" >> $GITHUB_ENV
       # Extract the version from pubspec.yaml
@@ -21,10 +23,12 @@ jobs:
       # Compare the versions in env to github.ref_name
       - run: |
           if [[ "${{ env.CMAKE_VER }}" == "${{ env.PUB_VER }}" ]] && \
+             [[ "${{ env.CMAKE_VER }}" == "${{ env.BINARY_VER }}" ]] && \
              [[ "${{ env.CMAKE_VER }}" == "${{ github.ref_name }}" ]]; then
             echo "All variables are equal."
           else
             echo "Variables differ:"
+            echo "BINARY_VER: ${{ env.BINARY_VER }}"
             echo "CMAKE_VER: ${{ env.CMAKE_VER }}"
             echo "PUB_VER: ${{ env.PUB_VER }}"
             echo "GITHUB_REF_NAME: ${{ github.ref_name }}"
@@ -48,12 +52,10 @@ jobs:
             arch: arm64-v8a
             runner: ubuntu-latest
           - os: macos
-            arch: x64
+            arch: arm64
             runner: macos-latest
 
     runs-on: ${{ matrix.dist.runner }}
-    container:
-      image: ghcr.io/jeffmur/fhel:builder
     steps:
       - uses: actions/checkout@v4
         with:

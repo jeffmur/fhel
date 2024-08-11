@@ -1,5 +1,3 @@
-// The Android Gradle Plugin builds the native code with the Android NDK.
-
 group 'com.example.fhel'
 version '1.0'
 
@@ -12,8 +10,11 @@ buildscript {
     dependencies {
         // The Android Gradle Plugin knows how to build native code with the NDK.
         classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath "de.undercouch:gradle-download-task:5.6.0"
     }
 }
+
+apply plugin: "de.undercouch.download"
 
 rootProject.allprojects {
     repositories {
@@ -29,62 +30,12 @@ android {
         namespace 'com.example.fhel'
     }
 
-    // Bumping the plugin compileSdkVersion requires all clients of this plugin
-    // to bump the version in their app.
     compileSdkVersion 33
+    ndkVersion android.ndkVersion
 
-    // Bumping the plugin ndkVersion requires all clients of this plugin to bump
-    // the version in their app and to download a newer version of the NDK.
-    ndkVersion "26.1.10909125"
-
-    //
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 32
-
-        externalNativeBuild {
-            cmake {
-                cppFlags ""
-                arguments "-DSEAL_BUILD_DEPS=OFF", "-DSEAL_USE_MSGSL=OFF", "-DSEAL_USE_ZLIB=OFF", "-DSEAL_USE_ZSTD=OFF",
-                        // "-DSEAL_USE_INTRIN=1",
-                        //   "-DSEAL_BUILD_SEAL_C=1",
-                        //   "-DSEAL_USE_ZLIB=OFF",
-                        //   "-DBUILD_SHARED_LIBS=ON",
-                        //   "-DSEAL_ARM64_EXITCODE=0",
-                        //   "-DSEAL_ARM64_EXITCODE__TRYRUN_OUTPUT=''",
-                          "-DSEAL___BUILTIN_CLZLL_FOUND_EXITCODE=0",
-                          "-DSEAL___BUILTIN_CLZLL_FOUND_EXITCODE__TRYRUN_OUTPUT=''",
-                          // For x86_64 Android devices
-                          "-DSEAL__ADDCARRY_U64_FOUND_EXITCODE=0",
-                          "-DSEAL__ADDCARRY_U64_FOUND_EXITCODE__TRYRUN_OUTPUT=''",
-                          "-DSEAL__SUBBORROW_U64_FOUND_EXITCODE=0",
-                          "-DSEAL__SUBBORROW_U64_FOUND_EXITCODE__TRYRUN_OUTPUT=''"
-            }
-        }
-        ndk {
-            /**
-             * Specifies the ABI (Application Binary Interface) filters for native libraries.
-             * The supported options for `abiFilters` are: [arm64-v8a, armeabi-v7a, x86, x86_64]
-             * Multiple filters can be specified by separating them with commas.
-             */
-            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
-            // abiFilters 'x86' /* libfhel.so won't work on 32-bit Intel devices */
-        }
-    }
-
-    // Invoke the shared CMake build with the Android Gradle Plugin.
-    externalNativeBuild {
-        cmake {
-            path "../../CMakeLists.txt"
-
-            // The default CMake version for the Android Gradle Plugin is 3.10.2.
-            // https://developer.android.com/studio/projects/install-ndk#vanilla_cmake
-            //
-            // The Flutter tooling requires that developers have CMake 3.10 or later
-            // installed. You should not increase this version, as doing so will cause
-            // the plugin to fail to compile for some customers of the plugin.
-            // version "3.22.1"
-        }
     }
 
     compileOptions {
@@ -92,3 +43,56 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
+
+// Use environment variables or default values
+def LIB_NAME = System.getenv('LIB_NAME') ?: 'fhel'
+def LIB_URL = System.getenv('LIB_URL') ?: 'https://github.com/jeffmur/fhel/releases/download'
+def SRC_DIR = project.buildscript.sourceFile.parentFile.parentFile
+def ANDROID_DIR = "${SRC_DIR}/android"
+def BIN_VER = new File("${SRC_DIR}/binary.version").text.trim()
+def SUPPORT_ARCH = ['x86_64', 'arm64-v8a', 'armeabi-v7a']
+
+def FHEL_DISABLE_AUTO_BUILD = System.getenv('FHEL_DISABLE_AUTO_BUILD') ?: null
+if (FHEL_DISABLE_AUTO_BUILD != null) {
+    println "Found FHEL_DISABLE_AUTO_BUILD, skip auto build"
+    return
+}
+
+task downloadLibs(type: Download) {
+    println "Downloading ${LIB_NAME} binaries..."
+    def SRC_URLS = SUPPORT_ARCH.collect { arch ->
+        "${LIB_URL}/v${BIN_VER}/lib${LIB_NAME}-android-${arch}.tar.gz"
+    }
+    src(SRC_URLS)
+    dest SRC_DIR
+    overwrite false
+}
+
+SUPPORT_ARCH.each { arch ->
+    def extractTaskName = "${LIB_NAME}_extract_libs_${arch}"
+    task(extractTaskName, type: Copy) {
+        from tarTree(resources.gzip("${SRC_DIR}/lib${LIB_NAME}-android-${arch}.tar.gz"))
+        into "${ANDROID_DIR}/src/main/jniLibs/${arch}"
+    }
+}
+
+task extractLibs(dependsOn: downloadLibs) {
+    println "Extracting ${LIB_NAME} binaries..."
+    SUPPORT_ARCH.each { arch ->
+        finalizedBy "${LIB_NAME}_extract_libs_${arch}"
+    }
+}
+
+// Ensure mergeReleaseJniLibFolders depends on extractLibs
+tasks.whenTaskAdded { task ->
+    if (task.name == 'mergeReleaseJniLibFolders') {
+        task.dependsOn extractLibs
+        SUPPORT_ARCH.each { arch ->
+            def extractTaskName = "${LIB_NAME}_extract_libs_${arch}"
+            task.dependsOn tasks.findByName(extractTaskName)
+        }
+    }
+}
+
+println "FHEL_DISABLE_AUTO_BUILD is not set, running ${LIB_NAME}:setup"
+preBuild.dependsOn extractLibs
