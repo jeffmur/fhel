@@ -105,6 +105,7 @@ dtest-ci: build-cmake
 
 .PHONY: apk-ci
 apk-ci: export ANDROID_SDK_ROOT ?= /tmp/android-sdk-linux
+apk-ci: export FHEL_DISABLE_AUTO_BUILD = 1
 apk-ci:
 	@git config --global --add safe.directory /tmp/flutter
 	$(MAKE) apk
