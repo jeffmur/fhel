@@ -56,7 +56,7 @@ def LIB_NAME = "fhel"
 def LIB_URL = "https://github.com/jeffmur/fhel/releases/download"
 def SRC_DIR = project.buildscript.sourceFile.parentFile.parentFile
 def ANDROID_DIR = "${SRC_DIR}/android"
-def BIN_VER = new File("${SRC_DIR}/binary.version").text
+def BIN_VER = new File("${SRC_DIR}/binary.version").text.trim()
 def SUPPORT_ARCH = ['x86_64', 'arm64-v8a', 'armeabi-v7a']
 
 task downloadLibs(type: Download) {
