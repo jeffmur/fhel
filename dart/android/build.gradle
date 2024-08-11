@@ -52,6 +52,12 @@ def ANDROID_DIR = "${SRC_DIR}/android"
 def BIN_VER = new File("${SRC_DIR}/binary.version").text.trim()
 def SUPPORT_ARCH = ['x86_64', 'arm64-v8a', 'armeabi-v7a']
 
+def FHEL_DISABLE_AUTO_BUILD = System.getenv('FHEL_DISABLE_AUTO_BUILD') ?: null
+if (FHEL_DISABLE_AUTO_BUILD != null) {
+    println "Found FHEL_DISABLE_AUTO_BUILD, skip auto build"
+    return
+}
+
 task downloadLibs(type: Download) {
     println "Downloading ${LIB_NAME} binaries..."
     def SRC_URLS = SUPPORT_ARCH.collect { arch ->
@@ -88,10 +94,5 @@ tasks.whenTaskAdded { task ->
     }
 }
 
-def FHEL_DISABLE_AUTO_BUILD = System.getenv('FHEL_DISABLE_AUTO_BUILD') ?: null
-if (FHEL_DISABLE_AUTO_BUILD != null) {
-    println "Found FHEL_DISABLE_AUTO_BUILD, skip auto build"
-} else {
-    println "FHEL_DISABLE_AUTO_BUILD is not set, running ${LIB_NAME}:setup"
-    preBuild.dependsOn extractLibs
-}
+println "FHEL_DISABLE_AUTO_BUILD is not set, running ${LIB_NAME}:setup"
+preBuild.dependsOn extractLibs
