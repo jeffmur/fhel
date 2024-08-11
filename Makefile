@@ -104,7 +104,7 @@ dtest-ci: build-cmake
 	$(MAKE) dtest
 
 .PHONY: apk-ci
-apk-ci: export
+apk-ci: export ANDROID_SDK_ROOT ?= /tmp/android-sdk-linux
 apk-ci:
 	@git config --global --add safe.directory /tmp/flutter
 	$(MAKE) apk
