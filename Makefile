@@ -106,6 +106,8 @@ dtest-ci: build-cmake
 .PHONY: apk-ci
 apk-ci: export UNIT_TEST = OFF # Disable unit test for release
 apk-ci: export ANDROID_SDK_ROOT ?= /tmp/android-sdk-linux
+apk-ci: export FHEL_DISABLE_AUTO_BUILD = 1
+apk-ci: export FHEL_C_LIB_PREFIX = $(FHE_BUILD_DIR)
 apk-ci: build-cmake
 	@git config --global --add safe.directory /tmp/flutter
 	$(MAKE) apk
