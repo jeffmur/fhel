@@ -50,7 +50,7 @@ dist: dist-cmake
 dist-ci: OUTPUT_FILE ?= libfhel-$(OS)-$(ARCH).tar.gz
 dist-ci: OUTPUT_PATH ?= $(FHE_RELEASE_DIR)/$(OUTPUT_FILE)
 dist-ci: dist-cmake
-	@find $(FHE_RELEASE_DIR) -name 'libfhel*' -printf '%f\n' | tar -czvf $(OUTPUT_PATH) -C $(FHE_RELEASE_DIR) --files-from -
+	@ls -d $(FHE_RELEASE_DIR)/libfhel* | grep -o '[^/]*$' | tar -czvf $(OUTPUT_PATH) -C $(FHE_RELEASE_DIR) --files-from -
 	@echo "tar_gz_name=$(OUTPUT_FILE)" >> $(GITHUB_OUTPUT)
 	@echo "tar_gz_path=$(OUTPUT_PATH)" >> $(GITHUB_OUTPUT)
 
