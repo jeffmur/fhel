@@ -77,20 +77,20 @@ jobs:
           draft: true
           prerelease: false
 
-  # publish:
-  #   name: pub.dev
-  #   needs: [version, binary]
-  #   runs-on: ubuntu-latest
-  #   container:
-  #     image: ghcr.io/jeffmur/fhel:builder
-  #   permissions:
-  #     id-token: write # Required for authentication using OIDC
-  #   environment:
-  #     name: pub.dev
-  #     url: https://pub.dev/packages/fhel
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         submodules: "true"
-  #     - uses: dart-lang/setup-dart@v1
-  #     - run: make publish-ci
+  publish:
+    name: pub.dev
+    needs: [version, binary]
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/jeffmur/fhel:builder
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    environment:
+      name: pub.dev
+      url: https://pub.dev/packages/fhel
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "true"
+      - uses: dart-lang/setup-dart@v1
+      - run: make publish-ci
