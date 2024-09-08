@@ -49,10 +49,11 @@ dist: dist-cmake
 .PHONY: dist-ci
 dist-ci: OUTPUT_FILE ?= libfhel-$(OS)-$(ARCH).tar.gz
 dist-ci: OUTPUT_PATH ?= $(FHE_RELEASE_DIR)/$(OUTPUT_FILE)
+dist-ci: TMP_DIR ?= $(FHE_RELEASE_DIR)/release
 dist-ci: dist-cmake
-	@mkdir release
-	@cp $(FHE_RELEASE_DIR)/libfhel* release
-	@cd $(FHE_RELEASE_DIR)/release
+	@mkdir $(TMP_DIR)
+	@cp $(FHE_RELEASE_DIR)/libfhel* $(TMP_DIR)
+	@cd $(TMP_DIR)
 	@tar -czvf $(OUTPUT_PATH) .
 	@echo "tar_gz_name=$(OUTPUT_FILE)" >> $(GITHUB_OUTPUT)
 	@echo "tar_gz_path=$(OUTPUT_PATH)" >> $(GITHUB_OUTPUT)
