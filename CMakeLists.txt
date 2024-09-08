@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(fhel VERSION 0.0.11 LANGUAGES CXX)
 
 # Import Backend Library
-add_subdirectory(src/backend/seal)
+add_subdirectory(src/backend/seal seal_build)
 
 # find_package(SEAL REQUIRED)
 

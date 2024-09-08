@@ -1,17 +1,16 @@
-import os
 from conan import ConanFile
-from conan.tools.files import load
+from conan.tools.files import load, rename
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
 import conan.tools.files as cfiles
 from pathlib import Path
-import tarfile
+import tarfile, os
 
 # for compatibility
-arch_map = {
-  "windows": {
-    "x86_64": "x64",
-  },
+release_arch = {
+  # "windows": {
+  #   "x86_64": "x64",
+  # },
   "linux": {
     "x86_64": "x64",
   },
@@ -30,22 +29,43 @@ arch_map = {
   # },
 }
 
+def get_release_ext(os:str):
+  os = os.lower()
+  if os == "macos" or os == "ios":
+    return "dylib"
+  elif os == "windows":
+    return "dll"
+  return "so"
+
 class fhel(ConanFile):
   name = "fhel"
   settings = "os", "arch", "compiler", "build_type"
+  exports_sources = "src/*", "include/*", "test/*", "CMakeLists.txt"
+  options = {
+    "ci": [True, False],
+  }
+
+  default_options = {
+    "ci": False,
+  }
 
   def set_version(self):
-    if not self.version and self.recipe_folder:
+    if not self.recipe_folder:
+      raise ConanInvalidConfiguration("recipe_folder not set")
+
+    if not self.version:
       version_file = Path(
         os.path.join(self.recipe_folder, "dart" , "binary.version")
       )
       if not version_file.exists():
         raise ConanInvalidConfiguration("binary.version file not found")
 
-      self.version = load(self, version_file);
+      self.version = load(self, version_file).strip();
 
-  def __init__(self, display_name=""):
-    super().__init__(display_name)
+  def generate(self):
+    "Generate the cmake toolchain file"
+    tc = CMakeToolchain(self)
+    tc.generate()
 
   def seal_negative_args(self) -> list[str]:
     """
@@ -66,11 +86,35 @@ class fhel(ConanFile):
       args.append("-DSEAL__SUBBORROW_U64_FOUND_EXITCODE__TRYRUN_OUTPUT=''")
     return args
 
-  def generate(self):
-    tc = CMakeToolchain(self)
-    tc.generate()
-
   def build(self):
+    "Compile libfhel dynamic library"
     cmake = CMake(self)
     cmake.configure(cli_args=self.seal_negative_args())
     cmake.build()
+
+  def copy_files(self):
+    "Copy the library to the package folder"
+    if not self.source_folder:
+      raise ConanInvalidConfiguration("source_folder not set")
+    if not self.package_folder:
+      raise ConanInvalidConfiguration("package_folder not set")
+
+    ext = get_release_ext(str(self.settings.os))
+
+    rename(self,
+      src=f"libfhel.{ext}.{self.version}",
+      dst=f"{self.package_folder}/libfhel.{ext}",
+    )
+
+  def package(self):
+    "Compresse the library for distribution"
+    self.copy_files()
+
+  def package_info(self):
+    "Export to GITHUB_OUTPUT"
+    os = str(self.settings.os).lower()
+    arch = str(self.settings.arch).lower()
+    output_tar_gz_path = f"libfhel-{os}-{arch}.tar.gz"
+    if self.options.ci:
+      with open("GITHUB_OUTPUT", "a") as f:
+        print(f'tar_gz_path={self.package_folder}/{output_tar_gz_path}', file=f)
