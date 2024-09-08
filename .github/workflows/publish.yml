@@ -39,58 +39,73 @@ jobs:
     strategy:
       matrix:
         dist:
-          - os: linux
-            arch: x64
-            runner: ubuntu-latest
-          - os: android
-            arch: x86_64
-            runner: ubuntu-latest
-          - os: android
-            arch: armeabi-v7a
-            runner: ubuntu-latest
-          - os: android
-            arch: arm64-v8a
-            runner: ubuntu-latest
-          - os: macos
-            arch: arm64
-            runner: macos-latest
+        - profile: linux-x64
+          runner: ubuntu-latest
+          release: linux-x64
+        - profile: macos-arm64
+          runner: macos-latest
+          release: macos-arm64
+        - profile: android-x86_64
+          runner: ubuntu-latest
+          release: android-x86_64
+        - profile: android-armv8
+          runner: ubuntu-latest
+          release: android-arm64-v8a
 
     runs-on: ${{ matrix.dist.runner }}
+    env:
+      ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: "true"
-      - id: dist
-        env:
-          OS: ${{ matrix.dist.os }}
-          ARCH: ${{ matrix.dist.arch }}
-        run: make dist-ci
-      - uses: actions/upload-artifact@v4
-        name: Upload Artifact
-        with:
-          path: ${{ steps.dist.outputs.tar_gz_path }}
-          name: ${{ steps.dist.outputs.tar_gz_name }}
-      - uses: softprops/action-gh-release@v2
-        name: GitHub Release
-        with:
-          files: ${{ steps.dist.outputs.tar_gz_path }}
-          draft: true
-          prerelease: false
 
-  publish:
-    name: pub.dev
-    needs: [version, binary]
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/jeffmur/fhel:builder
-    permissions:
-      id-token: write # Required for authentication using OIDC
-    environment:
-      name: pub.dev
-      url: https://pub.dev/packages/fhel
-    steps:
-      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
         with:
-          submodules: "true"
-      - uses: dart-lang/setup-dart@v1
-      - run: make publish-ci
+          python-version: "3.x"
+
+      - uses: nttld/setup-ndk@v1
+        if: matrix.dist.profile == 'android-x86_64' || matrix.dist.profile == 'android-armv8'
+        id: setup-ndk
+        with:
+          ndk-version: r26d
+
+      - name: Debug ANDROID_NDK_HOME
+        shell: bash
+        run: echo $ANDROID_NDK_HOME
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Compile
+        run: |
+          conan install . -pr:h profiles/${{ matrix.dist.profile }}
+          conan build . -pr:h profiles/${{ matrix.dist.profile }}
+
+      # - uses: softprops/action-gh-release@v2
+      #   name: GitHub Release
+      #   with:
+      #     files: ${{ steps.dist.outputs.tar_gz_path }}
+      #     draft: true
+      #     prerelease: false
+
+  # publish:
+  #   name: pub.dev
+  #   needs: [version, binary]
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: ghcr.io/jeffmur/fhel:builder
+  #   permissions:
+  #     id-token: write # Required for authentication using OIDC
+  #   environment:
+  #     name: pub.dev
+  #     url: https://pub.dev/packages/fhel
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: "true"
+  #     - uses: dart-lang/setup-dart@v1
+  #     - run: make publish-ci

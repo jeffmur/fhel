@@ -15,6 +15,19 @@ Testing/
 # Dart
 pubspec.lock
 
+# Python
+venv
+pyvenv.cfg
+poetry.lock
+
+# Conan
+CMakeFiles/
+CMakeCache.txt
+CMakePresets.json
+cmake_install.cmake
+*conan*
+!conanfile.py
+
 # IntelliJ related
 *.iml
 *.ipr
