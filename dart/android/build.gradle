@@ -85,7 +85,7 @@ task extractLibs(dependsOn: downloadLibs) {
 
 // Ensure mergeReleaseJniLibFolders depends on extractLibs
 tasks.whenTaskAdded { task ->
-    if (task.name == 'mergeReleaseJniLibFolders') {
+    if (task.name == 'mergeReleaseJniLibFolders' || task.name == 'mergeDebugJniLibFolders') {
         task.dependsOn extractLibs
         SUPPORT_ARCH.each { arch ->
             def extractTaskName = "${LIB_NAME}_extract_libs_${arch}"
