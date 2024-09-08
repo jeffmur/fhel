@@ -98,11 +98,8 @@ class fhel(ConanFile):
     )
 
   def package(self):
-    "Compresse the library for distribution"
+    "Package the compiled library"
     self.copy_files()
-
-  def package_info(self):
-    "Export to GITHUB_OUTPUT"
     if self.options.ci:
       with open("GITHUB_OUTPUT", "a") as f:
         print(f'conan_package_path={self.package_folder}', file=f)
