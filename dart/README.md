@@ -30,7 +30,6 @@ dart run fhel:setup <platform> --arch <architecture>
 
 | Platform | Architecture |
 |----------|--------------|
-| Android  | `x86_64` (default) `arm64-v8a` `armeabi-v7a` |
 | Linux    | `x64` (default) |
 | MacOS    | `arm64` (default) |
 

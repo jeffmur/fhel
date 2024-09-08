@@ -42,15 +42,6 @@ jobs:
           - os: linux
             arch: x64
             runner: ubuntu-latest
-          - os: android
-            arch: x86_64
-            runner: ubuntu-latest
-          - os: android
-            arch: armeabi-v7a
-            runner: ubuntu-latest
-          - os: android
-            arch: arm64-v8a
-            runner: ubuntu-latest
           - os: macos
             arch: arm64
             runner: macos-latest
