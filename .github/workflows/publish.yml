@@ -54,7 +54,7 @@ jobs:
 
     runs-on: ${{ matrix.dist.runner }}
     env:
-      ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path || '' }}
+      ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,7 +65,7 @@ jobs:
           python-version: "3.x"
 
       - uses: nttld/setup-ndk@v1
-        if: matrix.dist.profile == 'android-x86_64' || matrix.dist.profile == 'android-armv8'
+        # if: matrix.dist.profile == 'android-x86_64' || matrix.dist.profile == 'android-armv8'
         id: setup-ndk
         with:
           ndk-version: r26d
