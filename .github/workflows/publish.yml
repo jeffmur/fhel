@@ -93,8 +93,8 @@ jobs:
         run: |
           source .venv/bin/activate
           conan profile detect
-          conan install . --profile:build=profiles/${{ matrix.dist.profile }}
-          conan build . --profile:build=profiles/${{ matrix.dist.profile }}
+          conan install . --profile:host=profiles/${{ matrix.dist.profile }}
+          conan build . --profile:host=profiles/${{ matrix.dist.profile }}
 
       # - uses: softprops/action-gh-release@v2
       #   name: GitHub Release
