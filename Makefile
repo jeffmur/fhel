@@ -52,7 +52,7 @@ dist-ci: TMP_DIR ?= /tmp/fhel
 dist-ci: OUTPUT_PATH ?= $(TMP_DIR)/$(OUTPUT_FILE)
 dist-ci: dist-cmake
 	@rm -rf $(TMP_DIR); mkdir -p $(TMP_DIR)
-	@cp $(FHE_RELEASE_DIR)/libfhel* $(TMP_DIR)
+	@cp $(FHE_RELEASE_DIR)/libfhel.* $(TMP_DIR)
 	@cd $(TMP_DIR); tar -czvf $(OUTPUT_PATH) *
 	@echo "tar_gz_name=$(OUTPUT_FILE)" >> $(GITHUB_OUTPUT)
 	@echo "tar_gz_path=$(OUTPUT_PATH)" >> $(GITHUB_OUTPUT)
