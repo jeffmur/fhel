@@ -2,7 +2,7 @@ name: fhel
 description: |-
   Natively supports Fully Homomorphic Encryption operations on sensitive data without revealing it.
   Supports Key Derivation, Encryption, Decryption, and Mathematical operations.
-version: 0.0.8
+version: 0.0.11
 repository: https://github.com/jeffmur/fhel
 
 environment:
