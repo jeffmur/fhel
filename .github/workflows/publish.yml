@@ -51,6 +51,7 @@ jobs:
         - profile: android-armv8
           runner: ubuntu-latest
           release: android-arm64-v8a
+      fail-fast: false
 
     runs-on: ${{ matrix.dist.runner }}
     steps:

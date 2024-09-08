@@ -2,7 +2,7 @@ include(default)
 
 [settings]
 os=Macos
-os.version=14
+os.version=14.0
 arch=armv8
 compiler=apple-clang
 compiler.version=14.0
