@@ -80,18 +80,18 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry install -v
 
-      - name: Cache .venv
-        uses: actions/cache@v2
-        with:
-          path: .venv
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      # - name: Cache .venv
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: .venv
+      #     key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
 
       - name: Compile
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path || '' }}
         run: |
           source .venv/bin/activate
-          conan profile new default --detect
+          conan profile detect
           conan install . --profile:build=profiles/${{ matrix.dist.profile }}
           conan build . --profile:build=profiles/${{ matrix.dist.profile }}
 
