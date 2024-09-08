@@ -82,7 +82,7 @@ jobs:
           poetry install -v
 
       - name: Compile
-        if: not startsWith(matrix.dist.profile, 'android')
+        if: ${{ !startsWith(matrix.dist.profile, 'android') }}
         run: |
           source .venv/bin/activate
           conan profile detect
