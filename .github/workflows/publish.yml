@@ -54,7 +54,7 @@ jobs:
 
     runs-on: ${{ matrix.dist.runner }}
     env:
-      ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path || '' }}
     steps:
       - uses: actions/checkout@v4
         with:
