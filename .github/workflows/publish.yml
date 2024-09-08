@@ -86,6 +86,7 @@ jobs:
       - name: Compile
         if: ${{ !startsWith(matrix.dist.profile, 'android') }}
         run: |
+          source .venv/bin/activate
           conan create . --options:host ci=true
 
       - name: Android Compile
@@ -93,6 +94,7 @@ jobs:
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path || '' }}
         run: |
+          source .venv/bin/activate
           conan create . \
             --profile:host profiles/${{ matrix.dist.profile }} \
             --conf:host tools.android:ndk_path=$ANDROID_NDK_HOME \
