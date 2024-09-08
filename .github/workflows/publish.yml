@@ -53,8 +53,6 @@ jobs:
           release: android-arm64-v8a
 
     runs-on: ${{ matrix.dist.runner }}
-    env:
-      ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,13 +63,15 @@ jobs:
           python-version: "3.x"
 
       - uses: nttld/setup-ndk@v1
-        # if: matrix.dist.profile == 'android-x86_64' || matrix.dist.profile == 'android-armv8'
+        if: matrix.dist.profile == 'android-x86_64' || matrix.dist.profile == 'android-armv8'
         id: setup-ndk
         with:
           ndk-version: r26d
 
       - name: Debug ANDROID_NDK_HOME
         run: echo $ANDROID_NDK_HOME
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path || '' }}
 
       - name: Install Dependencies
         run: |
@@ -80,6 +80,8 @@ jobs:
           poetry install
 
       - name: Compile
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path || '' }}
         run: |
           conan install . -pr:h profiles/${{ matrix.dist.profile }}
           conan build . -pr:h profiles/${{ matrix.dist.profile }}
