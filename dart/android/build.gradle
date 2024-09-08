@@ -36,7 +36,8 @@ android {
 
     // Bumping the plugin ndkVersion requires all clients of this plugin to bump
     // the version in their app and to download a newer version of the NDK.
-    ndkVersion "26.1.10909125"
+    // ndkVersion "26.1.10909125"
+    ndkVersion android.ndkVersion
 
     defaultConfig {
         minSdkVersion 18
@@ -77,7 +78,7 @@ android {
     // Invoke the shared CMake build with the Android Gradle Plugin.
     externalNativeBuild {
         cmake {
-            path "../../CMakeLists.txt"
+            path file("${projectDir}/../../CMakeLists.txt")
 
             // The default CMake version for the Android Gradle Plugin is 3.10.2.
             // https://developer.android.com/studio/projects/install-ndk#vanilla_cmake
