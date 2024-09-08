@@ -87,7 +87,7 @@ jobs:
         if: ${{ !startsWith(matrix.dist.profile, 'android') }}
         run: |
           source .venv/bin/activate
-          conan create . --options:host ci=true
+          conan create . --options:host ci=True
 
       - name: Android Compile
         if: startsWith(matrix.dist.profile, 'android')
@@ -98,7 +98,7 @@ jobs:
           conan create . \
             --profile:host profiles/${{ matrix.dist.profile }} \
             --conf:host tools.android:ndk_path=$ANDROID_NDK_HOME \
-            --options:host ci=true
+            --options:host ci=True
 
       # - uses: softprops/action-gh-release@v2
       #   name: GitHub Release
