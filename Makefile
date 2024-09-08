@@ -188,19 +188,6 @@ seal/fast:
 .PHONY : seal/fast
 
 #=============================================================================
-# Target rules for targets named sealc
-
-# Build rule for target.
-sealc: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 sealc
-.PHONY : sealc
-
-# fast build rule for target.
-sealc/fast:
-	$(MAKE) $(MAKESILENT) -f src/backend/seal/CMakeFiles/sealc.dir/build.make src/backend/seal/CMakeFiles/sealc.dir/build
-.PHONY : sealc/fast
-
-#=============================================================================
 # Target rules for targets named zlib
 
 # Build rule for target.
@@ -386,7 +373,6 @@ help:
 	@echo "... minigzip"
 	@echo "... minigzip64"
 	@echo "... seal"
-	@echo "... sealc"
 	@echo "... zlib"
 	@echo "... zlibstatic"
 	@echo "... src/backend/aseal.o"
