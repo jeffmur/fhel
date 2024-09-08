@@ -101,5 +101,5 @@ class fhel(ConanFile):
     "Package the compiled library"
     self.copy_files()
     if self.options.ci:
-      with open("GITHUB_OUTPUT", "a") as f:
+      with open("GITHUB_OUTPUT", "a+") as f:
         print(f'conan_package_path={self.package_folder}', file=f)

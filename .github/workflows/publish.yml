@@ -89,7 +89,7 @@ jobs:
             conan create . \
               --profile:host profiles/${{ matrix.dist.profile }} \
               --conf:host tools.android:ndk_path=$ANDROID_NDK_HOME \
-              --options:host ci=True
+              --options:host '&:ci=True'
           else
             conan create . \
               --options:host ci=True
@@ -100,7 +100,7 @@ jobs:
         run: |
           source .venv/bin/activate
           echo ${{ steps.compile.outputs.conan_package_path }}
-
+          ls /home/runner/.conan2/p/b/
 
       # - uses: softprops/action-gh-release@v2
       #   name: GitHub Release
