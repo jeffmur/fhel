@@ -78,6 +78,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry config virtualenvs.in-project true
+          poetry install -v
 
       - name: Cache .venv
         uses: actions/cache@v2
@@ -89,8 +90,8 @@ jobs:
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path || '' }}
         run: |
-          poetry install -v
           source .venv/bin/activate
+          conan profile new default --detect
           conan install . --profile:build=profiles/${{ matrix.dist.profile }}
           conan build . --profile:build=profiles/${{ matrix.dist.profile }}
 
