@@ -1,5 +1,5 @@
 from conan import ConanFile
-from conan.tools.files import load, rename
+from conan.tools.files import load, copy
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
 import conan.tools.files as cfiles
@@ -99,11 +99,10 @@ class fhel(ConanFile):
     if not self.package_folder:
       raise ConanInvalidConfiguration("package_folder not set")
 
-    ext = get_release_ext(str(self.settings.os))
-
-    rename(self,
-      src=f"libfhel.{ext}.{self.version}",
-      dst=f"{self.package_folder}/libfhel.{ext}",
+    copy(self,
+      pattern=f"libfhel*",
+      src=self.source_folder,
+      dst=self.package_folder,
     )
 
   def package(self):
