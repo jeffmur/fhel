@@ -71,7 +71,6 @@ jobs:
           ndk-version: r26d
 
       - name: Debug ANDROID_NDK_HOME
-        shell: bash
         run: echo $ANDROID_NDK_HOME
 
       - name: Install Dependencies
