@@ -1,4 +1,4 @@
-group 'com.example.fhel'
+group 'com.android.fhel'
 version '1.0'
 
 buildscript {
@@ -27,15 +27,66 @@ apply plugin: 'com.android.library'
 
 android {
     if (project.android.hasProperty("namespace")) {
-        namespace 'com.example.fhel'
+        namespace 'com.android.fhel'
     }
 
+    // Bumping the plugin compileSdkVersion requires all clients of this plugin
+    // to bump the version in their app.
     compileSdkVersion 33
-    ndkVersion android.ndkVersion
+
+    // Bumping the plugin ndkVersion requires all clients of this plugin to bump
+    // the version in their app and to download a newer version of the NDK.
+    ndkVersion "26.1.10909125"
 
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 32
+
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+                arguments "-DSEAL_BUILD_DEPS=OFF", "-DSEAL_USE_MSGSL=OFF", "-DSEAL_USE_ZLIB=OFF", "-DSEAL_USE_ZSTD=OFF",
+                        // "-DSEAL_USE_INTRIN=1",
+                        //   "-DSEAL_BUILD_SEAL_C=1",
+                        //   "-DSEAL_USE_ZLIB=OFF",
+                        //   "-DBUILD_SHARED_LIBS=ON",
+                        //   "-DSEAL_ARM64_EXITCODE=0",
+                        //   "-DSEAL_ARM64_EXITCODE__TRYRUN_OUTPUT=''",
+                          "-DSEAL___BUILTIN_CLZLL_FOUND_EXITCODE=0",
+                          "-DSEAL___BUILTIN_CLZLL_FOUND_EXITCODE__TRYRUN_OUTPUT=''",
+                          // For x86_64 Android devices
+                          "-DSEAL__ADDCARRY_U64_FOUND_EXITCODE=0",
+                          "-DSEAL__ADDCARRY_U64_FOUND_EXITCODE__TRYRUN_OUTPUT=''",
+                          "-DSEAL__SUBBORROW_U64_FOUND_EXITCODE=0",
+                          "-DSEAL__SUBBORROW_U64_FOUND_EXITCODE__TRYRUN_OUTPUT=''"
+            }
+        }
+        ndk {
+            /**
+             * Specifies the ABI (Application Binary Interface) filters for native libraries.
+             * The supported options for `abiFilters` are: [arm64-v8a, armeabi-v7a, x86, x86_64]
+             * Multiple filters can be specified by separating them with commas.
+             */
+            abiFilters 'arm64-v8a'
+            abiFilters 'armeabi-v7a'
+            abiFilters 'x86_64'
+            // abiFilters 'x86' /* libfhel.so won't work on 32-bit Intel devices */
+        }
+    }
+
+    // Invoke the shared CMake build with the Android Gradle Plugin.
+    externalNativeBuild {
+        cmake {
+            path "../../CMakeLists.txt"
+
+            // The default CMake version for the Android Gradle Plugin is 3.10.2.
+            // https://developer.android.com/studio/projects/install-ndk#vanilla_cmake
+            //
+            // The Flutter tooling requires that developers have CMake 3.10 or later
+            // installed. You should not increase this version, as doing so will cause
+            // the plugin to fail to compile for some customers of the plugin.
+            // version "3.22.1"
+        }
     }
 
     compileOptions {
