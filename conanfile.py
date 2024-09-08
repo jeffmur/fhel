@@ -29,14 +29,6 @@ release_arch = {
   # },
 }
 
-def get_release_ext(os:str):
-  os = os.lower()
-  if os == "macos" or os == "ios":
-    return "dylib"
-  elif os == "windows":
-    return "dll"
-  return "so"
-
 class fhel(ConanFile):
   name = "fhel"
   settings = "os", "arch", "compiler", "build_type"
@@ -111,9 +103,6 @@ class fhel(ConanFile):
 
   def package_info(self):
     "Export to GITHUB_OUTPUT"
-    os = str(self.settings.os).lower()
-    arch = str(self.settings.arch).lower()
-    output_tar_gz_path = f"libfhel-{os}-{arch}.tar.gz"
     if self.options.ci:
       with open("GITHUB_OUTPUT", "a") as f:
-        print(f'tar_gz_path={self.package_folder}/{output_tar_gz_path}', file=f)
+        print(f'conan_package_path={self.package_folder}', file=f)
