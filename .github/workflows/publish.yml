@@ -77,12 +77,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install poetry
+          poetry shell
           poetry install
 
       - name: Compile
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path || '' }}
         run: |
+          poetry shell
           conan install . -pr:h profiles/${{ matrix.dist.profile }}
           conan build . -pr:h profiles/${{ matrix.dist.profile }}
 
