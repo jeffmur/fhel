@@ -103,7 +103,7 @@ jobs:
           source .venv/bin/activate
           cd ${{ steps.compile.outputs.conan_package_path }}
           tar -czf  *
-          echo "tar_gz_path=$(pwd)/$(OUTPUT_TAR_NAME)" >> $GITHUB_OUTPUT
+          echo "tar_gz_path=$(pwd)/$OUTPUT_TAR_NAME" >> $GITHUB_OUTPUT
 
       - uses: softprops/action-gh-release@v2
         name: GitHub Release
