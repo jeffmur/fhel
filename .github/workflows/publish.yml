@@ -59,7 +59,7 @@ jobs:
         with:
           submodules: "true"
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
 
@@ -103,7 +103,7 @@ jobs:
           source .venv/bin/activate
           cd ${{ steps.compile.outputs.conan_package_path }}
           tar -czf  *
-          echo "tar_gz_path=$(pwd)/$(OUTPUT_TAR_NAME)" >> $GITHUB_ENV
+          echo "tar_gz_path=$(pwd)/$(OUTPUT_TAR_NAME)" >> $GITHUB_OUTPUT
 
       - uses: softprops/action-gh-release@v2
         name: GitHub Release
