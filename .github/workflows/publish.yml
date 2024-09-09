@@ -97,17 +97,20 @@ jobs:
 
       - name: Package
         id: package
+        env:
+          OUTPUT_TAR_NAME: libfhel-${{ matrix.dist.release }}.tar.gz
         run: |
           source .venv/bin/activate
-          echo ${{ steps.compile.outputs.conan_package_path }}
-          ls ${HOME}/.conan2/p/b/
+          cd ${{ steps.compile.outputs.conan_package_path }}
+          tar -czf  *
+          echo "tar_gz_path=$(pwd)/$(OUTPUT_TAR_NAME)" >> $GITHUB_ENV
 
-      # - uses: softprops/action-gh-release@v2
-      #   name: GitHub Release
-      #   with:
-      #     files: ${{ steps.dist.outputs.tar_gz_path }}
-      #     draft: true
-      #     prerelease: false
+      - uses: softprops/action-gh-release@v2
+        name: GitHub Release
+        with:
+          files: ${{ steps.package.outputs.tar_gz_path }}
+          draft: true
+          prerelease: false
 
   # publish:
   #   name: pub.dev
