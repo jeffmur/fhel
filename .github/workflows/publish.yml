@@ -80,7 +80,7 @@ jobs:
 
       - name: Compile
         env:
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path || '' }}
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         id: compile
         run: |
           source .venv/bin/activate

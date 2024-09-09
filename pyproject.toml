@@ -18,4 +18,4 @@ build-backend = "poetry.core.masonry.api"
 # For IDE to recognize the venv
 [tool.pyright]
 venvPath = "."
-venv = "venv"
+venv = ".venv"

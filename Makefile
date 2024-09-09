@@ -36,24 +36,6 @@ build-cmake:
 .PHONY: build
 build: trust-project build-cmake
 
-# Release helper
-.PHONY: dist-cmake
-dist-cmake: export UNIT_TEST ?= OFF
-dist-cmake: export TARGET_DIR ?= $(FHE_RELEASE_DIR)
-dist-cmake:
-	@make build-cmake
-
-.PHONY: dist
-dist: dist-cmake
-
-.PHONY: dist-ci
-dist-ci: OUTPUT_FILE ?= libfhel-$(OS)-$(ARCH).tar.gz
-dist-ci: OUTPUT_PATH ?= $(FHE_RELEASE_DIR)/$(OUTPUT_FILE)
-dist-ci: dist-cmake
-	@ls -d $(FHE_RELEASE_DIR)/libfhel* | grep -o '[^/]*$$' | tar -czvf $(OUTPUT_PATH) -C $(FHE_RELEASE_DIR) --files-from=-
-	@echo "tar_gz_name=$(OUTPUT_FILE)" >> $(GITHUB_OUTPUT)
-	@echo "tar_gz_path=$(OUTPUT_PATH)" >> $(GITHUB_OUTPUT)
-
 # Generate html dart api docs
 .PHONY: docs
 docs:
