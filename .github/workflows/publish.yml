@@ -100,7 +100,7 @@ jobs:
         run: |
           source .venv/bin/activate
           echo ${{ steps.compile.outputs.conan_package_path }}
-          ls /home/runner/.conan2/p/b/
+          ls ${HOME}/.conan2/p/b/
 
       # - uses: softprops/action-gh-release@v2
       #   name: GitHub Release
