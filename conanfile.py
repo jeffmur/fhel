@@ -66,8 +66,8 @@ class fhel(ConanFile):
     """
     args = []
     if self.settings.os == "Android":
-      if self.settings.arch != "armv7": # Supports only 64-bit for now
-        args.append("-DSEAL_BUILD_SEAL_C=1")
+      if self.settings.arch != "armv7":
+        args.append("-DSEAL_BUILD_SEAL_C=1") # 64-bit only
       args.append("-DSEAL_USE_INTRIN=1")
       args.append("-DSEAL_ARM64_EXITCODE=0")
       args.append("-DSEAL_ARM64_EXITCODE__TRYRUN_OUTPUT=''")
