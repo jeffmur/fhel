@@ -30,10 +30,8 @@ final _SaveCipherSize _c_get_ciphertext_save_size = dylib
     .lookup<NativeFunction<_SaveCipherSizeC>>('save_ciphertext_size')
     .asFunction();
 
-typedef _LoadCiphertextC = Pointer Function(
-    Pointer library, Pointer<Uint8> data, Int size);
-typedef _LoadCiphertext = Pointer Function(
-    Pointer library, Pointer<Uint8> data, int size);
+typedef _LoadCiphertextC = Pointer Function(Pointer library, Pointer<Uint8> data, Int size);
+typedef _LoadCiphertext = Pointer Function(Pointer library, Pointer<Uint8> data, int size);
 
 final _LoadCiphertext _c_load_ciphertext = dylib
     .lookup<NativeFunction<_LoadCiphertextC>>('load_ciphertext')
@@ -86,10 +84,8 @@ class Ciphertext {
 
 // --- noise budget ---
 
-typedef _InvariantNoiseBudgetC = Int32 Function(
-    Pointer library, Pointer ciphertext);
-typedef _InvariantNoiseBudget = int Function(
-    Pointer library, Pointer ciphertext);
+typedef _InvariantNoiseBudgetC = Int32 Function(Pointer library, Pointer ciphertext);
+typedef _InvariantNoiseBudget = int Function(Pointer library, Pointer ciphertext);
 
 /// Returns the invariant noise budget of the ciphertext.
 final _InvariantNoiseBudget _c_invariant_noise_budget = dylib
