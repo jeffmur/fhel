@@ -1,3 +1,9 @@
+## 0.0.12
+
+- Added Ciphertext.fromBytes(Uint8List) Constructor
+- Added Ciphertext.toBytes() returns Uint8List
+- Added afhe.decodeDouble returns first element of decoded vector
+
 ## 0.0.11
 
 Conan Release Management
