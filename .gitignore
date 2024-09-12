@@ -16,7 +16,7 @@ Testing/
 pubspec.lock
 
 # Python
-venv
+.venv
 pyvenv.cfg
 poetry.lock
 

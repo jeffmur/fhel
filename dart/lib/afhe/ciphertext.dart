@@ -30,13 +30,14 @@ final _SaveCipherSize _c_get_ciphertext_save_size = dylib
     .lookup<NativeFunction<_SaveCipherSizeC>>('save_ciphertext_size')
     .asFunction();
 
-typedef _LoadCiphertextC = Pointer Function(Pointer library, Pointer<Uint8> data, Int size);
-typedef _LoadCiphertext = Pointer Function(Pointer library, Pointer<Uint8> data, int size);
+typedef _LoadCiphertextC = Pointer Function(
+    Pointer library, Pointer<Uint8> data, Int size);
+typedef _LoadCiphertext = Pointer Function(
+    Pointer library, Pointer<Uint8> data, int size);
 
 final _LoadCiphertext _c_load_ciphertext = dylib
     .lookup<NativeFunction<_LoadCiphertextC>>('load_ciphertext')
     .asFunction();
-
 
 /// Represents an underlying C ciphertext object.
 ///
@@ -48,6 +49,7 @@ class Ciphertext {
   // String text = "";
   /// Selects the [Backend] used for the encryption scheme.
   Backend backend = Backend();
+
   /// A pointer to the memory address of the underlying C++ object.
   Pointer obj = nullptr;
 
@@ -68,12 +70,26 @@ class Ciphertext {
   /// Saves the [Ciphertext] to a non-human-readable format.
   /// Useful for saving to disk or sending over the network.
   Pointer<Uint8> save() => _c_save_ciphertext(obj);
+
+  /// Converts a [Ciphertext] into a serialized binary format.
+  Uint8List toBytes() => save().asTypedList(saveSize);
+
+  /// Loads a [Ciphertext] from a serialized binary format.
+  Ciphertext.fromBytes(Afhe fhe, Uint8List bytes) {
+    final Pointer<Uint8> pointer = malloc.allocate<Uint8>(bytes.length);
+    // Copy the bytes to the allocated memory
+    final Uint8List pointerContent = pointer.asTypedList(bytes.length);
+    pointerContent.setAll(0, bytes);
+    obj = _c_load_ciphertext(fhe.library, pointer, bytes.length);
+  }
 }
 
 // --- noise budget ---
 
-typedef _InvariantNoiseBudgetC = Int32 Function(Pointer library, Pointer ciphertext);
-typedef _InvariantNoiseBudget = int Function(Pointer library, Pointer ciphertext);
+typedef _InvariantNoiseBudgetC = Int32 Function(
+    Pointer library, Pointer ciphertext);
+typedef _InvariantNoiseBudget = int Function(
+    Pointer library, Pointer ciphertext);
 
 /// Returns the invariant noise budget of the ciphertext.
 final _InvariantNoiseBudget _c_invariant_noise_budget = dylib
