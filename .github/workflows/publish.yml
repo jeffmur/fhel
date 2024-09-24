@@ -39,41 +39,75 @@ jobs:
     strategy:
       matrix:
         dist:
-          - os: linux
-            arch: x64
-            runner: ubuntu-latest
-          - os: android
-            arch: x86_64
-            runner: ubuntu-latest
-          - os: android
-            arch: armeabi-v7a
-            runner: ubuntu-latest
-          - os: android
-            arch: arm64-v8a
-            runner: ubuntu-latest
-          - os: macos
-            arch: arm64
-            runner: macos-latest
+        - profile: linux-x64
+          runner: ubuntu-latest
+          release: linux-x64
+        - profile: macos-arm64
+          runner: macos-latest
+          release: macos-arm64
+        - profile: android-x86_64
+          runner: ubuntu-latest
+          release: android-x86_64
+        - profile: android-armv8
+          runner: ubuntu-latest
+          release: android-arm64-v8a
+      fail-fast: false
 
     runs-on: ${{ matrix.dist.runner }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: "true"
-      - id: dist
-        env:
-          OS: ${{ matrix.dist.os }}
-          ARCH: ${{ matrix.dist.arch }}
-        run: make dist-ci
-      - uses: actions/upload-artifact@v4
-        name: Upload Artifact
+
+      - uses: actions/setup-python@v5
         with:
-          path: ${{ steps.dist.outputs.tar_gz_path }}
-          name: ${{ steps.dist.outputs.tar_gz_name }}
+          python-version: "3.x"
+
+      - uses: nttld/setup-ndk@v1
+        if: startsWith(matrix.dist.profile, 'android')
+        id: setup-ndk
+        with:
+          ndk-version: r26d
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry config virtualenvs.in-project true
+          poetry install -v
+          source .venv/bin/activate
+          conan profile detect
+
+      - name: Compile
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+        id: compile
+        run: |
+          source .venv/bin/activate
+          if ${{ startsWith(matrix.dist.profile, 'android') }};
+          then
+            conan create . \
+              --profile:host profiles/${{ matrix.dist.profile }} \
+              --conf:host tools.android:ndk_path=$ANDROID_NDK_HOME \
+              --options:host '&:ci=True'
+          else
+            conan create . \
+              --options:host ci=True
+          fi
+
+      - name: Package
+        id: package
+        env:
+          OUTPUT_TAR_NAME: libfhel-${{ matrix.dist.release }}.tar.gz
+        run: |
+          cd ${{ steps.compile.outputs.conan_package_path }}
+          tar -czf $OUTPUT_TAR_NAME *
+          echo "tar_gz_path=$(pwd)/$OUTPUT_TAR_NAME" >> $GITHUB_OUTPUT
+
       - uses: softprops/action-gh-release@v2
         name: GitHub Release
         with:
-          files: ${{ steps.dist.outputs.tar_gz_path }}
+          files: ${{ steps.package.outputs.tar_gz_path }}
           draft: true
           prerelease: false
 

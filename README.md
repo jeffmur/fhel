@@ -50,3 +50,15 @@ dart pub publish
 ```
 
 In the future, we may configure an [automated](https://dart.dev/tools/pub/automated-publishing) publishing.
+
+## Distribution 📦
+
+For distribution, we use [Conan](https://conan.io/) to manage C++ dependencies, wrapped with [Poetry](https://python-poetry.org/) to be run in a virtual environment.
+
+From the root of the project:
+```bash
+pip install poetry
+poetry config virtualenvs.create true
+poetry install
+conan create .
+```

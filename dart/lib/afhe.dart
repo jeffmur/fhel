@@ -6,6 +6,7 @@
 library afhe;
 
 import 'dart:ffi';
+import 'dart:typed_data'; // For Uint8List
 import 'package:ffi/ffi.dart'; // for Utf8
 import 'dart:io' show Directory, Platform;
 import 'package:path/path.dart' as path;
@@ -235,6 +236,13 @@ class Afhe {
     raiseForStatus();
     // String cannot be extracted from C object for CKKS
     return Plaintext.fromPointer(backend, ptr, extractStr: false);
+  }
+
+  /// Decodes a [Plaintext] into a double.
+  double decodeDouble(Plaintext plaintext) {
+    Pointer<Double> ptr = _c_decode_vector_double(library, plaintext.obj);
+    raiseForStatus();
+    return ptr[0];
   }
 
   /// Decodes a [Plaintext] into a list of doubles.
