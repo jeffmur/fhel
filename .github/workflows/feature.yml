@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
       - uses: dart-lang/setup-dart@v1
@@ -30,7 +30,7 @@ jobs:
       IMAGE_TAG: ${{ steps.tag.outputs.TAG || 'builder' }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
 
@@ -62,7 +62,7 @@ jobs:
       image: ghcr.io/jeffmur/fhel:${{ needs.build.outputs.IMAGE_TAG }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
 
@@ -76,7 +76,7 @@ jobs:
       image: ghcr.io/jeffmur/fhel:${{ needs.build.outputs.IMAGE_TAG }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
 
@@ -90,7 +90,7 @@ jobs:
       image: ghcr.io/jeffmur/fhel:${{ needs.build.outputs.IMAGE_TAG }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
 
@@ -104,7 +104,7 @@ jobs:
       image: ghcr.io/jeffmur/fhel:${{ needs.build.outputs.IMAGE_TAG }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
 

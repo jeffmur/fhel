@@ -13,7 +13,7 @@ jobs:
     name: Version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # Extract the binary.version
       - run: echo "BINARY_VER=$(cat binary.version)" >> $GITHUB_ENV
       # Extract the version from CMakeLists.txt
@@ -55,7 +55,7 @@ jobs:
 
     runs-on: ${{ matrix.dist.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: "true"
 
@@ -123,7 +123,7 @@ jobs:
       name: pub.dev
       url: https://pub.dev/packages/fhel
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: "true"
       - uses: dart-lang/setup-dart@v1
